@@ -1,0 +1,4 @@
+-r base.txt
+gunicorn>=20.1.0
+azure-storage-blob>=12.9.0
+sentry-sdk>=1.5.1
