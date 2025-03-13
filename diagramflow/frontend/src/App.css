@@ -1,0 +1,21 @@
+.App {
+    display: flex;
+    height: 98vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    display: flex;
+    overflow: hidden;
+    height: 98vh;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    font-size: calc(10px + 2vmin);
+    overflow: hidden;
+    background-color: #282c34;
+}
