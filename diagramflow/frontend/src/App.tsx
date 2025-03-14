@@ -76,37 +76,38 @@ const ShapeSizeInterface = ({ x, y, width, height, visible }: { x: number; y: nu
     0,                    height + 2 * padding,
     0,                    0,
   ]
-
+  const interface_square_width: number = 10;
+  
   return (
     <>
+      <Rect visible={visible} draggable={true} x={x - padding - interface_square_width / 2} y={y - padding - interface_square_width / 2} width={interface_square_width} height={interface_square_width} fill="blue" />
+      <Rect visible={visible} draggable={true} x={x + padding - interface_square_width / 2 + width} y={y - padding - interface_square_width / 2} width={interface_square_width} height={interface_square_width} fill="blue" />
+      <Rect visible={visible} draggable={true} x={x - padding - interface_square_width / 2} y={y + padding - interface_square_width / 2 + height} width={interface_square_width} height={interface_square_width} fill="blue" />
+      <Rect visible={visible} draggable={true} x={x + padding - interface_square_width / 2 + width} y={y + padding - interface_square_width / 2 + height} width={interface_square_width} height={interface_square_width} fill="blue" />
       <Line x={x - padding} y={y - padding} points={points} stroke="blue" visible={visible} />
     </>
   )
 }
 
 const GridLayer = () => {
+  const COUNT: number = 20;
+  
   return (
     <Layer>
-      {Array.from({length: Math.ceil(window.innerWidth / 20)}).map((_, i) => (
-        <Rect
+      {Array.from({length: Math.ceil(window.innerWidth / COUNT)}).map((_, i) => (
+        <Line
           key={`v-line-${i}`}
-          x={i * 20}
-          y={0}
-          width={1}
-          height={window.innerHeight}
-          fill="gray"
-          opacity={0.5}
+          points={[COUNT * i, 0, COUNT * i, window.innerHeight]}
+          stroke="black"
+          opacity={0.2}
         />
       ))}
-      {Array.from({length: Math.ceil(window.innerHeight / 20)}).map((_, i) => (
-        <Rect
+      {Array.from({length: Math.ceil(window.innerHeight / COUNT)}).map((_, i) => (
+        <Line
           key={`h-line-${i}`}
-          x={0}
-          y={i * 20}
-          width={window.innerWidth}
-          height={1}
-          fill="gray"
-          opacity={0.5}
+          points={[0, COUNT * i, window.innerWidth, COUNT * i]}
+          stroke="black"
+          opacity={0.2}
         />
       ))}
     </Layer>
