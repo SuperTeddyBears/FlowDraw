@@ -1,4 +1,4 @@
-import './App.css'
+import './styles/App.css'
 import {AppSideBar} from "./AppSideBar.tsx";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import {useState} from "react";
