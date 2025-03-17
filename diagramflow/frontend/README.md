@@ -24,9 +24,6 @@ Frontend aplikacji DiagramFlow, napisany w React z TypeScript.
 ## Uruchomienie lokalne
 
 ```bash
-# Ustawienie poprawnego katalogu
-cd .\frontend
-
 # Instalacja zależności
 npm install
 
