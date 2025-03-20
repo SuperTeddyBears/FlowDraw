@@ -1,10 +1,10 @@
 import {StrictMode} from "react";
-import {App} from "./App.tsx";
+import {Dashboard} from "./Dashboard.tsx";
 import {createRoot} from "react-dom/client";
 import './styles/index.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <Dashboard />
   </StrictMode>
 )
