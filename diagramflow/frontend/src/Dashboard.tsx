@@ -1,25 +1,32 @@
-import { useState, useEffect } from "react";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import Carousel from 'react-multi-carousel';
+import 'react-multi-carousel/lib/styles.css';
 import diagram from "./assets/diagram.png";
 import settings from "./assets/settings_icon.svg";
 
 export function Dashboard() {
-  const [slidePercentage, setSlidePercentage] = useState(25); // Default to 50% (for 2 elements)
-
-  useEffect(() => {
-    const handleResize = () => {
-      const windowWidth = window.innerWidth;
-
-      if (windowWidth >= 1200) setSlidePercentage(25); // 2 elements visible
-      else setSlidePercentage(100); // 1 element visible
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize(); // Initial call
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // W zależności od (chyba) szerokosci ekranu carousel wyswietla rozna ilosc elementow
+  const responsive = {
+    superLargeDesktop: {
+      breakpoint: { max: 4000, min: 3000 },
+      items: 5,
+      slidesToSlide: 5,
+    },
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 5,
+      slidesToSlide: 5,
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 3,
+      slidesToSlide: 3,
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+      slidesToSlide: 1,
+    }
+  };
 
   return (
     <div className="flex flex-col justify-between min-h-screen bg-gradient-to-bl from-blue-100 to-blue-300 p-6 rounded-2xl shadow-xl">
@@ -37,13 +44,7 @@ export function Dashboard() {
         <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm space-y-8">
           <div className="text-xl font-bold text-gray-700">Ostatnie diagramy:</div>
           <div className="">
-            <Carousel
-              autoPlay={false}
-              infiniteLoop={false}
-              centerMode={true}
-              showThumbs={false}
-              centerSlidePercentage={slidePercentage}
-            >
+            <Carousel responsive={responsive}>
               <CarouselElement num={1} />
               <CarouselElement num={2} />
               <CarouselElement num={3} />
@@ -71,10 +72,14 @@ export function Dashboard() {
 
 
 function CarouselElement({num}: {num: number}) {
+  const handleOnClick = () => {
+
+  }
+
   return (
-    <div className={"w-[90%] mx-auto cursor-pointer border-b-blue-300 border-4 p-4 rounded-xl shadow-s"} onClick={()=> console.log('go to diagram page ' + num)}>
+    <div className={"w-[90%] mx-auto cursor-pointer border-b-blue-300 border-4 p-4 rounded-xl flex flex-col"} onClick={handleOnClick}>
       <img src={diagram} alt={"diagram " + num} />
-      <p className="text-xl text-black">Diagram {num}</p>
+      <p className="text-xl text-black flex flex-row justify-center">Diagram {num}</p>
     </div>
   )
 }

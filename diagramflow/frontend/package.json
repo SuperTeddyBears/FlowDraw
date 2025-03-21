@@ -1,7 +1,7 @@
 {
   "name": "flow-draw",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,8 +15,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-konva": "^19.0.3",
+    "react-multi-carousel": "^2.8.5",
     "react-pro-sidebar": "^1.1.0",
-    "react-responsive-carousel": "^3.2.23",
     "tailwindcss": "^4.0.15"
   },
   "devDependencies": {
