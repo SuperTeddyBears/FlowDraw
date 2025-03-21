@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import diagram from "./assets/diagram.png";
+import settings from "./assets/settings_icon.svg";
 
 export function Dashboard() {
   const [slidePercentage, setSlidePercentage] = useState(25); // Default to 50% (for 2 elements)
@@ -26,9 +27,9 @@ export function Dashboard() {
 
         {/* Header Section */}
         <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
-          <div className="flex items-center justify-between text-xl text-shadow-md font-bold text-gray-700">
-            <span className="text-shadow-md">{"Witaj <username>!"}</span>
-            <img alt="Ustawienia" /> {/*TODO add settings icon and maybe onClick handling*/}
+          <div className="flex items-center justify-between text-xl font-bold text-gray-700">
+            <span>{"Witaj <username>!"}</span>
+            <img className="h-full max-h-10 border-2 p-0.5 rounded-md" src={settings} alt="Ustawienia" />
           </div>
         </div>
 
