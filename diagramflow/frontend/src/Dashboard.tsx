@@ -1,7 +1,10 @@
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import diagram from "./assets/diagram.png";
-import settings from "./assets/settings_icon.svg";
+import diagram from "./assets/placeholder_diagram.png";
+import settings from "./assets/placeholder_settings_icon.svg";
+import UML from "./assets/placeholder_UML_icon.png";
+import flowchart from "./assets/placeholder_flowchart.svg";
+import network from "./assets/placeholder_network_diagram.svg"
 
 export function Dashboard() {
   // W zależności od (chyba) szerokosci ekranu carousel wyswietla rozna ilosc elementow
@@ -36,7 +39,7 @@ export function Dashboard() {
         <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
           <div className="flex items-center justify-between text-xl font-bold text-gray-700">
             <span>{"Witaj <username>!"}</span>
-            <img className="h-full max-h-10 border-2 p-0.5 rounded-md" src={settings} alt="Ustawienia" />
+            <img className="max-h-10 border-2 p-0.5 rounded-md" src={settings} alt="Ustawienia" />
           </div>
         </div>
 
@@ -51,6 +54,16 @@ export function Dashboard() {
               <CarouselElement num={4} />
               <CarouselElement num={5} />
             </Carousel>
+          </div>
+        </div>
+
+        {/* New Diagram Section */}
+        <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
+          <div className="text-xl font-bold text-gray-700">Nowy diagram:</div>
+          <div className="flex flex-row space-x-10 p-4">
+            <NewGraphElement image={UML} type={diagramType.UML} />
+            <NewGraphElement image={flowchart} type={diagramType.Flowchart} />
+            <NewGraphElement image={network} type={diagramType.Network} />
           </div>
         </div>
       </div>
@@ -80,6 +93,33 @@ function CarouselElement({num}: {num: number}) {
     <div className={"w-[90%] mx-auto cursor-pointer border-b-blue-300 border-4 p-4 rounded-xl flex flex-col"} onClick={handleOnClick}>
       <img src={diagram} alt={"diagram " + num} />
       <p className="text-xl text-black flex flex-row justify-center">Diagram {num}</p>
+    </div>
+  )
+}
+
+enum diagramType {
+  UML,
+  Flowchart,
+  Network,
+}
+
+function NewGraphElement({image, type}: {image: string, type: diagramType}) {
+  const handleOnClick = () => {
+
+  }
+
+  return (
+    <div className="border-4 rounded-xl p-4 items-center justify-between space-x-8 cursor-pointer" onClick={handleOnClick}>
+      <img className="max-h-32" src={image} alt="Diagram sieciowy" />
+      <div className="text-xl font-bold text-gray-700">{
+        type === diagramType.UML
+          ? "Diagram UML"
+          : type === diagramType.Flowchart
+            ? "Flowchart"
+            : type === diagramType.Network
+              ? "Diagram sieciowy"
+              : ""
+      }</div>
     </div>
   )
 }
