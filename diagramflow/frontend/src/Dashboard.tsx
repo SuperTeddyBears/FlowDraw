@@ -1,10 +1,13 @@
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import diagram from "./assets/placeholder_diagram.png";
 import settings from "./assets/placeholder_settings_icon.svg";
 import UML from "./assets/placeholder_UML_icon.png";
 import flowchart from "./assets/placeholder_flowchart.svg";
 import network from "./assets/placeholder_network_diagram.svg"
+import {CarouselElement} from "./components/CarouselElement.tsx";
+import {diagramType} from "./types/diagramType.ts";
+import {NewGraphElement} from "./components/NewGraphElement.tsx";
+import {Footer} from "./components/Footer.tsx";
 
 export function Dashboard() {
   // W zależności od (chyba) szerokosci ekranu carousel wyswietla rozna ilosc elementow
@@ -68,58 +71,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Footer Section */}
-      <div className="bg-gray-200 text-center text-sm text-gray-600 py-2 border-t rounded-2xl flex flex-row justify-between">
-        <div className="mx-8">
-          <span className="font-bold text-blue-500">flow</span>
-          <span className="text-black">draw.</span>
-        </div>
-        <div>
-          Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.
-        </div>
-        <div className="mx-16"/>
-      </div>
+      <Footer/>
     </div>
   );
-}
-
-
-function CarouselElement({num}: {num: number}) {
-  const handleOnClick = () => {
-
-  }
-
-  return (
-    <div className={"w-[90%] mx-auto cursor-pointer border-b-blue-300 border-4 p-4 rounded-xl flex flex-col"} onClick={handleOnClick}>
-      <img src={diagram} alt={"diagram " + num} />
-      <p className="text-xl text-black flex flex-row justify-center">Diagram {num}</p>
-    </div>
-  )
-}
-
-enum diagramType {
-  UML,
-  Flowchart,
-  Network,
-}
-
-function NewGraphElement({image, type}: {image: string, type: diagramType}) {
-  const handleOnClick = () => {
-
-  }
-
-  return (
-    <div className="border-4 rounded-xl p-4 items-center justify-between space-x-8 cursor-pointer" onClick={handleOnClick}>
-      <img className="max-h-32" src={image} alt="Diagram sieciowy" />
-      <div className="text-xl font-bold text-gray-700">{
-        type === diagramType.UML
-          ? "Diagram UML"
-          : type === diagramType.Flowchart
-            ? "Flowchart"
-            : type === diagramType.Network
-              ? "Diagram sieciowy"
-              : ""
-      }</div>
-    </div>
-  )
 }
