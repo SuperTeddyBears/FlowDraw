@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+.App {
+    display: flex;
+    height: 98vh;
+    overflow: hidden;
+}
+
+.sidebar {
+    display: flex;
+    overflow: hidden;
+    height: 98vh;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    /*align-items: center;*/
+    /*justify-content: center;*/
+    font-size: calc(10px + 2vmin);
+    overflow: hidden;
+    background-color: #282c34;
+}
+
+.HomePage {
+    background-color: #FFFFFF;
+    text-align: center;
+    padding-top: 35px; 
+    height: 100vh; 
+    width: 100vw;  
+}
+
+.HomePage h1 {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.HomePage p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.HomePage button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #13B2EC;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.HomePage button.Login {
+    margin-left: 10px;
+    background-color: #FFFFFF; 
+    color: #13B2EC;
+    border: 1px solid #13B2EC; 
+}
+
+.HomePage button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.HomePage .Register .LoginButtons {
+    display: flex;
+    justify-content: flex-end; 
+    padding-right: 20px; 
+}
+

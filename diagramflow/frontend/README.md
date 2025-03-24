@@ -12,6 +12,7 @@ Frontend aplikacji DiagramFlow, napisany w React z TypeScript.
   - `pages/` - komponenty stron
   - `services/` - usługi do komunikacji z API
   - `store/` - zarządzanie stanem aplikacji
+  - `styles/` - pliki css
   - `types/` - definicje typów TypeScript
   - `utils/` - funkcje narzędziowe
 
@@ -27,7 +28,7 @@ Frontend aplikacji DiagramFlow, napisany w React z TypeScript.
 npm install
 
 # Uruchomienie serwera deweloperskiego
-npm start
+npm run dev
 ```
 
 ## Skrypty
