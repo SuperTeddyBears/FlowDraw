@@ -120,6 +120,7 @@
 }
 
 .NewSection {
+    background-color: #FFFFFF;
     padding-top: 150px;
     display: flex;
     justify-content: space-between;
@@ -128,7 +129,7 @@
 }
 
 .NewSection .LeftContent {
-    padding-left: 50px;
+    padding-left: 120px;
     padding-right: 250px;
 }
 
@@ -137,15 +138,34 @@
     margin-bottom: 20px;
 }
 
-.NewSection .RightContent {
-    font-size: 5rem;
+.NewSection .RightContent p{
+    font-size: 1.5rem;
     line-height: 1.6;
-    width: 500px;
-    color: #000;
-    padding-right: 120px; 
+    width: 600px;
+    color: #000000;
+    padding-right: 100px; 
     text-align: left;
     margin-left: auto;
 }
+
+.NewSection .RightContent .flow,
+.NewSection .RightContent .draw,
+.NewSection .RightContent .dot {
+    font-size: 2rem;
+    display: inline;
+    text-align: left;
+    margin: 0; 
+    padding: 0; 
+}
+
+
+.NewSection .RightContent .RightContentImage {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    padding-left: 90px;
+  }
+  
 
 .NewSection .FeaturesList {
     color: #000;

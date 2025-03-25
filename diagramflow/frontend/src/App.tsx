@@ -4,6 +4,7 @@ import { Layer, Stage } from 'react-konva';
 import { AppSideBar } from './components/AppSideBar.tsx';
 import { GridLayer } from './components/GridLayer.tsx';
 import { KonvaShape } from './components/KonvaShape.tsx';
+import diagramImage from './images/image-removebg-preview (1).png';
 
 const SIDEBAR_WIDTH = '0.1';
 
@@ -63,6 +64,7 @@ function HomePage() {
             <span className="draw">draw</span>
             <span className="dot">.</span> is a modern online tool for creating diagrams. With a simple interface, you can quickly visualize your ideas, design business processes, and organize information. Create easy-to-read flowcharts, UML or Network diagrams – all in one place!
           </p>
+          <img src={diagramImage} alt="Diagram Example" className="RightContentImage" />
         </div>
       </div>
     </div>
