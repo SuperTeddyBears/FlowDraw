@@ -4,6 +4,8 @@ import { Layer, Stage } from 'react-konva';
 import { GridLayer } from './components/GridLayer.tsx';
 import { AppSideBar } from './components/AppSideBar.tsx';
 import { KonvaShape } from './components/KonvaShape.tsx';
+import { LoginScreen } from './components/LoginScreen.tsx';
+
 
 const SIDEBAR_WIDTH = '0.1';
 
@@ -34,6 +36,7 @@ export function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginScreen />} />
         <Route
           path="/app"
           element={
