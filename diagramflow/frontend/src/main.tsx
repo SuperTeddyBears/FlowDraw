@@ -1,5 +1,4 @@
 import {StrictMode} from "react";
-// import {Dashboard} from "./Dashboard.tsx";
 import {App} from "./App.tsx";
 import {createRoot} from "react-dom/client";
 import './styles/index.css'

@@ -1,15 +1,15 @@
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import settings from "./assets/placeholder_settings_icon.svg";
-import UML from "./assets/placeholder_UML_icon.png";
-import flowchart from "./assets/placeholder_flowchart.svg";
-import network from "./assets/placeholder_network_diagram.svg"
-import {CarouselElement} from "./components/CarouselElement.tsx";
-import {diagramType} from "./types/diagramType.ts";
-import {NewGraphElement} from "./components/NewGraphElement.tsx";
-import {Footer} from "./components/Footer.tsx";
+import settings from "../assets/placeholder_settings_icon.svg";
+import UML from "../assets/placeholder_UML_icon.png";
+import flowchart from "../assets/placeholder_flowchart.svg";
+import network from "../assets/placeholder_network_diagram.svg"
+import {CarouselElement} from "../components/CarouselElement.tsx";
+import {diagramType} from "../types/diagramType.ts";
+import {NewGraphElement} from "../components/NewGraphElement.tsx";
+import {Footer} from "../components/Footer.tsx";
 
-export function Dashboard() {
+export function DashboardPage() {
   // W zależności od (chyba) szerokosci ekranu carousel wyswietla rozna ilosc elementow
   const responsive = {
     superLargeDesktop: {
@@ -59,7 +59,7 @@ export function Dashboard() {
             </Carousel>
           </div>
         </div>
-
+        
         {/* New Diagram Section */}
         <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
           <div className="text-xl font-bold text-gray-700">Nowy diagram:</div>
