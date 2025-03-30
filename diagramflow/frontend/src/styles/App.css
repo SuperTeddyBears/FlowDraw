@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 .App {
     display: flex;
     height: 98vh;
@@ -28,30 +28,59 @@
     padding-top: 35px; 
     height: 100vh; 
     width: 100vw;  
+    position: relative; 
 }
 
 .HomePage h1 {
-    font-size: 2.5rem;
-    color: #333;
+    justify-content: center; 
+    font-size: 40px;
+    font-weight: lighter;
+    color: #000;
+    display: flex;
+    align-items: baseline;
+    font-size: 3.5rem;
+
 }
 
-.HomePage p {
+.HomePage .flow {
+    padding-left: 10px;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #000;
+}
+
+.HomePage .draw {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #00AEEF;
+}
+
+.HomePage .dot {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #00AEEF;
+}
+
+.HomePage p{
     font-size: 1.2rem;
-    color: #666;
+    color: #000;
+    padding-bottom: 15px;
 }
 
-.HomePage button {
+.HomePage button {  
     padding: 10px 20px;
     font-size: 1rem;
     background-color: #13B2EC;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 7px;
     cursor: pointer;
 }
 
 .HomePage button.Login {
-    margin-left: 10px;
     background-color: #FFFFFF; 
     color: #13B2EC;
     border: 1px solid #13B2EC; 
@@ -63,9 +92,100 @@
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.HomePage .Register .LoginButtons {
+.HomePage .RegisterLoginButtons {
     display: flex;
     justify-content: flex-end; 
-    padding-right: 20px; 
+    right: 60px; 
+    position: absolute;
+    gap: 30px;
+    width: 382px;
+    height: 95px;
 }
+
+.HomePage .RegisterLoginButtons button {
+    width: 150px;
+    height: 40px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
+
+.HomePage .WelcomeMessage {
+    margin-top: 180px;
+}
+
+.HomePage button.AppButton{
+    width: 180px;
+    height: 50px;
+}
+
+.NewSection {
+    background-color: #FFFFFF;
+    padding-top: 150px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-left: 120px;
+}
+
+.NewSection .LeftContent {
+    padding-left: 120px;
+    padding-right: 250px;
+}
+
+.NewSection .LeftContent h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+}
+
+.NewSection .RightContent p{
+    font-size: 1.5rem;
+    line-height: 1.6;
+    width: 600px;
+    color: #000000;
+    padding-right: 100px; 
+    text-align: left;
+    margin-left: auto;
+}
+
+.NewSection .RightContent .flow,
+.NewSection .RightContent .draw,
+.NewSection .RightContent .dot {
+    font-size: 2rem;
+    display: inline;
+    text-align: left;
+    margin: 0; 
+    padding: 0; 
+}
+
+
+.NewSection .RightContent .RightContentImage {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 20px;
+    padding-left: 90px;
+  }
+  
+
+.NewSection .FeaturesList {
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+}
+
+.NewSection .FeatureItem {
+    padding-left: 10px;
+    padding-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.NewSection .FeatureText {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #000;
+}
+
 
