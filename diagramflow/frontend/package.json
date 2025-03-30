@@ -12,8 +12,8 @@
   "dependencies": {
     "@material/web": "^2.2.0",
     "@tailwindcss/vite": "^4.0.15",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-konva": "^19.0.3",
     "react-multi-carousel": "^2.8.5",
     "react-pro-sidebar": "^1.1.0",

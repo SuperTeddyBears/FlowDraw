@@ -5,7 +5,7 @@ import logo from "../assets/logo.svg";
 import googleIcon from "../assets/loginscreen_google_logo.png";
 import diagramImage from "../assets/loginscreen_diagram.png";
 
-export const LoginScreen = () => {
+export const LoginPage = () => {
   return (
     <>
       <div
@@ -75,7 +75,7 @@ export const LoginScreen = () => {
                 Forgot password?
               </button>
             </div>
-
+            
             <button
               type="button"
               className="sign-in"
