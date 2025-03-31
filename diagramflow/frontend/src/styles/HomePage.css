@@ -1,6 +1,5 @@
 
 .HomePage {
-    background-color: #FFFFFF;
     text-align: center;
     padding-top: 35px;
     height: 100vh;
@@ -56,12 +55,6 @@
     cursor: pointer;
 }
 
-.HomePage button.Login {
-    background-color: #FFFFFF;
-    color: #13B2EC;
-    border: 1px solid #13B2EC;
-}
-
 .HomePage button:hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
@@ -96,7 +89,6 @@
 }
 
 .NewSection {
-    background-color: #FFFFFF;
     padding-top: 150px;
     display: flex;
     justify-content: space-between;

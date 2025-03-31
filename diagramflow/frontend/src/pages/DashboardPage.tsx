@@ -37,22 +37,21 @@ export function DashboardPage() {
   const carouselElements: number = 10;
 
   return (
-    <div className="flex flex-col justify-between min-h-screen bg-gradient-to-bl from-blue-100 to-blue-300 p-6 rounded-2xl shadow-xl">
-      <div className="space-y-8 bg-gray-100 p-6 rounded-2xl shadow-xl"> {/* Space between divs */}
-
+    <div className="flex flex-col min-h-screen bg-gradient-to-bl from-blue-100 to-blue-300 p-6 rounded-2xl shadow-xl">
+      <div className="flex-grow space-y-10">
         {/* Header Section */}
-        <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
+        <div className="border p-4 rounded-xl shadow-sm" style={{backgroundColor: "#DDE1EBA6"}}>
           <div className="flex items-center justify-between text-xl font-bold text-gray-700">
             <span>{"Witaj <username>!"}</span>
-            <img className="max-h-10 p-0.5" src={settings} alt="Ustawienia" />
+            <img className="max-h-12 p-0.5 cursor-pointer" src={settings} alt="Ustawienia" />
           </div>
         </div>
-
+        
         {/* Carousel Section */}
-        <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm space-y-8">
+        <div className="bg-gray-100 border p-4 rounded-xl shadow-sm space-y-8" style={{backgroundColor: "#DDE1EBA6"}}>
           <div className="text-xl font-bold text-gray-700">Ostatnie diagramy:</div>
-          <div className="">
-            <Carousel responsive={responsive}>
+          <div>
+            <Carousel draggable={false} responsive={responsive}>
               {Array.from({ length: carouselElements }, (_, index) => (
                 <CarouselElement num={index + 1} />
               ))}
@@ -61,7 +60,7 @@ export function DashboardPage() {
         </div>
         
         {/* New Diagram Section */}
-        <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
+        <div className="bg-gray-100 border p-4 rounded-xl shadow-sm" style={{backgroundColor: "#DDE1EBA6"}}>
           <div className="text-xl font-bold text-gray-700">Nowy diagram:</div>
           <div className="flex flex-row space-x-10 p-4">
             <NewGraphElement image={UML} type={diagramType.UML} />
@@ -70,8 +69,8 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
-
-      <Footer/>
+      
+      <Footer />
     </div>
   );
 }

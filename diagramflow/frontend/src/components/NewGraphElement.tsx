@@ -20,7 +20,7 @@ export function NewGraphElement({image, type}: { image: string, type: diagramTyp
   
   return (
     <div
-      className="border-4 rounded-xl p-4 flex flex-col items-center space-y-4 cursor-pointer w-1/5"
+      className="border-4 rounded-xl p-4 flex flex-col items-center space-y-4 cursor-pointer w-1/8"
       onClick={handleOnClick}
     >
       <img className="max-h-32 object-contain" src={image} alt="Diagram sieciowy"/>
