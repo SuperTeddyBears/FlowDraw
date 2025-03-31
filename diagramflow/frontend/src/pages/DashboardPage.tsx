@@ -34,6 +34,8 @@ export function DashboardPage() {
     }
   };
 
+  const carouselElements: number = 10;
+
   return (
     <div className="flex flex-col justify-between min-h-screen bg-gradient-to-bl from-blue-100 to-blue-300 p-6 rounded-2xl shadow-xl">
       <div className="space-y-8 bg-gray-100 p-6 rounded-2xl shadow-xl"> {/* Space between divs */}
@@ -42,7 +44,7 @@ export function DashboardPage() {
         <div className="border-b-blue-300 border p-4 rounded-xl bg-gradient-to-bl from-blue-100 to-blue-300 shadow-sm">
           <div className="flex items-center justify-between text-xl font-bold text-gray-700">
             <span>{"Witaj <username>!"}</span>
-            <img className="max-h-10 border-2 p-0.5 rounded-md" src={settings} alt="Ustawienia" />
+            <img className="max-h-10 p-0.5" src={settings} alt="Ustawienia" />
           </div>
         </div>
 
@@ -51,11 +53,9 @@ export function DashboardPage() {
           <div className="text-xl font-bold text-gray-700">Ostatnie diagramy:</div>
           <div className="">
             <Carousel responsive={responsive}>
-              <CarouselElement num={1} />
-              <CarouselElement num={2} />
-              <CarouselElement num={3} />
-              <CarouselElement num={4} />
-              <CarouselElement num={5} />
+              {Array.from({ length: carouselElements }, (_, index) => (
+                <CarouselElement num={index + 1} />
+              ))}
             </Carousel>
           </div>
         </div>

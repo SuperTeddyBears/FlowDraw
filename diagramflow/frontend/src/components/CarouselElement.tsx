@@ -6,7 +6,7 @@ export function CarouselElement({num}: { num: number }) {
   }
   
   return (
-    <div className={"w-[90%] mx-auto cursor-pointer border-b-blue-300 border-4 p-4 rounded-xl flex flex-col"}
+    <div className={"w-[90%] mx-auto cursor-pointer  flex flex-col"}
          onClick={handleOnClick}>
       <img src={diagram} alt={"diagram " + num}/>
       <p className="text-xl text-black flex flex-row justify-center">Diagram {num}</p>

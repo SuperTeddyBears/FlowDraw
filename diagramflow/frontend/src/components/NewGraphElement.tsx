@@ -19,10 +19,14 @@ export function NewGraphElement({image, type}: { image: string, type: diagramTyp
   }
   
   return (
-    <div className="border-4 rounded-xl p-4 items-center justify-between space-x-8 cursor-pointer"
-         onClick={handleOnClick}>
-      <img className="max-h-32" src={image} alt="Diagram sieciowy"/>
-      <div className="text-xl font-bold text-gray-700">{handleDiagramType(type)}</div>
+    <div
+      className="border-4 rounded-xl p-4 flex flex-col items-center space-y-4 cursor-pointer w-1/5"
+      onClick={handleOnClick}
+    >
+      <img className="max-h-32 object-contain" src={image} alt="Diagram sieciowy"/>
+      <div className="text-xl font-bold text-gray-700 text-center">
+        {handleDiagramType(type)}
+      </div>
     </div>
   )
 }
