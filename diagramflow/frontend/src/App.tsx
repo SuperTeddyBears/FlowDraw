@@ -4,7 +4,7 @@ import {HomePage} from "./pages/HomePage.tsx";
 import {MainPage} from "./pages/MainPage.tsx";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {DashboardPage} from "./pages/DashboardPage.tsx";
-
+import {DiagramPage} from "./pages/DiagramPage.tsx";
 export function App() {
   return (
     <Router>
@@ -13,6 +13,7 @@ export function App() {
         <Route path="/app" element={<MainPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/diagrampage" element={<DiagramPage />} />
       </Routes>
     </Router>
   );

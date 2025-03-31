@@ -1,0 +1,20 @@
+.canvas-container {
+    flex-grow: 1;
+    overflow: auto;
+    position: relative;
+
+    width: 100%; /* Dodane: upewnia się, że canvas zajmuje całą dostępną szerokość */
+    border-radius: 20px;
+    background-color: white;
+}
+
+.canvas-grid {
+    width: 3000px;
+    height: 3000px;
+    background-size: 20px 20px;
+    background-image:
+            linear-gradient(to right, #ddd 1px, transparent 1px),
+            linear-gradient(to bottom, #ddd 1px, transparent 1px);
+    background-position: top left;
+    transform-origin: top left;
+}

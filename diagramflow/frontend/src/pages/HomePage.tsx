@@ -21,7 +21,7 @@ export function HomePage() {
           <span className="dot">.</span>
         </h1>
         <p>Click below to start creating your diagrams!</p>
-        <Link to="/app">
+        <Link to="/diagrampage">
           <button className='AppButton'>Go to App</button>
         </Link>
       </div>

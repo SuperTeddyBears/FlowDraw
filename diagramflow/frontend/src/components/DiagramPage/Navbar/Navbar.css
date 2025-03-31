@@ -1,0 +1,80 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 16px;
+    border-bottom: 1px solid #ddd;
+    height: 60px;
+    border-radius: 20px;
+    background-color: #DDE1EBA6;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 20px;
+    color: #333;
+}
+
+.logo span {
+    color: #00a8e8;
+}
+
+.drawing-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.drawing-title h1 {
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 4px;
+}
+
+.drawing-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #00a8e8;
+    color: white;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #e0e0e4;
+
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.btn-share {
+    background-color: #00a8e8;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.btn-share:hover {
+    background-color: #e0e0e4;
+}

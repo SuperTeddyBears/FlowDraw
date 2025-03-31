@@ -22,3 +22,25 @@
     overflow: hidden;
     background-color: #282c34;
 }
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: #FEF7FF;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.workspace {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+    height: calc(100vh - 100px); /* Przybliżona wysokość po odjęciu navbara i footera */
+}
