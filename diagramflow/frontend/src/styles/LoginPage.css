@@ -44,6 +44,7 @@ html, body, #root {
     font-family: "Inter-Medium", Helvetica, sans-serif;
     margin-bottom: 30px;
     font-weight: 450;
+    color: #1d1d1d;
 }
 
 .google-login {
@@ -60,6 +61,7 @@ html, body, #root {
     font-size: 14px;
     cursor: pointer;
     margin-bottom: 30px;
+    color: #000000;
 }
 
 .google-icon {
@@ -96,6 +98,7 @@ html, body, #root {
     font-weight: 500;
     font-family: "Inter-Medium", Helvetica, sans-serif;
     margin-bottom: 5px;
+    color: #000000;
 }
 
 .login-input input {
@@ -104,6 +107,7 @@ html, body, #root {
     border-radius: 5px;
     font-size: 15px;
     background-color: white;
+    color: #000000;
 }
 
 .login-actions {
@@ -158,6 +162,7 @@ html, body, #root {
 .register {
     font-size: 15px;
     margin-top: 15px;
+    color: #000000;
 }
 
 .register-link {
