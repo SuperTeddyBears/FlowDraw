@@ -1,6 +1,7 @@
 import {Link} from "react-router-dom";
 import diagramImage from '../assets/image-removebg-preview (1).png';
 import '../styles/HomePage.css';
+import '../components/DiagramPage/App.css';
 
 export function HomePage() {
   return (

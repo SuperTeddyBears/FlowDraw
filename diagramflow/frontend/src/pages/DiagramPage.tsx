@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/App.css';
+import '../components/DiagramPage/App.css';
 import Navbar from '../components/DiagramPage/Navbar/Navbar';
 import Toolbar from '../components/DiagramPage/Toolbar/Toolbar';
 import Sidebar from '../components/DiagramPage/Sidebar/Sidebar';

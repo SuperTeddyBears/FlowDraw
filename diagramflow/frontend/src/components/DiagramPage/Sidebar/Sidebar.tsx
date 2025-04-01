@@ -18,17 +18,17 @@ const Sidebar: React.FC = () => {
     const categories: Category[] = [
         {
             id: 'uml',
-            name: '▶ UML',
+            name: '▶ UML Diagram',
             items: []
         },
         {
             id: 'uml2',
-            name: '▶ UML 2',
+            name: '▶ FlowChart',
             items: []
         },
         {
             id: 'uml3',
-            name: '▶ UML 3',
+            name: '▶ Network Diagram',
             items: []
         }
     ];
