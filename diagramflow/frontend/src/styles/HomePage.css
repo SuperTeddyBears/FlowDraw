@@ -1,14 +1,16 @@
 
 .HomePage {
+    background-color: #FFFFFF;
     text-align: center;
-    padding-top: 35px;
-    height: 100vh;
-    width: 100vw;
-    position: relative;
+    padding-top: 35px; 
+    height: 100vh; 
+    width: 100vw;  
+    position: relative; 
 }
 
 .HomePage h1 {
-    justify-content: center;
+    justify-content: center; 
+    font-size: 40px;
     font-weight: lighter;
     color: #000;
     display: flex;
@@ -45,7 +47,7 @@
     padding-bottom: 15px;
 }
 
-.HomePage button {
+.HomePage button {  
     padding: 10px 20px;
     font-size: 1rem;
     background-color: #13B2EC;
@@ -53,6 +55,12 @@
     border: none;
     border-radius: 7px;
     cursor: pointer;
+}
+
+.HomePage button.Login {
+    background-color: #FFFFFF; 
+    color: #13B2EC;
+    border: 1px solid #13B2EC; 
 }
 
 .HomePage button:hover {
@@ -63,8 +71,8 @@
 
 .HomePage .RegisterLoginButtons {
     display: flex;
-    justify-content: flex-end;
-    right: 60px;
+    justify-content: flex-end; 
+    right: 60px; 
     position: absolute;
     gap: 30px;
     width: 382px;
@@ -73,10 +81,10 @@
 
 .HomePage .RegisterLoginButtons button {
     width: 150px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 40px; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
 }
 
 .HomePage .WelcomeMessage {
@@ -89,6 +97,7 @@
 }
 
 .NewSection {
+    background-color: #FFFFFF;
     padding-top: 150px;
     display: flex;
     justify-content: space-between;
@@ -111,7 +120,7 @@
     line-height: 1.6;
     width: 600px;
     color: #000000;
-    padding-right: 100px;
+    padding-right: 100px; 
     text-align: left;
     margin-left: auto;
 }
@@ -122,18 +131,33 @@
     font-size: 2rem;
     display: inline;
     text-align: left;
-    margin: 0;
-    padding: 0;
+    margin: 0; 
+    padding: 0; 
 }
-
 
 .NewSection .RightContent .RightContentImage {
     width: 100%;
     max-width: 400px;
     margin-top: 20px;
     padding-left: 90px;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    border-radius: 10px; 
+    transition: transform 0.3s ease-in-out; 
+    animation: float 4s ease-in-out infinite; 
 }
 
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
 
 .NewSection .FeaturesList {
     color: #000;
@@ -155,3 +179,49 @@
     font-weight: 400;
     color: #000;
 }
+
+.WavingHand {
+    padding-left: 250px;
+    padding-top: 150px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 5rem;
+    cursor: default;
+}
+
+.WelcomeMessage {
+    margin-top: 100px;
+    text-align: center;
+}
+
+.WelcomeMessage h1 {
+    font-size: 3rem;
+    color: #000;
+}
+
+.WelcomeMessage p {
+    font-size: 1.2rem;
+    color: #000;
+    margin-top: 10px;
+}
+
+.WelcomeMessage .AppButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #13B2EC;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.WelcomeMessage .AppButton:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+
+
