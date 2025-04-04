@@ -1,11 +1,11 @@
-
 .HomePage {
     background-color: #FFFFFF;
     text-align: center;
     padding-top: 35px; 
-    height: 100vh; 
-    width: 100vw;  
-    position: relative; 
+    min-height: 100vh;
+    width: 100%;  
+    position: relative;
+    overflow-x: hidden;
 }
 
 .HomePage h1 {
@@ -16,7 +16,6 @@
     display: flex;
     align-items: baseline;
     font-size: 3.5rem;
-
 }
 
 .HomePage .flow {
@@ -55,6 +54,7 @@
     border: none;
     border-radius: 7px;
     cursor: pointer;
+    transition: all 0.15s ease;
 }
 
 .HomePage button.Login {
@@ -63,20 +63,16 @@
     border: 1px solid #13B2EC; 
 }
 
-.HomePage button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
 .HomePage .RegisterLoginButtons {
     display: flex;
     justify-content: flex-end; 
-    right: 60px; 
     position: absolute;
+    right: 60px;
+    top: 35px;
     gap: 30px;
     width: 382px;
     height: 95px;
+    z-index: 10;
 }
 
 .HomePage .RegisterLoginButtons button {
@@ -87,8 +83,27 @@
     align-items: center; 
 }
 
+.HomePage .WelcomeText{
+    text-align: center;
+    flex: 1;
+}
+
 .HomePage .WelcomeMessage {
-    margin-top: 180px;
+    margin-top: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.HomePage .WelcomeTextContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%; 
+    position: relative;
+    transform: translateX(-50px);
+    margin-bottom: -20px;
 }
 
 .HomePage button.AppButton{
@@ -96,33 +111,55 @@
     height: 50px;
 }
 
+.HomePage .WavingHand {
+    font-size: 5rem;
+    cursor: default;
+    position: relative;
+    top: 0;
+    right: -400px;
+}
+
 .NewSection {
     background-color: #FFFFFF;
     padding-top: 150px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.ContentContainer {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding-left: 120px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
 .NewSection .LeftContent {
-    padding-left: 120px;
-    padding-right: 250px;
+    flex: 1;
+    padding-right: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
 .NewSection .LeftContent h1 {
     font-size: 3.5rem;
     margin-bottom: 20px;
+    justify-content: flex-start;
+}
+
+.NewSection .RightContent {
+    flex: 1;
+    padding-left: 40px;
 }
 
 .NewSection .RightContent p{
     font-size: 1.5rem;
     line-height: 1.6;
-    width: 600px;
     color: #000000;
-    padding-right: 100px; 
     text-align: left;
-    margin-left: auto;
 }
 
 .NewSection .RightContent .flow,
@@ -135,17 +172,78 @@
     padding: 0; 
 }
 
-.NewSection .RightContent .RightContentImage {
+.FeatureList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 15px;
     width: 100%;
-    max-width: 400px;
-    margin-top: 20px;
-    padding-left: 90px;
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
-    border-radius: 10px; 
-    transition: transform 0.3s ease-in-out; 
+}
+
+.FeatureItem {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-align: left;
+}
+
+.FeatureIcon {
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.FeatureText {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #000;
+}
+
+.DiagramsSection {
+    padding: 120px 20px 100px;
+    text-align: center;
+    width: 100%;
+}
+
+.DiagramsSection h1 {
+    font-size: 2.5rem;
+    color: #000;
+    margin-bottom: 60px;
+}
+
+.DiagramsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 80px;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.DiagramItem {
+    text-align: center;
+}
+
+.DiagramItem h1 {
+    font-size: 2rem;
+    color: #000;
+    margin-bottom: 30px;
+}
+
+.ImageWrapper {
+    overflow: hidden;
+    border-radius: 10px;
+    display: inline-block;
     animation: float 4s ease-in-out infinite; 
 }
 
+.DiagramItem .CenteredDiagramImage {
+    width: 100%;
+    max-width: 600px;
+    display: block;
+    transition: none; 
+}
 
 @keyframes float {
     0% {
@@ -159,69 +257,52 @@
     }
 }
 
-.NewSection .FeaturesList {
-    color: #000;
-    display: flex;
-    flex-direction: column;
-    gap: 50px;
+@media (max-width: 1200px) {
+    .ContentContainer {
+        flex-direction: column;
+    }
+    
+    .NewSection .LeftContent,
+    .NewSection .RightContent {
+        padding: 0;
+        width: 100%;
+    }
+    
+    .NewSection .RightContent {
+        margin-top: 60px;
+    }
+    
+    .WavingHand {
+        top: 30px;
+        left: 30px;
+        font-size: 4rem;
+    }
 }
 
-.NewSection .FeatureItem {
-    padding-left: 10px;
-    padding-top: 10px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+@media (max-width: 768px) {
+    .HomePage .RegisterLoginButtons {
+        position: relative;
+        justify-content: center;
+        right: auto;
+        width: 100%;
+        padding: 0 20px;
+    }
+    
+    .WavingHand {
+        display: none;
+    }
+    
+    .HomePage .WelcomeMessage {
+        margin-top: 100px;
+    }
+    
+    .HomePage h1 {
+        font-size: 2.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .NewSection {
+        padding-top: 80px;
+    }
 }
-
-.NewSection .FeatureText {
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: #000;
-}
-
-.WavingHand {
-    padding-left: 250px;
-    padding-top: 150px;
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    font-size: 5rem;
-    cursor: default;
-}
-
-.WelcomeMessage {
-    margin-top: 100px;
-    text-align: center;
-}
-
-.WelcomeMessage h1 {
-    font-size: 3rem;
-    color: #000;
-}
-
-.WelcomeMessage p {
-    font-size: 1.2rem;
-    color: #000;
-    margin-top: 10px;
-}
-
-.WelcomeMessage .AppButton {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 1rem;
-    background-color: #13B2EC;
-    color: white;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.WelcomeMessage .AppButton:hover {
-    transform: scale(1.1);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-
-
