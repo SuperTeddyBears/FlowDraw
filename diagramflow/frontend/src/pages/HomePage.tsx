@@ -4,6 +4,8 @@ import umlImage from '../assets/uml.png';
 import networkImage from '../assets/network.png';
 import '../styles/HomePage.css';
 import { motion } from 'framer-motion';
+import logo from "../assets/logo.svg";
+
 
 export function HomePage() {
   return (
@@ -240,6 +242,12 @@ export function HomePage() {
           ))}
         </div>
       </motion.div>
+      <footer className="footer">
+        <img className="footer-logo" src={logo} alt="FlowDraw Logo" />
+        <p className="footer-text">
+          Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.
+        </p>
+      </footer>
     </div>
   );
 }
