@@ -6,7 +6,7 @@ import '../styles/HomePage.css';
 import { motion } from 'framer-motion';
 import logo from "../assets/logo.svg";
 
-
+import '../styles/App.css';
 export function HomePage() {
   return (
     <div className='HomePage'>

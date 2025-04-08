@@ -20,5 +20,5 @@
     height: calc(100vh - 100px); /* Przybliżona wysokość po odjęciu navbara i footera */
 }
 :root {
-    color: rgb(223, 29, 29);
+    color: rgb(0, 0, 0);
 }

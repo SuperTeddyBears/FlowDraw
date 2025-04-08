@@ -1,4 +1,4 @@
-.sidebar {
+.sidebar_diagram {
     width: 220px;
     min-width: 220px; /* Dodane: zapobiega zmniejszaniu sidebara */
     max-width: 220px; /* Dodane: zapobiega zwiększaniu sidebara */

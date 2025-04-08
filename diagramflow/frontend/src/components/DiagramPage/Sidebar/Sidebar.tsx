@@ -42,7 +42,7 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <div className="sidebar">
+        <div className="sidebar_diagram">
             <div className="toolbar-search">
                 <input type="text" placeholder="Search..." />
             </div>
