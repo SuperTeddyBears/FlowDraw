@@ -12,6 +12,7 @@
   "dependencies": {
     "@material/web": "^2.2.0",
     "@tailwindcss/vite": "^4.0.15",
+    "framer-motion": "^12.6.3",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-konva": "^19.0.3",
