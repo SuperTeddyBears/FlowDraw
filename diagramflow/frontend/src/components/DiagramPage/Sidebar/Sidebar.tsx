@@ -20,13 +20,13 @@ const Sidebar: React.FC = () => {
     const networkDiagramItems: CategoryItem[] = svgFileNames
         .map((fileName) => {
             const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
-            const iconPath = `/assets/diagram-elements/${fileName}.svg`;
+            const iconPath = `src/assets/diagram-elements/${fileName}.svg`;
             return {
                 id: fileName,
                 name: iconName,
                 icon: iconPath
             };
-        })
+        });
 
     const categories: Category[] = [
         {
