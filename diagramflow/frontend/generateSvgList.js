@@ -5,25 +5,39 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, '..');
 
-const svgDir = join(__dirname, 'src', 'assets', 'diagram-elements');
-const outputFile = join(__dirname, 'src', 'svgList.ts');
+// Definicje ścieżek
+const svgDirUML = join(__dirname, 'src', 'assets', 'diagram-elements', 'UML');
+const outputFileUML = join(__dirname, 'src', 'svgListUML.ts');
 
-console.log('Ścieżka do folderu SVG:', svgDir);
-console.log('Ścieżka do pliku wyjściowego:', outputFile);
+const svgDirFlowChart = join(__dirname, 'src', 'assets', 'diagram-elements', 'FlowChart');
+const outputFileFlowChart = join(__dirname, 'src', 'svgListFlowChart.ts');
 
-try {
-    const files = await readdir(svgDir);
-    console.log('Znalezione pliki:', files);
+const svgDirNetwork = join(__dirname, 'src', 'assets', 'diagram-elements', 'Network');
+const outputFileNetwork = join(__dirname, 'src', 'svgListNetwork.ts');
 
-    const svgFiles = files
-        .filter(file => file.endsWith('.svg'))
-        .map(file => file.replace('.svg', ''));
-    console.log('Znalezione pliki SVG:', svgFiles);
+// Funkcja do generowania listy SVG
+async function generateSvgList(svgDir, outputFile, exportName) {
+    try {
+        const files = await readdir(svgDir);
+        const svgFiles = files
+            .filter(file => file.endsWith('.svg'))
+            .map(file => file.replace('.svg', ''));
 
-    const content = `export const svgFileNames = ${JSON.stringify(svgFiles, null, 2)};\n`;
-
-    await writeFile(outputFile, content);
-    console.log('Lista SVG-ów została wygenerowana w src/svgList.ts');
-} catch (err) {
-    console.error('Błąd podczas odczytu folderu lub zapisywania pliku:', err);
+        const content = `export const ${exportName} = ${JSON.stringify(svgFiles, null, 2)};\n`;
+        await writeFile(outputFile, content);
+        console.log(`Lista SVG-ów została wygenerowana w ${outputFile}`);
+    } catch (err) {
+        console.error(`Błąd dla ${outputFile}:`, err);
+    }
 }
+
+// Wykonanie dla wszystkich trzech folderów
+async function main() {
+    await Promise.all([
+        generateSvgList(svgDirUML, outputFileUML, 'svgFileNamesUML'),
+        generateSvgList(svgDirFlowChart, outputFileFlowChart, 'svgFileNamesFlowChart'),
+        generateSvgList(svgDirNetwork, outputFileNetwork, 'svgFileNamesNetwork')
+    ]);
+}
+
+main().catch(err => console.error('Błąd główny:', err));

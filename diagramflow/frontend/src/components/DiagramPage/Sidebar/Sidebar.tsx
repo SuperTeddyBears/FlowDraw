@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './Sidebar.css';
-import { svgFileNames } from '../../../svgList';
+import { svgFileNamesUML } from '../../../svgListUML';
+import { svgFileNamesFlowChart } from '../../../svgListFlowChart';
+import { svgFileNamesNetwork } from '../../../svgListNetwork';
 
 interface CategoryItem {
     id: string;
@@ -17,10 +19,31 @@ interface Category {
 const Sidebar: React.FC = () => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-    const networkDiagramItems: CategoryItem[] = svgFileNames
+    const networkDiagramItemsUML: CategoryItem[] = svgFileNamesUML
         .map((fileName) => {
             const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
-            const iconPath = `src/assets/diagram-elements/${fileName}.svg`;
+            const iconPath = `src/assets/diagram-elements/UML/${fileName}.svg`;
+            return {
+                id: fileName,
+                name: iconName,
+                icon: iconPath
+            };
+        });
+    const networkDiagramItemsFlowChart: CategoryItem[] = svgFileNamesFlowChart
+        .map((fileName) => {
+            const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
+            const iconPath = `src/assets/diagram-elements/FlowChart/${fileName}.svg`;
+            return {
+                id: fileName,
+                name: iconName,
+                icon: iconPath
+            };
+        });
+
+    const networkDiagramItemsNetwork: CategoryItem[] = svgFileNamesNetwork
+        .map((fileName) => {
+            const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
+            const iconPath = `src/assets/diagram-elements/Network/${fileName}.svg`;
             return {
                 id: fileName,
                 name: iconName,
@@ -32,17 +55,17 @@ const Sidebar: React.FC = () => {
         {
             id: 'uml',
             name: '▶ UML Diagram',
-            items: []
+            items: networkDiagramItemsUML
         },
         {
             id: 'uml2',
             name: '▶ FlowChart',
-            items: []
+            items: networkDiagramItemsFlowChart
         },
         {
             id: 'uml3',
             name: '▶ Network Diagram',
-            items: networkDiagramItems
+            items: networkDiagramItemsNetwork
         }
     ];
 
