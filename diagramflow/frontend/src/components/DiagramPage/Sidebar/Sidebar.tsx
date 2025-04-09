@@ -92,31 +92,32 @@ const Sidebar: React.FC = () => {
                         >
                             {category.name}
                         </div>
-                        {expandedCategory === category.id && (
-                            <div className="category-items">
-                                {category.items.length > 0 ? (
-                                    category.items.map(item => (
-                                        <div key={item.id} className="category-item">
-                                            {item.icon && (
-                                                <img
-                                                    src={item.icon}
-                                                    alt={item.name}
-                                                    className="item-icon"
-                                                    style={{ width: '24px', height: '24px', marginRight: '8px' }}
-                                                    onError={(e) => {
-                                                        console.error(`Błąd ładowania SVG: ${item.icon}`);
-                                                        e.currentTarget.style.display = 'none';
-                                                    }}
-                                                />
-                                            )}
-                                            {item.name}
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="empty-category">No items</div>
-                                )}
+                        <div
+                            className={`category-items ${
+                                expandedCategory === category.id ? 'expanded' : 'collapsed'
+                            }`}
+                        >
+                            {category.items.length > 0 ? (
+                                category.items.map(item => (
+                                    <div key={item.id} className="category-item">
+                                        {item.icon && (
+                                            <img
+                                                src={item.icon}
+                                                alt={item.name}
+                                                className="item-icon"
+                                                style={{ width: '40px', height: '40px'}}
+                                                onError={(e) => {
+                                                    console.error(`Błąd ładowania SVG: ${item.icon}`);
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="empty-category">No items</div>
+                            )}
                             </div>
-                        )}
                     </div>
                 ))}
             </div>

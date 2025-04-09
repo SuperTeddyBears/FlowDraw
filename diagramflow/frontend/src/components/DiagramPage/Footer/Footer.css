@@ -1,17 +1,31 @@
 .footer {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     background-color: #f0f0f4;
     padding: 8px 16px;
     border-top: 1px solid #ddd;
     height: 40px;
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    max-width: 1200px;
+    width: 100%;
 }
 
 .footer-logo {
     font-size: 18px;
     font-weight: bold;
     color: #333;
+    line-height: 1;
 }
 
 .footer-logo span {
@@ -21,4 +35,5 @@
 .footer-copyright {
     font-size: 12px;
     color: #666;
+    text-align: center;
 }
