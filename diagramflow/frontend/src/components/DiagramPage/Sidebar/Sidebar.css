@@ -47,6 +47,12 @@
     background-color: #e0e0e4;
 }
 
+.item-icon {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+}
+
 .empty-category {
     padding: 4px 16px 4px 24px;
     font-size: 13px;

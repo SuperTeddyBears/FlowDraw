@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "generate-svg-list": "node generateSvgList.js",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint flow-draw",
