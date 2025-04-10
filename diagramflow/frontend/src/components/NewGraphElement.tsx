@@ -1,4 +1,5 @@
 import {diagramType} from "../types/diagramType.ts";
+import {Link} from "react-router-dom";
 
 export function NewGraphElement({image, type}: { image: string, type: diagramType }) {
   const handleOnClick = () => {
@@ -23,10 +24,12 @@ export function NewGraphElement({image, type}: { image: string, type: diagramTyp
       className="border-4 rounded-xl p-4 flex flex-col items-center space-y-4 cursor-pointer w-1/8"
       onClick={handleOnClick}
     >
-      <img className="max-h-32 object-contain" src={image} alt="Diagram sieciowy"/>
-      <div className="text-xl font-bold text-gray-700 text-center">
-        {handleDiagramType(type)}
-      </div>
+      <Link to="/diagrampage" >
+        <img className="max-h-32 object-contain" src={image} alt="Diagram sieciowy"/>
+        <div className="text-xl font-bold text-gray-700 text-center">
+          {handleDiagramType(type)}
+        </div>
+      </Link>
     </div>
   )
 }
