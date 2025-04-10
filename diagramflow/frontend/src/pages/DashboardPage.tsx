@@ -4,10 +4,10 @@ import settings from "../assets/placeholder_settings_icon.svg";
 import UML from "../assets/placeholder_UML_icon.png";
 import flowchart from "../assets/placeholder_flowchart.svg";
 import network from "../assets/placeholder_network_diagram.svg"
-import {CarouselElement} from "../components/CarouselElement.tsx";
+import {CarouselElement} from "../components/DashboardPage/CarouselElement.tsx";
 import {diagramType} from "../types/diagramType.ts";
 import {NewGraphElement} from "../components/NewGraphElement.tsx";
-import {Footer} from "../components/Footer.tsx";
+import {Footer} from "../components/DashboardPage/Footer.tsx";
 
 export function DashboardPage() {
   // W zależności od (chyba) szerokosci ekranu carousel wyswietla rozna ilosc elementow

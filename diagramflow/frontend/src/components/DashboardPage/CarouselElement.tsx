@@ -1,4 +1,4 @@
-import diagram from "../assets/placeholder_diagram.png";
+import diagram from "../../assets/placeholder_diagram.png";
 import {Link} from "react-router-dom";
 
 export function CarouselElement({num}: { num: number }) {
