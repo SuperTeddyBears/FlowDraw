@@ -11,7 +11,8 @@ import ExampleAvatar from '../assets/avatar.png';
 import { Link } from 'react-router-dom';
 
 const DashboardPage: FunctionComponent = () => {
-  const scrollInterval = useRef<NodeJS.Timeout | null>(null);
+  const scrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
 
   const scrollRight = () => {
     const carousel = document.getElementById('carousel');
@@ -104,7 +105,7 @@ const DashboardPage: FunctionComponent = () => {
 
           {/* New Diagrams */}
           <div className="newDiagramWrapper">
-            <div className="diagramText">New Diagrams</div>
+            <div className="diagramText">New Diagram</div>
             <div className="newDiagramSection">
               <div className="newDiagramSectionItems">
                 {[
