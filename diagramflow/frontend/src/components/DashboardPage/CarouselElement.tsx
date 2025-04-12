@@ -1,13 +1,11 @@
-import diagram from "../../assets/placeholder_diagram.png";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
+import diagram from "../../assets/dashboard_recent_diagram.png";
 
-export function CarouselElement({num}: { num: number }) {
+export function CarouselElement({ num }: { num: number }) {
   return (
-    <Link to="/diagrampage">
-      <div className={"w-[90%] mx-auto cursor-pointer  flex flex-col"}>
-        <img draggable={false} src={diagram} alt={"diagram " + num}/>
-        <p className="text-xl text-black flex flex-row justify-center">Diagram {num}</p>
-      </div>
+    <Link to="/diagrampage" className="carousel-element">
+      <img draggable={false} src={diagram} alt={`Diagram ${num}`} />
+      <p className="carousel-caption">Diagram {num}</p>
     </Link>
-  )
+  );
 }
