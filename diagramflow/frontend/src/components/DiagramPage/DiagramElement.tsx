@@ -92,6 +92,7 @@ export const DiagramElement = ({ path, onTextClick, textElements, onAddTextEleme
                 />
             ))}
 
+
             {transformerRef.current && (
                 <Transformer
                     ref={transformerRef}

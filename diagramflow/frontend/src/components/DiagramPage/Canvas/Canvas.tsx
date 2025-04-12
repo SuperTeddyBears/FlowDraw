@@ -85,6 +85,7 @@ const Canvas: FC = () => {
           </Stage>
         </div>
 
+
         {activeTextarea && (
             <textarea
                 value={activeTextarea.text}
