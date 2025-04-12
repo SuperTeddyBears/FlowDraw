@@ -60,6 +60,7 @@ const Canvas: FC = () => {
     setTextElements([...textElements, newTextElement]);
   };
 
+
   return (
       <div
           className="canvas-container"

@@ -11,6 +11,7 @@ interface DiagramElementProps {
     onAddTextElement: (x: number, y: number) => void;
 }
 
+
 export const DiagramElement = ({ path, onTextClick, textElements, onAddTextElement }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
