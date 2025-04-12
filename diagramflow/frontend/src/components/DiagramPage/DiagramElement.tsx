@@ -1,35 +1,31 @@
 import {Image} from 'react-konva';
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import {KonvaEventObject} from "konva/lib/Node";
 
-export const DiagramElement = ({path}: {path: string}) => {
-  const img = new window.Image();
-  img.src = path;
-  
-  const [shape, setShape] = useState({
-    x: 100,
-    y: 100,
-    width: img.width,
-    height: img.height,
-  });
-  
+export const DiagramElement = ({path, x, y}: {path: string, x: number, y: number}) => {
+  const [image, setImage] = useState<HTMLImageElement | undefined>(undefined);
+  const [position, setPosition] = useState({ x, y });
+
+  useEffect(() => {
+    const img = new window.Image();
+    img.src = path;
+    img.onload = () => setImage(img);
+  }, [path]);
+
   const updatePosition = (e: KonvaEventObject<DragEvent>) => {
-    setShape({
-      ...shape,
+    setPosition({
       x: e.target.x(),
       y: e.target.y(),
     });
   };
-  
+
   return (
     <Image
-      image={img}
-      x={shape.x}
-      y={shape.y}
-      width={shape.width}
-      height={shape.height}
+      image={image}
+      x={position.x}
+      y={position.y}
       draggable={true}
       onDragEnd={updatePosition}
     />
   );
-}
+};
