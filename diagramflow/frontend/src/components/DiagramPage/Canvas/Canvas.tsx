@@ -2,23 +2,44 @@ import './Canvas.css';
 import { Stage, Layer } from "react-konva";
 import { FC, Fragment, useRef, useState, DragEvent } from "react";
 import { DiagramElement } from "../DiagramElement";
+import {DiagramElementProps} from "../DiagramElement";
 
 const Canvas: FC = () => {
-  const [elementPaths, setElementPaths] = useState([
-    'src/assets/diagram-elements/UML/hcAfXP01.svg',
-  ]);
+  const [diagramElementProps, setDiagramElementProps] = useState<DiagramElementProps[]>([]);
 
   const [activeTextarea, setActiveTextarea] = useState<{ x: number, y: number, text: string, id: string } | null>(null);
 
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
   const [textElements, setTextElements] = useState<{ id: string, text: string, x: number, y: number }[]>([]);
-
+  
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedPath = e.dataTransfer?.getData('text/plain');
-    if (droppedPath) {
-      setElementPaths((prev) => [...prev, droppedPath]);
+    const rect = canvasRef.current?.getBoundingClientRect();
+    
+    if (droppedPath && canvasRef.current && rect) {
+      const img = new window.Image();
+      img.src = droppedPath;
+      
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        
+        const newElement: DiagramElementProps = {
+          path: droppedPath,
+          posX: e.clientX - rect.left + canvasRef.current!.scrollLeft - width / 2,
+          posY: e.clientY - rect.top + canvasRef.current!.scrollTop - height / 2,
+          onTextClick: handleTextClick,
+          textElements: [],
+          onAddTextElement: handleAddTextElement,
+        };
+        setDiagramElementProps((prev) => [...prev, newElement]);
+      };
+      
+      img.onerror = () => {
+        console.error('Failed to load the image:', droppedPath);
+      };
     }
   };
 
@@ -72,10 +93,12 @@ const Canvas: FC = () => {
         <div className="canvas-grid">
           <Stage width={3000} height={3000}>
             <Layer>
-              {elementPaths.map((path, index) => (
+              {diagramElementProps.map((element, index) => (
                   <Fragment key={index}>
                     <DiagramElement
-                        path={path}
+                        path={element.path}
+                        posX={element.posX}
+                        posY={element.posY}
                         onTextClick={handleTextClick}
                         textElements={textElements}
                         onAddTextElement={handleAddTextElement}

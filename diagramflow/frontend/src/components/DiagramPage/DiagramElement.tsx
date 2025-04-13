@@ -4,28 +4,30 @@ import { KonvaEventObject } from 'konva/lib/Node';
 import { Image as KonvaImage } from 'konva/lib/shapes/Image';
 import { Transformer as KonvaTransformer } from 'konva/lib/shapes/Transformer';
 
-interface DiagramElementProps {
+export interface DiagramElementProps {
     path: string;
+    posX: number,
+    posY: number,
     onTextClick: (x: number, y: number, currentText: string, id: string) => void;
     textElements: { id: string, text: string, x: number, y: number }[];
     onAddTextElement: (x: number, y: number) => void;
 }
 
 
-export const DiagramElement = ({ path, onTextClick, textElements, onAddTextElement }: DiagramElementProps) => {
+export const DiagramElement = ({ path, posX, posY, onTextClick, textElements, onAddTextElement }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
 
     const [shape, setShape] = useState({
-        x: 100,
-        y: 100,
+        x: posX,
+        y: posY,
         width: img.width,
         height: img.height,
     });
 
     const imageRef = useRef<KonvaImage>(null);
     const transformerRef = useRef<KonvaTransformer>(null);
-    let [isSelected, setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState(false);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         setShape({
