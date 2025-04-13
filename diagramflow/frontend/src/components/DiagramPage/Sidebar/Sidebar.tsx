@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, forwardRef} from 'react';
 import './Sidebar.css';
 import {svgFileNamesUML} from '../../../svgListUML';
 import {svgFileNamesFlowChart} from '../../../svgListFlowChart';
@@ -16,8 +16,8 @@ interface Category {
   items: CategoryItem[];
 }
 
-const Sidebar: React.FC = () => {
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
+    const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   
   const networkDiagramItemsUML: CategoryItem[] = svgFileNamesUML
     .map((fileName) => {
@@ -79,7 +79,7 @@ const Sidebar: React.FC = () => {
   };
   
   return (
-    <div className="sidebar_diagram">
+    <div className="sidebar_diagram" ref={ref}>
       <div className="toolbar-search">
         <input type="text" placeholder="Search..."/>
       </div>
@@ -128,6 +128,6 @@ const Sidebar: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default Sidebar;
