@@ -9,10 +9,11 @@ interface DiagramElementProps {
     onTextClick: (x: number, y: number, currentText: string, id: string) => void;
     textElements: { id: string, text: string, x: number, y: number }[];
     onAddTextElement: (x: number, y: number) => void;
+    onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
 }
 
 
-export const DiagramElement = ({ path, onTextClick, textElements, onAddTextElement }: DiagramElementProps) => {
+export const DiagramElement = ({ path, onTextClick, textElements, onAddTextElement, onContextMenu }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
 
@@ -25,7 +26,7 @@ export const DiagramElement = ({ path, onTextClick, textElements, onAddTextEleme
 
     const imageRef = useRef<KonvaImage>(null);
     const transformerRef = useRef<KonvaTransformer>(null);
-    let [isSelected, setIsSelected] = useState(false);
+    const [isSelected, setIsSelected] = useState(false);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         setShape({
@@ -78,6 +79,7 @@ export const DiagramElement = ({ path, onTextClick, textElements, onAddTextEleme
                 onDblClick={handleDoubleClick}
                 onDragEnd={updatePosition}
                 onTransformEnd={updateSize}
+                onContextMenu={(e) => onContextMenu(e, path)}
             />
 
             {textElements.map((element) => (
