@@ -1,7 +1,7 @@
 // Canvas.tsx
 import './Canvas.css';
 import { Stage, Layer, Line, Arrow } from "react-konva";
-import { FC, Fragment, useRef, useState, DragEvent } from "react";
+import {FC, Fragment, useRef, useState, DragEvent, ChangeEvent} from "react";
 import { DiagramElement, DiagramElementProps } from "../DiagramElement";
 
 interface ExtendedDiagramElementProps extends DiagramElementProps {
@@ -77,7 +77,7 @@ const Canvas: FC = () => {
     setActiveTextarea({ x, y, text: currentText, id });
   };
 
-  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (activeTextarea) {
       setActiveTextarea({ ...activeTextarea, text: e.target.value });
     }
