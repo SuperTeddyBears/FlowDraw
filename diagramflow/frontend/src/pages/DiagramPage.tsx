@@ -6,7 +6,6 @@ import Sidebar from '../components/DiagramPage/Sidebar/Sidebar';
 import Canvas from '../components/DiagramPage/Canvas/Canvas';
 import Footer from '../components/DiagramPage/Footer/Footer';
 
-
 export const DiagramPage: React.FC = () => {
     const sidebarRef = useRef<HTMLDivElement | null>(null);
     return (

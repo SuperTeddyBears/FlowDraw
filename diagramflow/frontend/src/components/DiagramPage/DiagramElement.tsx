@@ -16,6 +16,7 @@ export interface DiagramElementProps {
     isConnecting?: boolean;
     onConnect?: (id: string, centerX: number, centerY: number) => void;
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
+    onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
 }
 
 export const DiagramElement = ({
@@ -29,6 +30,7 @@ export const DiagramElement = ({
                                    isConnecting = false,
                                    onConnect,
                                    onPositionChange,
+                                   onContextMenu,
                                }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
@@ -113,6 +115,7 @@ export const DiagramElement = ({
                 onDblClick={handleDoubleClick}
                 onDragEnd={updatePosition}
                 onTransformEnd={updateSize}
+                onContextMenu={(e) => onContextMenu(e, path)}
             />
 
             {textElements.map((element) => (
@@ -130,7 +133,7 @@ export const DiagramElement = ({
 
             {isSelected && (
                 <Transformer
-                    ref={transformerRef as any}
+                    ref={transformerRef}
                     boundBoxFunc={(oldBox, newBox) => {
                         if (newBox.width < 50 || newBox.height < 50) {
                             return oldBox;
