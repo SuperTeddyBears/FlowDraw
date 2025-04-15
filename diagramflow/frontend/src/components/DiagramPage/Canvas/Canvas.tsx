@@ -1,12 +1,13 @@
 // Canvas.tsx
 import './Canvas.css';
-import {Stage, Layer, Line, Arrow} from "react-konva";
+import {Stage, Layer, Line} from "react-konva";
 import {Fragment, useRef, useState, DragEvent, ChangeEvent, RefObject, useEffect} from "react";
 import {DiagramElement, DiagramElementProps} from "../DiagramElement";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
+import {connection} from "../connection.ts";
 
-interface ExtendedDiagramElementProps extends DiagramElementProps {
+export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string; // dodany identyfikator
   posX: number;
   posY: number;
@@ -14,19 +15,13 @@ interface ExtendedDiagramElementProps extends DiagramElementProps {
   height: number;
 }
 
-interface ConnectionLine {
-  id: string;
-  fromId: string;
-  toId: string;
-  type: "plain" | "arrow";
-}
-
 const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) => {
   // Elementy – dodajemy dodatkowe pola: id, width, height. Początkowo width/height ustawiamy na 0.
   const [diagramElements, setDiagramElements] = useState<ExtendedDiagramElementProps[]>([]);
   // Połączenia między elementami
-  const [connections, setConnections] = useState<ConnectionLine[]>([]);
   const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
+  
+  const [connectionElements, setConnectionElements] = useState<connection[]>([]);
   
   // Stan menu kontekstowego
   const [contextMenu, setContextMenu] = useState<{
@@ -40,11 +35,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     y: 0,
     targetId: null,
   });
-  
-  // Stany dla trybu łączenia
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [connectingFrom, setConnectingFrom] = useState<{ id: string; centerX: number; centerY: number } | null>(null);
-  const [connectionType, setConnectionType] = useState<"plain" | "arrow">("plain");
   
   const canvasRef = useRef<HTMLDivElement | null>(null);
   
@@ -111,6 +101,25 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     const droppedPath = e.dataTransfer?.getData('text/plain');
+    
+    if (droppedPath.includes('conn')) {
+      console.log('Dropped connection');
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (droppedPath && canvasRef.current && rect) {
+        const offset = 50;
+        let x = e.clientX - rect.left + canvasRef.current.scrollLeft;
+        let y = e.clientY - rect.top + canvasRef.current.scrollTop;
+        
+        x = Math.max(offset, Math.min(3000 - offset, x));
+        y = Math.max(offset, Math.min(3000 - offset, y));
+        
+        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50);
+        setConnectionElements((prev) => [...prev, newConnection]);
+        console.log(connectionElements);
+      }
+      return;
+    }
+    
     const rect = canvasRef.current?.getBoundingClientRect();
     if (droppedPath && canvasRef.current && rect) {
       const img = new window.Image();
@@ -130,9 +139,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
           onTextClick: handleTextClick,
           textElements: [],
           onAddTextElement: handleAddTextElement,
-          // Przekaż dodatkowe propsy do łączenia:
-          isConnecting: isConnecting,
-          onConnect: handleElementConnect,
           onPositionChange: handlePositionChange,
           onContextMenu: handleKonvaContextMenu
         };
@@ -200,36 +206,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     );
   };
   
-  // Callback wywoływany przy kliknięciu w element przy trybie łączenia
-  const handleElementConnect = (id: string, centerX: number, centerY: number) => {
-    if (!connectingFrom) {
-      // Pierwsze kliknięcie – zapisujemy dane pierwszego elementu
-      setConnectingFrom({id, centerX, centerY});
-    } else if (connectingFrom.id === id) {
-      // Kliknięcie tego samego elementu – anulujemy wybór
-      setConnectingFrom(null);
-    } else {
-      // Drugi element – tworzymy połączenie
-      const newConnection: ConnectionLine = {
-        id: `connection-${Date.now()}`,
-        fromId: connectingFrom.id,
-        toId: id,
-        type: connectionType,
-      };
-      setConnections(prev => [...prev, newConnection]);
-      setConnectingFrom(null);
-      setIsConnecting(false);
-    }
-  };
-  
-  // Opcjonalnie – aktualizacja elementów przy zmianie trybu łączenia
-  // Przekazujemy nową wartość isConnecting do wszystkich elementów
-  const updateElementsConnectingFlag = (flag: boolean) => {
-    setDiagramElements(prev =>
-      prev.map(el => ({...el, isConnecting: flag}))
-    );
-  };
-  
   return (
     <div
       className="canvas-container"
@@ -238,72 +214,21 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
       onDragOver={handleDragOver}
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
-      {/* Kontrolki trybu łączenia */}
-      <div style={{marginBottom: '10px'}}>
-        <button
-          onClick={() => {
-            setIsConnecting(prev => {
-              const newFlag = !prev;
-              updateElementsConnectingFlag(newFlag);
-              // Jeśli odłączamy tryb, kasujemy też pierwszy wybrany element
-              if (!newFlag) setConnectingFrom(null);
-              return newFlag;
-            });
-          }}
-        >
-          {isConnecting ? "Anuluj łączenie" : "Połącz elementy"}
-        </button>
-        {isConnecting && (
-          <label style={{marginLeft: '10px'}}>
-            Rodzaj połączenia:&nbsp;
-            <select
-              value={connectionType}
-              onChange={(e) => setConnectionType(e.target.value as "plain" | "arrow")}
-            >
-              <option value="plain">Linia</option>
-              <option value="arrow">Strzałka</option>
-            </select>
-          </label>
-        )}
-        {isConnecting && connectingFrom && (
-          <span style={{marginLeft: '10px'}}>
-            Wybrano pierwszy element – kliknij drugi element, aby połączyć.
-          </span>
-        )}
-      </div>
-      
       <div className="canvas-grid">
         <Stage width={3000} height={3000}>
-          {/* Warstwa rysująca połączenia – rysujemy je najpierw, aby były za elementami */}
+          {/* Warstwa rysująca połączenia */}
           <Layer>
-            {connections.map(conn => {
-              const fromEl = diagramElements.find(el => el.id === conn.fromId);
-              const toEl = diagramElements.find(el => el.id === conn.toId);
-              if (!fromEl || !toEl) return null;
-              const fromCenterX = fromEl.posX + fromEl.width / 2;
-              const fromCenterY = fromEl.posY + fromEl.height / 2;
-              const toCenterX = toEl.posX + toEl.width / 2;
-              const toCenterY = toEl.posY + toEl.height / 2;
-              return conn.type === "arrow" ? (
-                <Arrow
-                  key={conn.id}
-                  points={[fromCenterX, fromCenterY, toCenterX, toCenterY]}
-                  pointerLength={10}
-                  pointerWidth={10}
-                  fill="black"
-                  stroke="black"
-                  strokeWidth={2}
-                />
-              ) : (
-                <Line
-                  key={conn.id}
-                  points={[fromCenterX, fromCenterY, toCenterX, toCenterY]}
-                  stroke="black"
-                  strokeWidth={2}
-                />
-              );
-            })}
+            {connectionElements.map((element) =>
+                <Fragment key={element.id}>
+                  <Line
+                    points={element.getConnectionCoordinates(diagramElements)}
+                    stroke="black"
+                    strokeWidth={2}
+                  />
+                </Fragment>
+            )}
           </Layer>
+          
           {/* Warstwa rysująca elementy diagramu */}
           <Layer>
             {diagramElements.map((element) => (
@@ -316,8 +241,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
                   onTextClick={handleTextClick}
                   textElements={element.textElements}
                   onAddTextElement={handleAddTextElement}
-                  isConnecting={isConnecting}
-                  onConnect={handleElementConnect}
                   onPositionChange={handlePositionChange}
                   onContextMenu={(e) => handleKonvaContextMenu(e, element.id)}
                 />

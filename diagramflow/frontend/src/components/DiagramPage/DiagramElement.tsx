@@ -13,8 +13,6 @@ export interface DiagramElementProps {
     onTextClick: (x: number, y: number, currentText: string, id: string) => void;
     textElements: { id: string; text: string; x: number; y: number }[];
     onAddTextElement: (x: number, y: number) => void;
-    isConnecting?: boolean;
-    onConnect?: (id: string, centerX: number, centerY: number) => void;
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
     onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
 }
@@ -27,8 +25,6 @@ export const DiagramElement = ({
                                    onTextClick,
                                    textElements,
                                    onAddTextElement,
-                                   isConnecting = false,
-                                   onConnect,
                                    onPositionChange,
                                    onContextMenu,
                                }: DiagramElementProps) => {
@@ -84,6 +80,27 @@ export const DiagramElement = ({
             transformerRef.current.getLayer()?.batchDraw();
         }
     }, [isSelected]);
+    
+    useEffect(() => {
+        const handleClickOutside = () => {
+            if (!imageRef.current) return;
+            
+            const pos = imageRef.current!.getStage()?.getPointerPosition();
+            if (!pos) return;
+            
+            if (pos.x >= shape.x && pos.x <= shape.x + shape.width && pos.y >= shape.y && pos.y <= shape.y + shape.height) {
+                return;
+            }
+            
+            setIsSelected(false);
+        };
+    
+        window.addEventListener('click', handleClickOutside);
+    
+        return () => {
+            window.removeEventListener('click', handleClickOutside);
+        };
+    }, [shape, imageRef, setIsSelected]);
 
     const handleDoubleClick = () => {
         onAddTextElement(shape.x + shape.width / 2 - 50, shape.y + shape.height / 2 - 10);
@@ -103,15 +120,7 @@ export const DiagramElement = ({
                 width={shape.width}
                 height={shape.height}
                 draggable={true}
-                onClick={() => {
-                    if (isConnecting && onConnect && id) {
-                        const centerX = shape.x + shape.width / 2;
-                        const centerY = shape.y + shape.height / 2;
-                        onConnect(id, centerX, centerY);
-                    } else {
-                        setIsSelected(!isSelected);
-                    }
-                }}
+                onClick={() => setIsSelected(!isSelected)}
                 onDblClick={handleDoubleClick}
                 onDragEnd={updatePosition}
                 onTransformEnd={updateSize}

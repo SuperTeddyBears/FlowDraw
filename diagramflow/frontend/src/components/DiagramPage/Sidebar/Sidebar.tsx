@@ -7,7 +7,7 @@ import {svgFileNamesNetwork} from '../../../svgListNetwork';
 interface CategoryItem {
   id: string;
   name: string;
-  iconPath?: string;
+  iconPath: string;
 }
 
 interface Category {
@@ -66,6 +66,15 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
       id: 'uml3',
       name: '▶ Network Diagram',
       items: networkDiagramItemsNetwork
+    },
+    {
+      id: 'conns',
+      name: '▶ Connections',
+      items: [{
+        id: 'line-simple',
+        name: 'simple line',
+        iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
+      }]
     }
   ];
   
