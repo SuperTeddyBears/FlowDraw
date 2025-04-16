@@ -41,12 +41,20 @@ export class connection {
     return [startX, startY, endX, endY];
   }
   
-  setStart(elementId: string, position: string) {
-    this.start = {elementId, position};
+  setStart(elementId: string | null, position: string | null) {
+    if (elementId === null || position === null) {
+      this.start = {x: 0, y: 0};
+      return;
+    }
+    this.start = {elementId: elementId as string, position: position as string};
   }
   
-  setEnd(elementId: string, position: string) {
-    this.end = {elementId, position};
+  setEnd(elementId: string | null, position: string | null) {
+    if (elementId === null || position === null) {
+      this.end = {x: 0, y: 0};
+      return;
+    }
+    this.end = {elementId: elementId as string, position: position as string};
   }
   
   getStartPosition(): string | null {

@@ -58,28 +58,36 @@ export const DiagramElement = ({
             }
         }
     };
-
+    
     const updateSize = () => {
         const node = imageRef.current;
         if (node) {
+            const scaleX = node.scaleX();
+            const scaleY = node.scaleY();
+            
+            // Update the shape dimensions and rotation
             setShape((prev) => ({
                 ...prev,
-                width: node.width(),
-                height: node.height(),
+                width: node.width() * scaleX,
+                height: node.height() * scaleY,
             }));
+            
+            // Reset the scale to 1 after applying the new dimensions
+            node.scaleX(1);
+            node.scaleY(1);
+            
             if (onPositionChange && id) {
-                onPositionChange(id, shape.x, shape.y, node.width(), node.height());
+                onPositionChange(id, shape.x, shape.y, node.width() * scaleX, node.height() * scaleY);
             }
         }
     };
-
+    
     useEffect(() => {
         if (transformerRef.current && imageRef.current) {
-            // Używamy bezpośrednio ref - nie wywołujemy getKonvaNode()
             transformerRef.current.nodes([imageRef.current]);
             transformerRef.current.getLayer()?.batchDraw();
         }
-    }, [isSelected]);
+    }, [isSelected, shape]);
     
     useEffect(() => {
         const handleClickOutside = () => {
@@ -123,7 +131,7 @@ export const DiagramElement = ({
                 onClick={() => setIsSelected(!isSelected)}
                 onDblClick={handleDoubleClick}
                 onDragMove={updatePosition}
-                onTransformEnd={updateSize}
+                onTransform={updateSize}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 
@@ -149,6 +157,7 @@ export const DiagramElement = ({
                         }
                         return newBox;
                     }}
+                    rotateEnabled={false}
                 />
             )}
         </>

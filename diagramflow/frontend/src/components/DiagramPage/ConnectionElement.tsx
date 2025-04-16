@@ -52,6 +52,7 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
     }
     
     if (point === 'start') {
+      element.setStart(null, null);
       const distance = Math.hypot(newX - endX, newY - endY);
       if (distance >= collisionRadius * 2) {
         setStartX(newX);
@@ -62,6 +63,7 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
         setStartY(endY + t * (newY - endY));
       }
     } else {
+      element.setEnd(null, null);
       const distance = Math.hypot(newX - startX, newY - startY);
       if (distance >= collisionRadius * 2) {
         setEndX(newX);
@@ -115,11 +117,11 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
   
   useEffect(() => {
     updateSnappedElementPosition(element.getStartSnappedElementId(), setStartX, setStartY, element.getStartPosition());
-  }, [element, updateSnappedElementPosition]);
+  }, [diagramElements, element, updateSnappedElementPosition]);
   
   useEffect(() => {
     updateSnappedElementPosition(element.getEndSnappedElementId(), setEndX, setEndY, element.getEndPosition());
-  }, [element, updateSnappedElementPosition]);
+  }, [diagramElements, element, updateSnappedElementPosition]);
   
   return (
     <>
