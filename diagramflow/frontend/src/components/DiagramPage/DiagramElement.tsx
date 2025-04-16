@@ -117,7 +117,16 @@ export const DiagramElement = ({
     }, [shape, imageRef, setIsSelected]);
 
     const handleDoubleClick = () => {
-        onAddTextElement(shape.x + shape.width / 2 - 50, shape.y + shape.height / 2 - 10);
+        const pos = imageRef.current?.getStage()?.getPointerPosition();
+        if (
+            pos &&
+            pos.x >= shape.x &&
+            pos.x <= shape.x + shape.width &&
+            pos.y >= shape.y &&
+            pos.y <= shape.y + shape.height
+        ) {
+            onAddTextElement(shape.x + shape.width / 2 - 50, shape.y + shape.height / 2 - 10);
+        }
     };
 
     const handleTextClick = (elemId: string, text: string) => {
@@ -138,6 +147,7 @@ export const DiagramElement = ({
                 onDblClick={handleDoubleClick}
                 onDragMove={updatePosition}
                 onTransform={updateSize}
+                onDragEnd={() => setIsSelected(false)}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 

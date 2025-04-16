@@ -14,6 +14,7 @@ export interface ExtendedDiagramElementProps extends DiagramElementProps {
   posY: number;
   width: number;
   height: number;
+  hasText: boolean;
 }
 
 const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) => {
@@ -155,7 +156,8 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
           textElements: [],
           onAddTextElement: handleAddTextElement,
           onPositionChange: handlePositionChange,
-          onContextMenu: handleKonvaContextMenu
+          onContextMenu: handleKonvaContextMenu,
+          hasText: false,
         };
         setDiagramElements((prev) => [...prev, newElement]);
       };
@@ -203,22 +205,56 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
       id: newId,
       text: 'Nowy tekst',
       x,
-      y
+      y,
     };
-    // Dodajemy tekst do ostatnio dodanego elementu lub w dowolny sposób – tutaj uproszczamy
-    setDiagramElements(prev => {
-      if (prev.length === 0) return prev;
-      const last = prev[prev.length - 1];
-      const updated = {...last, textElements: [...last.textElements, newTextElement]};
-      return [...prev.slice(0, prev.length - 1), updated];
+  
+    setDiagramElements((prev) => {
+      return prev.map((el) => {
+        if (el.hasText) {
+          return el;
+        }
+        
+        const isWithinBounds =
+          x >= el.posX &&
+          x <= el.posX + el.width &&
+          y >= el.posY &&
+          y <= el.posY + el.height;
+  
+        if (isWithinBounds) {
+          return {
+            ...el,
+            textElements: [newTextElement], // Replace any existing text element
+            hasText: true, // Mark as having text
+          };
+        }
+  
+        return el; // Return the element unchanged if no conditions are met
+      });
     });
   };
   
   // Callback aktualizujący pozycję i rozmiar elementu – wywoływany z DiagramElement przy drag/transform
   const handlePositionChange = (id: string, x: number, y: number, width: number, height: number) => {
     setDiagramElements(prev =>
-      prev.map(el => el.id === id ? {...el, posX: x, posY: y, width, height} : el)
+      prev.map(el => {
+        if (el.id === id) {
+          return {
+            ...el,
+            posX: x,
+            posY: y,
+            width,
+            height,
+            textElements: el.textElements.map(te => ({
+              ...te,
+              x: x + width / 2 - 50, // Center horizontally
+              y: y + height / 2 - 10, // Center vertically
+            })),
+          };
+        }
+        return el;
+      })
     );
+    
   };
   
   return (
@@ -267,9 +303,20 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
       
       {activeTextarea && (
         <textarea
+          ref={(textarea) => {
+            if (textarea && textarea.value === 'Nowy tekst') {
+              textarea.select();
+            }
+          }}
           value={activeTextarea.text}
           onChange={handleTextChange}
           onBlur={handleTextareaBlur}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleTextareaBlur();
+            }
+          }}
           style={{
             position: 'absolute',
             top: activeTextarea.y,
