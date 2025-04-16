@@ -1,15 +1,8 @@
 import {ExtendedDiagramElementProps} from "./Canvas/Canvas.tsx";
 
-enum connectionPosition {
-  TOP,
-  RIGHT,
-  BOTTOM,
-  LEFT,
-}
-
 interface connectionData {
   elementId: string;
-  position: connectionPosition;
+  position: string;
 }
 
 interface position {
@@ -31,20 +24,60 @@ export class connection {
   getConnectionCoordinates(diagramElements: ExtendedDiagramElementProps[]): [number, number, number, number] {
     const startX = 'x' in this.start
       ? this.start.x
-      : diagramElements.find(el => el.id === (this.start as connectionData).elementId)!.posX;
+      : diagramElements.find(el => el.id === (this.start as connectionData).elementId)?.posX ?? 0;
   
     const startY = 'y' in this.start
       ? this.start.y
-      : diagramElements.find(el => el.id === (this.start as connectionData).elementId)!.posY;
+      : diagramElements.find(el => el.id === (this.start as connectionData).elementId)?.posY ?? 0;
   
     const endX = 'x' in this.end
       ? this.end.x
-      : diagramElements.find(el => el.id === (this.end as connectionData).elementId)!.posX;
+      : diagramElements.find(el => el.id === (this.end as connectionData).elementId)?.posX ?? 0;
   
     const endY = 'y' in this.end
       ? this.end.y
-      : diagramElements.find(el => el.id === (this.end as connectionData).elementId)!.posY;
+      : diagramElements.find(el => el.id === (this.end as connectionData).elementId)?.posY ?? 0;
   
     return [startX, startY, endX, endY];
+  }
+  
+  setStart(elementId: string, position: string) {
+    this.start = {elementId, position};
+  }
+  
+  setEnd(elementId: string, position: string) {
+    this.end = {elementId, position};
+  }
+  
+  getStartPosition(): string | null {
+    if ('x' in this.start) {
+      return null;
+    }
+    const startElement = this.start as connectionData;
+    return startElement.position;
+  }
+  
+  getEndPosition(): string | null {
+    if ('x' in this.end) {
+      return null;
+    }
+    const endElement = this.end as connectionData;
+    return endElement.position;
+  }
+  
+  getStartSnappedElementId(): string | null {
+    if ('x' in this.start) {
+      return null;
+    }
+    const startElement = this.start as connectionData;
+    return startElement.elementId;
+  }
+  
+  getEndSnappedElementId(): string | null {
+    if ('x' in this.end) {
+      return null;
+    }
+    const endElement = this.end as connectionData;
+    return endElement.elementId;
   }
 }

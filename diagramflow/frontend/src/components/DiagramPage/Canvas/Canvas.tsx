@@ -1,11 +1,12 @@
 // Canvas.tsx
 import './Canvas.css';
-import {Stage, Layer, Line} from "react-konva";
+import {Stage, Layer} from "react-konva";
 import {Fragment, useRef, useState, DragEvent, ChangeEvent, RefObject, useEffect} from "react";
 import {DiagramElement, DiagramElementProps} from "../DiagramElement";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
 import {connection} from "../connection.ts";
+import ConnectionElement from "../ConnectionElement.tsx";
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string; // dodany identyfikator
@@ -87,7 +88,23 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     
     const updated = [...diagramElements];
     const index = updated.findIndex((item) => item.id === id);
-    if (index === -1) return;
+    if (index === -1) {
+      const connectionIndex = connectionElements.findIndex((conn) => conn.id.toString() === id);
+      if (connectionIndex === -1) return;
+      
+      const [connection] = connectionElements.splice(connectionIndex, 1);
+      
+      if (action === 'bringToFront') {
+        setConnectionElements((prev) => [...prev, connection]);
+      } else if (action === 'sendToBack') {
+        setConnectionElements((prev) => [connection, ...prev]);
+      } else if (action === 'delete') {
+        setConnectionElements((prev) => prev.filter((_, i) => i !== connectionIndex));
+      }
+      
+      handleCloseContextMenu();
+      return;
+    }
     
     const [item] = updated.splice(index, 1);
     
@@ -103,7 +120,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     const droppedPath = e.dataTransfer?.getData('text/plain');
     
     if (droppedPath.includes('conn')) {
-      console.log('Dropped connection');
       const rect = canvasRef.current?.getBoundingClientRect();
       if (droppedPath && canvasRef.current && rect) {
         const offset = 50;
@@ -115,7 +131,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
         
         const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50);
         setConnectionElements((prev) => [...prev, newConnection]);
-        console.log(connectionElements);
       }
       return;
     }
@@ -216,19 +231,6 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     >
       <div className="canvas-grid">
         <Stage width={3000} height={3000}>
-          {/* Warstwa rysująca połączenia */}
-          <Layer>
-            {connectionElements.map((element) =>
-                <Fragment key={element.id}>
-                  <Line
-                    points={element.getConnectionCoordinates(diagramElements)}
-                    stroke="black"
-                    strokeWidth={2}
-                  />
-                </Fragment>
-            )}
-          </Layer>
-          
           {/* Warstwa rysująca elementy diagramu */}
           <Layer>
             {diagramElements.map((element) => (
@@ -246,6 +248,19 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
                 />
               </Fragment>
             ))}
+          </Layer>
+          
+          {/* Warstwa rysująca połączenia */}
+          <Layer>
+            {connectionElements.map((element) =>
+              <Fragment key={element.id}>
+                <ConnectionElement
+                  element={element}
+                  diagramElements={diagramElements}
+                  handleKonvaContextMenu={handleKonvaContextMenu}
+                />
+              </Fragment>
+            )}
           </Layer>
         </Stage>
       </div>

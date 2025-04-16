@@ -122,7 +122,7 @@ export const DiagramElement = ({
                 draggable={true}
                 onClick={() => setIsSelected(!isSelected)}
                 onDblClick={handleDoubleClick}
-                onDragEnd={updatePosition}
+                onDragMove={updatePosition}
                 onTransformEnd={updateSize}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
