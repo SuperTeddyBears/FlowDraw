@@ -64,20 +64,26 @@ export const DiagramElement = ({
         if (node) {
             const scaleX = node.scaleX();
             const scaleY = node.scaleY();
-            
-            // Update the shape dimensions and rotation
+    
+            const newWidth = node.width() * scaleX;
+            const newHeight = node.height() * scaleY;
+    
+            const deltaX = (newWidth - shape.width) / 2;
+            const deltaY = (newHeight - shape.height) / 2;
+    
             setShape((prev) => ({
                 ...prev,
-                width: node.width() * scaleX,
-                height: node.height() * scaleY,
+                x: prev.x - deltaX,
+                y: prev.y - deltaY,
+                width: newWidth,
+                height: newHeight,
             }));
-            
-            // Reset the scale to 1 after applying the new dimensions
+    
             node.scaleX(1);
             node.scaleY(1);
-            
+    
             if (onPositionChange && id) {
-                onPositionChange(id, shape.x, shape.y, node.width() * scaleX, node.height() * scaleY);
+                onPositionChange(id, shape.x - deltaX, shape.y - deltaY, newWidth, newHeight);
             }
         }
     };
