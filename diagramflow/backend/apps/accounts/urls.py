@@ -8,6 +8,7 @@ from .views import (
     LogoutView
 )
 
+# This is the URL configuration for the accounts' app.
 urlpatterns = [
     path('auth/google', GoogleLoginView.as_view(), name='auth-google'),
     path('auth/login', LoginView.as_view(), name='auth-login'),
