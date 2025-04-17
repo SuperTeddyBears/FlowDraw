@@ -15,7 +15,7 @@ type AuthContextType = {
     loading: boolean;
     login: (token: string) => Promise<void>;
     logout: () => void;
-    isAuthenticated: () => boolean;
+    isAuthenticated: boolean;
 };
 
 // Default values for the context
@@ -26,7 +26,7 @@ const defaultAuthContext: AuthContextType = {
     },
     logout: () => {
     },
-    isAuthenticated: () => false,
+    isAuthenticated: false,
 };
 
 // React context for authentication
@@ -90,16 +90,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}
         loadUserFromToken();
     }, []); // Load user from token on initial render
 
-    const value = {
+    const value: AuthContextType = {
         user,
         loading,
         login,
         logout,
-        isAuthenticated: () => !!user,
-        // Check if user is authenticated - !! means a boolean value
+        isAuthenticated: !!user, // Check if user is authenticated
     };
 
-    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom hook to use the AuthContext
