@@ -15,12 +15,10 @@ const ProtectedRoute = ({children}: { children: React.ReactNode }) => {
     if (loading) {
         return <div className="loading">Ładowanie...</div>; // or a loading spinner
     }
-
     // If the user is not authenticated, redirect to the login page
     if (!isAuthenticated) {
         return <Navigate to="/login"/>;
     }
-
     // Else save on rendering the children
     return <>{children}</>;
 }
