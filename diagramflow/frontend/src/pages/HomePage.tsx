@@ -192,7 +192,7 @@ export function HomePage() {
           viewport={{ once: true, amount: 0.05 }} 
           transition={{ duration: 0.8 }}
         >
-          You can create here:
+          Here you can create:
         </motion.h1>
         
         <div className="DiagramsContainer">
