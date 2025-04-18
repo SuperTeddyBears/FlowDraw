@@ -32,6 +32,9 @@ export const LoginPage = () => {
             await login(token);
             navigate('/dashboard');
         } catch (err: any) {
+            if (err.response?.data?.error?.includes('Google')) {
+                setError('This account was created with Google. Use button "Continue with Google".');
+            }
             setError(err.response?.data?.message || 'Login failed');
         }
     }
@@ -115,6 +118,11 @@ export const LoginPage = () => {
                             </button>
                         </form>
 
+                        <div className="login-hint">
+                            <p>Jeśli zarejestrowałeś się przez Google, użyj tej samej metody do logowania.</p>
+                        </div>
+
+
                         <p className="register">
                             Don’t have an account?{" "}
                             <button
@@ -125,8 +133,10 @@ export const LoginPage = () => {
                                 Join free today
                             </button>
                         </p>
+
                     </div>
                 </div>
+
 
                 <div className="welcome-section">
                     <h3 className="welcome-title">WELCOME BACK!</h3>

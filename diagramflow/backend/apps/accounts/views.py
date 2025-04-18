@@ -72,6 +72,7 @@ class LoginView(APIView):
     """
     This LoginView handles the user login process.
     It checks if the user exists and verifies the password.
+    :param: email, password
     """
 
     def post(self, request):
@@ -80,6 +81,11 @@ class LoginView(APIView):
 
         try:
             user = User.objects.get(email=email)
+
+            if not user.has_usable_password():
+                return Response({'error': 'This account is linked to Google login. Please use Google login.'},
+                                status=status.HTTP_400_BAD_REQUEST
+                                )
 
             # If password correct
             if user.check_password(password):

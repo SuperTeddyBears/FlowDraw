@@ -14,7 +14,8 @@ const ProtectedRoute = ({children}: { children: React.ReactNode }) => {
 
     // We could show loader here - DELETE IF NOT NEEDED: FIXME
     if (loading) {
-        return <div className="loading">Ładowanie...</div>; // or a loading spinner
+        // return <div className="loading">Ładowanie...</div>; // or a loading spinner
+        return <div className="loading"><span className="spinner"></span> Ładowanie...</div>;
     }
     // If the user is not authenticated, redirect to the login page
     if (!isAuthenticated) {
@@ -33,6 +34,9 @@ export function AppWithProviders() {
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/register" element={<RegisterPage/>}/>
+                        {/*For development purposes only uncommnet these two lines to access pages without a login */}
+                        {/*<Route path="/dashboard" element={<DashboardPage/>}></Route>*/}
+                        {/*<Route path="/diagrampage" element={<DiagramPage/>}></Route>*/}
                         <Route
                             path="/dashboard"
                             element={
