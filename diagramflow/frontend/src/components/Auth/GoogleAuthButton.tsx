@@ -33,7 +33,7 @@ const GoogleAuthButton: React.FC = () => {
             <GoogleLogin
                 onSuccess={handleGoogleLogin}
                 onError={() => console.log("Login Failed")}
-                useOneTap
+                // useOneTap // Causing errors with FedCM
                 text="continue_with"
                 shape="pill"
             ></GoogleLogin>
