@@ -6,6 +6,7 @@ import {DiagramPage} from "./pages/DiagramPage.tsx";
 import {AuthProvider, useAuth} from './contexts/AuthContext';
 import GoogleOAuthProvider from './providers/GoogleOAuthProvider';
 import React from "react";
+import {RegisterPage} from "./pages/RegisterPage.tsx";
 
 // For the sake of protected routes
 const ProtectedRoute = ({children}: { children: React.ReactNode }) => {
@@ -31,7 +32,7 @@ export function AppWithProviders() {
                     <Routes>
                         <Route path="/" element={<HomePage/>}/>
                         <Route path="/login" element={<LoginPage/>}/>
-                        <Route path="/register" element={<LoginPage/>}/>
+                        <Route path="/register" element={<RegisterPage/>}/>
                         <Route
                             path="/dashboard"
                             element={

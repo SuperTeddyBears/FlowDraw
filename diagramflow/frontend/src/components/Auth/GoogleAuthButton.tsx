@@ -14,6 +14,8 @@ const GoogleAuthButton: React.FC = () => {
                 token: credentialResponse.credential,
             });
 
+            console.log("Client ID:", import.meta.env.VITE_GOOGLE_CLIENT_ID);
+            console.log("Window origin:", window.location.origin);
             console.log("Odpowiedź z API:", response.data);
 
             // Downloading the JWT token from the response
