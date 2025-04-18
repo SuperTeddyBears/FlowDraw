@@ -1,7 +1,7 @@
 import Konva from "konva";
 import {Circle, Line} from "react-konva";
-import {connection} from "./connection.ts";
-import {ExtendedDiagramElementProps} from "./Canvas/Canvas.tsx";
+import {connection} from "../connection.ts";
+import {ExtendedDiagramElementProps} from "./Canvas.tsx";
 import {useCallback, useEffect, useState} from "react";
 import {KonvaEventObject} from "konva/lib/Node";
 

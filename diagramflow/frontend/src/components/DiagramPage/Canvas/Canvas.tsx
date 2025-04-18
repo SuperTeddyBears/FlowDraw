@@ -2,11 +2,11 @@
 import './Canvas.css';
 import {Stage, Layer} from "react-konva";
 import {Fragment, useRef, useState, DragEvent, ChangeEvent, RefObject, useEffect} from "react";
-import {DiagramElement, DiagramElementProps} from "../DiagramElement";
+import {DiagramElement, DiagramElementProps} from "./DiagramElement.tsx";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
 import {connection} from "../connection.ts";
-import ConnectionElement from "../ConnectionElement.tsx";
+import ConnectionElement from "./ConnectionElement.tsx";
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string; // dodany identyfikator
