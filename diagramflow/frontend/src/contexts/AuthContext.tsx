@@ -69,21 +69,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}
     // Login function
     const login = async (token: string, userData?: any) => {
         setLoading(true);
-        if (userData) {
-            // If we got user data, set it directly
-            setUser({
-                id: userData.id,
-                name: userData.name,
-                email: userData.email,
-                image: userData.image,
-            });
-            localStorage.setItem(TOKEN_KEY, token);
-        } else {
-            // Else just process the token
-            await processToken(token);
+        try {
+            if (userData) {
+                // If we got user data, set it directly
+                setUser({
+                    id: userData.id,
+                    name: userData.name,
+                    email: userData.email,
+                    image: userData.image,
+                });
+                localStorage.setItem(TOKEN_KEY, token);
+            } else {
+                // Else just process the token
+                await processToken(token);
+            }
+        } catch (error) {
+            console.error('Error logging in:', error);
+            setUser(null);
+            setLoading(false);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
-    };
+    }
 
     // Logout function
     const logout = () => {
