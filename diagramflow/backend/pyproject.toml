@@ -1,0 +1,27 @@
+[project]
+name = "flowdraw"
+version = "1.0.0"
+description = ""
+authors = [
+    {name = "WCY22IJ1S1",email = "you@example.com"}
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "django (>=5.2,<6.0)",
+    "views (>=0.3,<0.4)",
+    "google (>=3.0.0,<4.0.0)",
+    "djangorestframework-simplejwt (>=5.5.0,<6.0.0)",
+    "google-auth (>=2.39.0,<3.0.0)",
+    "django-cors-headers (>=4.7.0,<5.0.0)",
+    "django-allauth (>=65.7.0,<66.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "dj-config-url (>=0.1.1,<0.2.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

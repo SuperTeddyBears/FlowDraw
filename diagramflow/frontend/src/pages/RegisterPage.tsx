@@ -1,4 +1,5 @@
-import "../styles/LoginPage.css";
+// src/pages/RegisterPage.tsx
+import "../styles/LoginPage.css"; // Możemy użyć tego samego stylu co dla login
 import backgroundImage from "../assets/loginscreen_backgound.png";
 import loginBackground from "../assets/loginscreen_shadow.png";
 import logo from "../assets/logo.svg";
@@ -9,35 +10,52 @@ import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
     const {login, isAuthenticated} = useAuth();
     const navigate = useNavigate();
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
 
-    // If logged in, redirect to dashboard
+    // Check if user is already authenticated
     useEffect(() => {
         if (isAuthenticated) {
             navigate('/dashboard');
         }
     }, [isAuthenticated, navigate]);
 
-    // Function for the classic login
-    const handleStandardLogin = async (e: React.FormEvent) => {
+    // Registraction of the user
+    const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
+        setError('');
+
+        // Check if all fields are filled
+        if (password !== confirmPassword) {
+            setError('Hasła nie są zgodne');
+            return;
+        }
+
         try {
-            const response = await axios.post('/api/auth/login', {email, password});
+            const response = await axios.post('/api/auth/register', {
+                name,
+                email,
+                password
+            });
+
             const {token} = response.data;
             await login(token);
             navigate('/dashboard');
         } catch (err: any) {
-            if (err.response?.data?.error?.includes('Google')) {
-                setError('This account was created with Google. Use button "Continue with Google".');
+            if (axios.isAxiosError(err) && err.response) {
+                setError(err.response.data.message || 'Błąd rejestracji. Spróbuj ponownie.');
+            } else {
+                setError('Błąd serwera. Spróbuj ponownie później.');
             }
-            setError(err.response?.data?.message || 'Login failed');
         }
-    }
+    };
+
     return (
         <>
             <div
@@ -59,9 +77,8 @@ export const LoginPage = () => {
                     <div className="login-section">
                         <img className="logo" src={logo} alt="FlowDraw Logo"/>
 
-                        <h2 className="login-title">Login to your account</h2>
+                        <h2 className="login-title">Create your account</h2>
 
-                        {/*New button for Google login*/}
                         <div className="google-login-container">
                             <GoogleAuthButton/>
                         </div>
@@ -72,8 +89,20 @@ export const LoginPage = () => {
                             <div className="line"></div>
                         </div>
 
-                        <form onSubmit={handleStandardLogin}>
+                        <form onSubmit={handleRegister}>
                             {error && <div className="error-message">{error}</div>}
+
+                            <div className="login-input">
+                                <label htmlFor="name">Full Name</label>
+                                <input
+                                    id="name"
+                                    type="text"
+                                    placeholder="Enter your full name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                />
+                            </div>
 
                             <div className="login-input">
                                 <label htmlFor="email">Email</label>
@@ -92,56 +121,47 @@ export const LoginPage = () => {
                                 <input
                                     id="password"
                                     type="password"
-                                    placeholder="Enter your password"
+                                    placeholder="Create a password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
                                 />
                             </div>
 
-                            <div className="login-actions">
-                                <div className="remember-me">
-                                    <input type="checkbox" id="remember"/>
-                                    <label htmlFor="remember">Remember me</label>
-                                </div>
-                                <button
-                                    type="button"
-                                    className="forgot-password"
-                                    onClick={() => alert("Funkcja odzyskiwania hasła nie jest jeszcze dostępna.")}
-                                >
-                                    Forgot password?
-                                </button>
+                            <div className="login-input">
+                                <label htmlFor="confirmPassword">Confirm Password</label>
+                                <input
+                                    id="confirmPassword"
+                                    type="password"
+                                    placeholder="Confirm your password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    required
+                                />
                             </div>
 
                             <button type="submit" className="sign-in">
-                                Sign in
+                                Sign up
                             </button>
                         </form>
 
-                        <div className="login-hint">
-                            <p>Jeśli zarejestrowałeś się przez Google, użyj tej samej metody do logowania.</p>
-                        </div>
-
-
                         <p className="register">
-                            Don’t have an account?{" "}
+                            Already have an account?{" "}
                             <button
                                 type="button"
                                 className="register-link"
-                                onClick={() => navigate('/register')}
+                                onClick={() => navigate('/login')}
                             >
-                                Join free today
+                                Login here
                             </button>
                         </p>
-
                     </div>
                 </div>
 
-
                 <div className="welcome-section">
-                    <h3 className="welcome-title">WELCOME BACK!</h3>
+                    <h3 className="welcome-title">JOIN US TODAY!</h3>
                     <h2 className="welcome-text">
-                        You're one step away from visualizing your ideas!
+                        Start creating amazing diagrams in minutes!
                     </h2>
                     <img className="diagram-image" alt="Diagram image" src={diagramImage}/>
                 </div>
