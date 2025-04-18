@@ -1,7 +1,17 @@
 // Canvas.tsx
 import './Canvas.css';
 import {Stage, Layer} from "react-konva";
-import {Fragment, useRef, useState, DragEvent, ChangeEvent, RefObject, useEffect} from "react";
+import {
+  Fragment,
+  useRef,
+  useState,
+  DragEvent,
+  ChangeEvent,
+  RefObject,
+  useEffect,
+  SetStateAction,
+  Dispatch
+} from "react";
 import {DiagramElement, DiagramElementProps} from "./DiagramElement.tsx";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
@@ -17,28 +27,32 @@ export interface ExtendedDiagramElementProps extends DiagramElementProps {
   hasText: boolean;
 }
 
-const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) => {
-  // Elementy – dodajemy dodatkowe pola: id, width, height. Początkowo width/height ustawiamy na 0.
-  const [diagramElements, setDiagramElements] = useState<ExtendedDiagramElementProps[]>([]);
-  // Połączenia między elementami
+interface ContextMenuProps {
+  visible: boolean;
+  x: number;
+  y: number;
+  targetId: string | null;
+}
+
+const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements}:
+                {
+                  sidebarRef: RefObject<HTMLDivElement | null>,
+                  diagramElements: ExtendedDiagramElementProps[],
+                  setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
+                  connectionElements: connection[],
+                  setConnectionElements: Dispatch<SetStateAction<connection[]>>
+                }) => {
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  
+  // Stan aktywnego elementu do wprowadzania tekstu
   const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
-  
-  const [connectionElements, setConnectionElements] = useState<connection[]>([]);
-  
   // Stan menu kontekstowego
-  const [contextMenu, setContextMenu] = useState<{
-    visible: boolean;
-    x: number;
-    y: number;
-    targetId: string | null;
-  }>({
+  const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
     visible: false,
     x: 0,
     y: 0,
     targetId: null,
   });
-  
-  const canvasRef = useRef<HTMLDivElement | null>(null);
   
   const handleKonvaContextMenu = (
     e: KonvaEventObject<PointerEvent>,
@@ -207,7 +221,7 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
       x,
       y,
     };
-  
+    
     setDiagramElements((prev) => {
       return prev.map((el) => {
         if (el.hasText) {
@@ -219,7 +233,7 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
           x <= el.posX + el.width &&
           y >= el.posY &&
           y <= el.posY + el.height;
-  
+        
         if (isWithinBounds) {
           return {
             ...el,
@@ -227,7 +241,7 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
             hasText: true, // Mark as having text
           };
         }
-  
+        
         return el; // Return the element unchanged if no conditions are met
       });
     });
