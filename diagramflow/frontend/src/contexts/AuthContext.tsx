@@ -13,7 +13,7 @@ type User = {
 type AuthContextType = {
     user: User | null;
     loading: boolean;
-    login: (token: string) => Promise<void>;
+    login: (token: string, userData?: any) => Promise<void>;
     logout: () => void;
     isAuthenticated: boolean;
 };
@@ -67,9 +67,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({children}
     };
 
     // Login function
-    const login = async (token: string) => {
+    const login = async (token: string, userData?: any) => {
         setLoading(true);
-        await processToken(token);
+        if (userData) {
+            // If we got user data, set it directly
+            setUser({
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                image: userData.image,
+            });
+            localStorage.setItem(TOKEN_KEY, token);
+        } else {
+            // Else just process the token
+            await processToken(token);
+        }
         setLoading(false);
     };
 

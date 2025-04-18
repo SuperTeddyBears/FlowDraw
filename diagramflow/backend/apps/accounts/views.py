@@ -23,13 +23,16 @@ class GoogleLoginView(APIView):
     def post(self, request):
         try:
             # Get the token from the request
+            print("Otrzymano żądanie autoryzacji Google")
             token = request.data.get('token')
+            print(f"Token: {token[:20]}...")
 
             # Verify the token with Google
             idinfo = id_token.verify_oauth2_token(
                 token,
                 requests.Request(),
-                os.environ.get('GOOGLE_CLIENT_ID')
+                os.environ.get('GOOGLE_CLIENT_ID'),
+                clock_skew_in_seconds=300  # Zwiększ tolerancję do 5 minut
             )
 
             # Take the required information from the token
@@ -61,7 +64,8 @@ class GoogleLoginView(APIView):
                 }
             })
         except Exception as e:
-            return Response({'error': str(e), status: status.HTTP_400_BAD_REQUEST})
+            print(f"Błąd autoryzacji Google: {str(e)}")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class LoginView(APIView):

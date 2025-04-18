@@ -5,7 +5,7 @@ import logo from "../assets/logo.svg";
 import diagramImage from "../assets/loginscreen_diagram.png";
 import GoogleAuthButton from "../components/Auth/GoogleAuthButton";
 import {useAuth} from '../contexts/AuthContext';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
@@ -17,10 +17,11 @@ export const LoginPage = () => {
     const [error, setError] = useState('');
 
     // If logged in, redirect to dashboard
-    if (isAuthenticated) {
-        navigate('/dashboard');
-        return null; // Prevent rendering the login page if already authenticated
-    }
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
 
     // Function for the classic login
     const handleStandardLogin = async (e: React.FormEvent) => {

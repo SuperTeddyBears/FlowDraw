@@ -6,7 +6,7 @@ import logo from "../assets/logo.svg";
 import diagramImage from "../assets/loginscreen_diagram.png";
 import GoogleAuthButton from "../components/Auth/GoogleAuthButton";
 import {useAuth} from '../contexts/AuthContext';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
@@ -20,10 +20,11 @@ export const RegisterPage = () => {
     const [error, setError] = useState('');
 
     // Check if user is already authenticated
-    if (isAuthenticated) {
-        navigate('/dashboard');
-        return null;
-    }
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/dashboard');
+        }
+    }, [isAuthenticated, navigate]);
 
     // Registraction of the user
     const handleRegister = async (e: React.FormEvent) => {
