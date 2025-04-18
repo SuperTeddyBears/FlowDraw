@@ -236,3 +236,12 @@ html, body, #root {
     font-size: 12px;
 }
 
+.login-hint {
+    font-size: 13px;
+    color: #666;
+    text-align: center;
+    margin-top: 16px;
+    font-style: italic;
+}
+
+
