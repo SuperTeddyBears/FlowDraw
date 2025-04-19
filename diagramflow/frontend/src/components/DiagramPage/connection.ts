@@ -10,15 +10,22 @@ interface position {
   y: number;
 }
 
+export enum lineTypes {
+  straight = 'straight',
+  jagged = 'jagged',
+}
+
 export class connection {
   id: number;
   start: connectionData | position;
   end: connectionData | position;
+  lineType: lineTypes;
 
-  constructor(id: number, startX: number, startY: number, endX: number, endY: number) {
+  constructor(id: number, startX: number, startY: number, endX: number, endY: number, lineType: lineTypes) {
     this.id = id;
     this.start = {x: startX, y: startY};
     this.end = {x: endX, y: endY};
+    this.lineType = lineType;
   }
   
   getConnectionCoordinates(diagramElements: ExtendedDiagramElementProps[]): [number, number, number, number] {

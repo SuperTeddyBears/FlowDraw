@@ -1,9 +1,11 @@
 import Konva from "konva";
-import {Circle, Line} from "react-konva";
-import {connection} from "../connection.ts";
+import {Circle} from "react-konva";
+import {connection, lineTypes} from "../connection.ts";
 import {ExtendedDiagramElementProps} from "./Canvas.tsx";
 import {useCallback, useEffect, useState} from "react";
 import {KonvaEventObject} from "konva/lib/Node";
+import JaggedLine from "./JaggedLine.tsx";
+import StraightLine from "./StraightLine.tsx";
 
 const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
   element: connection,
@@ -26,8 +28,8 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
     let snappedElementId = null;
     let snappedWall = null;
     
-    for (const element of diagramElements) {
-      const {posX, posY, width, height} = element;
+    for (const diagramElement of diagramElements) {
+      const {posX, posY, width, height} = diagramElement;
       
       if (
         newX >= posX &&
@@ -45,7 +47,7 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
         const closest = distances.reduce((a, b) => (a.distance < b.distance ? a : b));
         newX = closest.x;
         newY = closest.y;
-        snappedElementId = element.id;
+        snappedElementId = diagramElement.id;
         snappedWall = closest.wall;
         break;
       }
@@ -84,6 +86,7 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
     }
   };
   
+  // TODO : While moving one end of the connection, the other end should snap to the nearest wall
   const updateSnappedElementPosition = useCallback((snappedElementId: string | null, setX: (value: number) => void, setY: (value: number) => void, snapPosition: string | null) => {
     if (!snappedElementId) {
       return;
@@ -138,28 +141,22 @@ const ConnectionElement = ({element, diagramElements, handleKonvaContextMenu}: {
         radius={3}
         fill="black"
       />
-      <Line
-        points={[startX, startY, endX, endY]}
-        stroke="black"
-        strokeWidth={2}
-      />
+      {
+        element.lineType == lineTypes.straight ?
+        <StraightLine
+          coords={[startX, startY, endX, endY]}
+          element={element}
+          collisionRadius={collisionRadius}
+          handleKonvaContextMenu={handleKonvaContextMenu}
+        />
+          :
+        <JaggedLine
+          coords={[startX, startY, endX, endY]}
+          element={element}
+        />
+      }
       
       {/*The collision detection*/}
-      <Line
-        points={[startX, startY, endX, endY]}
-        stroke="transparent"
-        strokeWidth={collisionRadius}
-        onContextMenu={(e: Konva.KonvaEventObject<PointerEvent>) => {
-          e.evt.preventDefault();
-          const stage = e.target.getStage();
-          if (stage) {
-            const pointerPosition = stage.getPointerPosition();
-            if (pointerPosition) {
-              handleKonvaContextMenu(e, element.id.toString());
-            }
-          }
-        }}
-      />
       <Circle
         x={startX}
         y={startY}

@@ -1,21 +1,21 @@
 // Canvas.tsx
 import './Canvas.css';
-import {Stage, Layer} from "react-konva";
+import {Layer, Stage} from "react-konva";
 import {
-  Fragment,
-  useRef,
-  useState,
-  DragEvent,
   ChangeEvent,
+  Dispatch,
+  DragEvent,
+  Fragment,
   RefObject,
-  useEffect,
   SetStateAction,
-  Dispatch
+  useEffect,
+  useRef,
+  useState
 } from "react";
 import {DiagramElement, DiagramElementProps} from "./DiagramElement.tsx";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
-import {connection} from "../connection.ts";
+import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
@@ -144,7 +144,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         x = Math.max(offset, Math.min(3000 - offset, x));
         y = Math.max(offset, Math.min(3000 - offset, y));
         
-        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50);
+        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.straight);
         setConnectionElements((prev) => [...prev, newConnection]);
       }
       return;
