@@ -43,7 +43,6 @@ export class connection {
   
   setStart(elementId: string | null, position: string | null) {
     if (elementId === null || position === null) {
-      this.start = {x: 0, y: 0};
       return;
     }
     this.start = {elementId: elementId as string, position: position as string};
@@ -51,7 +50,6 @@ export class connection {
   
   setEnd(elementId: string | null, position: string | null) {
     if (elementId === null || position === null) {
-      this.end = {x: 0, y: 0};
       return;
     }
     this.end = {elementId: elementId as string, position: position as string};
