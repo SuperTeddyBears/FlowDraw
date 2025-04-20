@@ -10,10 +10,12 @@ import {connection} from "../components/DiagramPage/connection.ts";
 export const DiagramPage: React.FC = () => {
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   
-  // Elementy – dodajemy dodatkowe pola: id, width, height. Początkowo width/height ustawiamy na 0.
+  // Elementy diagramu
   const [diagramElements, setDiagramElements] = useState<ExtendedDiagramElementProps[]>([]);
   // Połączenia między elementami
   const [connectionElements, setConnectionElements] = useState<connection[]>([]);
+  // Nazwa diagramu
+  const [diagramName, setDiagramName] = useState<string>(`New Diagram ${Date.now()}`);
   
   return (
     <div className="app">
@@ -22,6 +24,8 @@ export const DiagramPage: React.FC = () => {
         setDiagramElements={setDiagramElements}
         connectionElements={connectionElements}
         setConnectionElements={setConnectionElements}
+        diagramName={diagramName}
+        setDiagramName={setDiagramName}
       />
       <div className="main-content">
         <Toolbar/>

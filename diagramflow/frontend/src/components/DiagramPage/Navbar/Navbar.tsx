@@ -9,7 +9,9 @@ const Navbar = ({diagramElements, connectionElements}:
                   diagramElements: ExtendedDiagramElementProps[],
                   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
                   connectionElements: connection[],
-                  setConnectionElements: Dispatch<SetStateAction<connection[]>>
+                  setConnectionElements: Dispatch<SetStateAction<connection[]>>,
+                  diagramName: string,
+                  setDiagramName: Dispatch<SetStateAction<string>>,
                 }) => {
   return (
     <div className="navbar">
