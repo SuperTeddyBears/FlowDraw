@@ -7,7 +7,7 @@ import Canvas, {ExtendedDiagramElementProps} from '../components/DiagramPage/Can
 import Footer from '../components/DiagramPage/Footer/Footer';
 import {connection} from "../components/DiagramPage/connection.ts";
 import {useLocation} from "react-router-dom";
-import {deserializesDiagram, getDiagramName} from "../components/DiagramPage/utils.ts";
+import {deserializesDiagram} from "../components/DiagramPage/utils.ts";
 
 export const DiagramPage = () => {
   const location = useLocation();
@@ -18,11 +18,11 @@ export const DiagramPage = () => {
   // Połączenia między elementami
   const [connectionElements, setConnectionElements] = useState<connection[]>([]);
   // Nazwa diagramu
-  const [diagramName, setDiagramName] = useState<string>(getDiagramName(location.state?.diagram) || 'New Diagram');
+  const [diagramName, setDiagramName] = useState<string>(location.state?.name || 'New Diagram');
 
   useEffect(() => {
     deserializesDiagram(location.state?.diagram, setDiagramElements, setConnectionElements);
-  }, [setDiagramElements, setConnectionElements, location.state?.diagram]);
+  }, [location.state?.diagram]);
   
   return (
     <div className="app">

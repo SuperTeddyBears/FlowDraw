@@ -1,4 +1,4 @@
-import {FunctionComponent, useEffect, useRef, useState} from 'react';
+import {Fragment, FunctionComponent, useEffect, useRef, useState} from 'react';
 import '../styles/UserDashboard.css';
 import {CarouselElement} from '../components/DashboardPage/CarouselElement.tsx';
 import LoginBackground from '../assets/loginscreen_backgound.png';
@@ -11,6 +11,7 @@ import {Link} from 'react-router-dom';
 import {useAuth} from "../contexts/AuthContext.tsx";
 import UserDropdown from "../components/DashboardPage/UserDrodown.tsx";
 import axios from "axios";
+import {getDiagramName} from "../components/DiagramPage/utils.ts";
 
 const DashboardPage: FunctionComponent = () => {
   const scrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -102,14 +103,16 @@ const DashboardPage: FunctionComponent = () => {
           </div>
 
           {/* Recent Diagrams */}
-          <div className="recentDiagramsWrapper">
-            <div className="recentDiagramsSection">
-              <div className="diagramText">Recent Diagrams</div>
-              {recentDiagrams.length > 0 && (
+          {recentDiagrams.length > 0 && (
+            <div className="recentDiagramsWrapper">
+              <div className="recentDiagramsSection">
+                <div className="diagramText">Recent Diagrams</div>
                 <div className="carouselContainer">
                   <div className="carousel" id="carousel">
-                    {recentDiagrams.map((diagram) => (
-                      <CarouselElement diagramData={diagram}/>
+                    {recentDiagrams.map((diagram, index) => (
+                      <Fragment key={index}>
+                        <CarouselElement diagramName={getDiagramName(diagram)} diagramData={diagram}/>
+                      </Fragment>
                     ))}
                   </div>
                   <div
@@ -127,9 +130,9 @@ const DashboardPage: FunctionComponent = () => {
                     →
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* New Diagrams */}
           <div className="newDiagramWrapper">
