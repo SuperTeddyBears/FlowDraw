@@ -102,10 +102,10 @@ const DashboardPage: FunctionComponent = () => {
           </div>
 
           {/* Recent Diagrams */}
-          <div className="recentDiagramsWrapper">
-            <div className="recentDiagramsSection">
-              <div className="diagramText">Recent Diagrams</div>
-              {recentDiagrams.length > 0 && (
+          {recentDiagrams.length > 0 && (
+            <div className="recentDiagramsWrapper">
+              <div className="recentDiagramsSection">
+                <div className="diagramText">Recent Diagrams</div>
                 <div className="carouselContainer">
                   <div className="carousel" id="carousel">
                     {recentDiagrams.map((diagram) => (
@@ -127,9 +127,9 @@ const DashboardPage: FunctionComponent = () => {
                     →
                   </div>
                 </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* New Diagrams */}
           <div className="newDiagramWrapper">
