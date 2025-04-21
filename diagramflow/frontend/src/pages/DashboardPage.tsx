@@ -1,4 +1,4 @@
-import {FunctionComponent, useRef} from 'react';
+import {FunctionComponent, useEffect, useRef, useState} from 'react';
 import '../styles/UserDashboard.css';
 import {CarouselElement} from '../components/DashboardPage/CarouselElement.tsx';
 import LoginBackground from '../assets/loginscreen_backgound.png';
@@ -10,12 +10,33 @@ import Logo from '../assets/logo.svg';
 import {Link} from 'react-router-dom';
 import {useAuth} from "../contexts/AuthContext.tsx";
 import UserDropdown from "../components/DashboardPage/UserDrodown.tsx";
+import axios from "axios";
 
 const DashboardPage: FunctionComponent = () => {
   const scrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const {user} = useAuth();
-  
-  
+
+  const [recentDiagrams, setRecentDiagrams] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchDiagrams = async () => {
+      try {
+        const userId = user?.id
+        if (!userId) {
+          console.error('User ID is not available');
+          return;
+        }
+
+        const response = await axios.post('/api/user/diagrams', {userId});
+        setRecentDiagrams(response.data);
+      } catch (error) {
+        console.error('Failed to fetch recent diagrams:', error);
+      }
+    };
+
+    fetchDiagrams();
+  }, [user]);
+
   const scrollRight = () => {
     const carousel = document.getElementById('carousel');
     if (carousel) {
@@ -24,7 +45,7 @@ const DashboardPage: FunctionComponent = () => {
       }, 16);
     }
   };
-  
+
   const scrollLeft = () => {
     const carousel = document.getElementById('carousel');
     if (carousel) {
@@ -33,13 +54,13 @@ const DashboardPage: FunctionComponent = () => {
       }, 16);
     }
   };
-  
+
   const stopScroll = () => {
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
     }
   };
-  
+
   return (
     <div className="userdashboard">
       {/* Header */}
@@ -63,7 +84,7 @@ const DashboardPage: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Main Content */}
       <div className="pageSection">
         <div
@@ -78,35 +99,37 @@ const DashboardPage: FunctionComponent = () => {
                 <span>!</span>
             </span>
           </div>
-          
+
           {/* Recent Diagrams */}
           <div className="recentDiagramsWrapper">
             <div className="recentDiagramsSection">
               <div className="diagramText">Recent Diagrams</div>
-              <div className="carouselContainer">
-                <div className="carousel" id="carousel">
-                  {[...Array(12)].map((_, index) => (
-                    <CarouselElement key={index} num={index + 1}/>
-                  ))}
+              {recentDiagrams.length > 0 && (
+                <div className="carouselContainer">
+                  <div className="carousel" id="carousel">
+                    {recentDiagrams.map((_, index) => (
+                      <CarouselElement key={index} name={(index + 1).toString()}/>
+                    ))}
+                  </div>
+                  <div
+                    className="carouselArrow carouselArrowLeft"
+                    onMouseEnter={scrollLeft}
+                    onMouseLeave={stopScroll}
+                  >
+                    ←
+                  </div>
+                  <div
+                    className="carouselArrow carouselArrowRight"
+                    onMouseEnter={scrollRight}
+                    onMouseLeave={stopScroll}
+                  >
+                    →
+                  </div>
                 </div>
-                <div
-                  className="carouselArrow carouselArrowLeft"
-                  onMouseEnter={scrollLeft}
-                  onMouseLeave={stopScroll}
-                >
-                  ←
-                </div>
-                <div
-                  className="carouselArrow carouselArrowRight"
-                  onMouseEnter={scrollRight}
-                  onMouseLeave={stopScroll}
-                >
-                  →
-                </div>
-              </div>
+              )}
             </div>
           </div>
-          
+
           {/* New Diagrams */}
           <div className="newDiagramWrapper">
             <div className="diagramText">New Diagram</div>
@@ -129,7 +152,7 @@ const DashboardPage: FunctionComponent = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Footer */}
       <footer className="footer">
         <img className="footer-logo" src={Logo} alt="FlowDraw Logo"/>
@@ -140,9 +163,3 @@ const DashboardPage: FunctionComponent = () => {
 };
 
 export {DashboardPage};
-
-function fetchRecentDiagrams(userId: string, count: number): Promise<string[]> {
-  
-  
-  return Promise.all([]);
-}
