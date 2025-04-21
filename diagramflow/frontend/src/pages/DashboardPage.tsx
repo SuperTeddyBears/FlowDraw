@@ -23,10 +23,11 @@ const DashboardPage: FunctionComponent = () => {
       try {
         const userId = user?.id
         if (!userId) {
-          console.error('User ID is not available');
+          console.info('User ID is not available');
           return;
         }
 
+        // Call to backend api to retrieve all serialised diagrams
         const response = await axios.post('/api/user/diagrams', {userId});
         setRecentDiagrams(response.data);
       } catch (error) {
@@ -107,8 +108,8 @@ const DashboardPage: FunctionComponent = () => {
               {recentDiagrams.length > 0 && (
                 <div className="carouselContainer">
                   <div className="carousel" id="carousel">
-                    {recentDiagrams.map((_, index) => (
-                      <CarouselElement key={index} name={(index + 1).toString()}/>
+                    {recentDiagrams.map((diagram) => (
+                      <CarouselElement diagramData={diagram}/>
                     ))}
                   </div>
                   <div
@@ -139,10 +140,10 @@ const DashboardPage: FunctionComponent = () => {
                   {src: FlowchartDiagram, alt: 'Flowchart Diagram'},
                   {src: UMLDiagram, alt: 'UML Diagram'},
                   {src: NetDiagram, alt: 'Network Diagram'}
-                ].map((item, index) => (
-                  <Link to="/diagrampage" className="new-diagram-element" key={index}>
+                ].map((item) => (
+                  <Link to={{pathname: "/diagrampage"}} state={{ name: 'New ${item.alt}' }} >
                     <div className="diagramBox">
-                      <img src={item.src} alt={item.alt}/>
+                      <img src={item.src} alt={item.alt} />
                     </div>
                     <p className="carousel-caption">{item.alt}</p>
                   </Link>

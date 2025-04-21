@@ -1,10 +1,10 @@
 import {Dispatch, SetStateAction} from 'react';
 import './Navbar.css';
-import {handleHelpClick, serializeDiagram} from './utils.ts';
+import {handleHelpClick, serializeDiagram} from '../utils.ts';
 import {connection} from "../connection.ts";
 import {ExtendedDiagramElementProps} from "../Canvas/Canvas.tsx";
 
-const Navbar = ({diagramElements, connectionElements}:
+const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName}:
                 {
                   diagramElements: ExtendedDiagramElementProps[],
                   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
@@ -13,12 +13,21 @@ const Navbar = ({diagramElements, connectionElements}:
                   diagramName: string,
                   setDiagramName: Dispatch<SetStateAction<string>>,
                 }) => {
+  const handleRename = () => {
+    const newName = prompt('Enter new diagram name:', diagramName);
+    if (newName) {
+      setDiagramName(newName);
+    }
+  }
+
   return (
     <div className="navbar">
       <div className="navbar-left">
         <div className="logo">flow<span>draw</span>.</div>
         <div className="drawing-title">
-          <h1>Title of the drawing</h1>
+          <h1
+          onDoubleClick={handleRename}
+          >{diagramName}</h1>
           <div className="drawing-buttons">
             <button className="btn btn-primary" onClick={handleHelpClick}>File</button>
             <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
@@ -28,7 +37,7 @@ const Navbar = ({diagramElements, connectionElements}:
         </div>
       </div>
       <div className="navbar-right">
-        <button className="btn btn-share" onClick={() => serializeDiagram(diagramElements, connectionElements)}>Share</button>
+        <button className="btn btn-share" onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share</button>
       </div>
     </div>
   );

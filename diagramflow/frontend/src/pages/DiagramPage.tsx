@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import '../components/DiagramPage/App.css';
 import Navbar from '../components/DiagramPage/Navbar/Navbar';
 import Toolbar from '../components/DiagramPage/Toolbar/Toolbar';
@@ -6,8 +6,11 @@ import Sidebar from '../components/DiagramPage/Sidebar/Sidebar';
 import Canvas, {ExtendedDiagramElementProps} from '../components/DiagramPage/Canvas/Canvas';
 import Footer from '../components/DiagramPage/Footer/Footer';
 import {connection} from "../components/DiagramPage/connection.ts";
+import {useLocation} from "react-router-dom";
+import {deserializesDiagram, getDiagramName} from "../components/DiagramPage/utils.ts";
 
-export const DiagramPage: React.FC = () => {
+export const DiagramPage = () => {
+  const location = useLocation();
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   
   // Elementy diagramu
@@ -15,7 +18,11 @@ export const DiagramPage: React.FC = () => {
   // Połączenia między elementami
   const [connectionElements, setConnectionElements] = useState<connection[]>([]);
   // Nazwa diagramu
-  const [diagramName, setDiagramName] = useState<string>(`New Diagram ${Date.now()}`);
+  const [diagramName, setDiagramName] = useState<string>(getDiagramName(location.state?.diagram) || 'New Diagram');
+
+  useEffect(() => {
+    deserializesDiagram(location.state?.diagram, setDiagramElements, setConnectionElements);
+  }, [setDiagramElements, setConnectionElements, location.state?.diagram]);
   
   return (
     <div className="app">

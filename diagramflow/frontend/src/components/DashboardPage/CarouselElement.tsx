@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
 import diagram from "../../assets/dashboard_recent_diagram.png";
+import {getDiagramName} from "../DiagramPage/utils.ts";
 
-export function CarouselElement({ name }: { name: string }) {
+export function CarouselElement({ diagramData }: { diagramData: string }) {
   return (
-    <Link to="/diagrampage" className="carousel-element">
-      <img draggable={false} src={diagram} alt={name} />
-      <p className="carousel-caption">{name}</p>
+    <Link to={{ pathname: "/diagrampage"}} state={{diagram: diagramData}} className="carousel-element">
+      <img draggable={false} src={diagram} alt={getDiagramName(diagramData)} />
+      <p className="carousel-caption">{getDiagramName(diagramData)}</p>
     </Link>
   );
 }
