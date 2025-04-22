@@ -11,6 +11,8 @@ class User(AbstractUser):
     image = models.URLField(max_length=500, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
+
+
     REQUIRED_FIELDS = ['username']
 
     # THIS IS THE DEFAULT USER MODEL
