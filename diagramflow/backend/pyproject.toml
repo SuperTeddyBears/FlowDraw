@@ -18,7 +18,9 @@ dependencies = [
     "django-allauth (>=65.7.0,<66.0.0)",
     "python-dotenv (>=1.1.0,<2.0.0)",
     "dj-config-url (>=0.1.1,<0.2.0)",
-    "psycopg2-binary (>=2.9.10,<3.0.0)"
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "google-auth-oauthlib (>=1.2.2,<2.0.0)",
+    "google-api-python-client (>=2.167.0,<3.0.0)"
 ]
 
 
