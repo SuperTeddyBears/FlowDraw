@@ -35,7 +35,11 @@ const DashboardPage: FunctionComponent = () => {
 
         // Call to backend api to retrieve all serialised diagrams
         const response = await axios.get('/api/user/diagrams', { headers: { Authorization: `Bearer ${token}` } });
-        setRecentDiagrams(response.data);
+        const diagrams: string[] = []
+        for (const entry of response.data) {
+          diagrams.push(entry.data);
+        }
+        setRecentDiagrams(diagrams);
       } catch (error) {
         console.error('Failed to fetch recent diagrams:', error);
       }
@@ -148,13 +152,15 @@ const DashboardPage: FunctionComponent = () => {
                   {src: FlowchartDiagram, alt: 'Flowchart Diagram'},
                   {src: UMLDiagram, alt: 'UML Diagram'},
                   {src: NetDiagram, alt: 'Network Diagram'}
-                ].map((item) => (
-                  <Link to={{pathname: "/diagrampage"}} state={{ name: 'New ${item.alt}' }} >
-                    <div className="diagramBox">
-                      <img src={item.src} alt={item.alt} />
-                    </div>
-                    <p className="carousel-caption">{item.alt}</p>
-                  </Link>
+                ].map((item, index) => (
+                  <Fragment key={index}>
+                    <Link to={{pathname: "/diagrampage"}} state={{ name: `New ${item.alt}` }} >
+                      <div className="diagramBox">
+                        <img src={item.src} alt={item.alt} />
+                      </div>
+                      <p className="carousel-caption">{item.alt}</p>
+                    </Link>
+                  </Fragment>
                 ))}
               </div>
             </div>

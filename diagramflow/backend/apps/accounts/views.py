@@ -178,6 +178,7 @@ class VerifyTokenView(APIView):
         return Response({'user': {
             'id': user.id,
             'username': user.username,
+            'email': user.email,
             'name': user.name,
             'image': user.image,
         }},

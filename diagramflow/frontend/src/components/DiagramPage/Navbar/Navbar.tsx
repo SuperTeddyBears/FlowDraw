@@ -44,7 +44,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   return (
     <div className="navbar">
       <div className="navbar-left">
-        <Link to={"/"}>
+        <Link to={"/dashboard"}>
           <div className="logo">flow<span>draw</span>.</div>
         </Link>
         <div className="drawing-title">
