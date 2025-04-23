@@ -23,13 +23,18 @@ const DashboardPage: FunctionComponent = () => {
     const fetchDiagrams = async () => {
       try {
         const userId = user?.id
+        const token = localStorage.getItem('flow_auth_token');
         if (!userId) {
           console.info('User ID is not available');
           return;
         }
+        if (!token) {
+          console.error('Token not found');
+          return;
+        }
 
         // Call to backend api to retrieve all serialised diagrams
-        const response = await axios.post('/api/user/diagrams', {userId});
+        const response = await axios.get('/api/user/diagrams', { headers: { Authorization: `Bearer ${token}` } });
         setRecentDiagrams(response.data);
       } catch (error) {
         console.error('Failed to fetch recent diagrams:', error);

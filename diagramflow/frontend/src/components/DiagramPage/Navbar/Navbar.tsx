@@ -29,7 +29,16 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
     const json = serializeDiagram(diagramName, diagramElements, connectionElements);
     const userId = user?.id;
     console.log(userId, json);
-    axios.post('/api/user/save_diagram', {userId, json}).then(() => alert('Diagram saved successfully!'));
+    const token = localStorage.getItem('flow_auth_token');
+    if (!token) {
+      console.error('Token not found');
+      return;
+    }
+    axios.post(
+      '/api/user/save_diagram',
+      { user: userId, data: json },
+      { headers: { Authorization: `Bearer ${token}` } }
+    ).then(() => alert('Diagram saved successfully!'));
   }
 
   return (
