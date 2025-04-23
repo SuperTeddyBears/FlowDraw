@@ -169,9 +169,11 @@ class VerifyTokenView(APIView):
         return Response({'user': {
             'id': user.id,
             'username': user.username,
+            'email': user.email,
             'name': user.name,
             'image': user.image,
         }},
+
             status=status.HTTP_200_OK
         )
 
