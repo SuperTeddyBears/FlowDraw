@@ -5,7 +5,7 @@ import "../../styles/UserDropdown.css";
 
 const UserDropdown: React.FC = () => {
     const {user, logout} = useAuth();
-    console.log("User data in dropdown:", user); // Log user data for debugging
+    // console.log("User data in dropdown:", user); // Log user data for debugging
     const [isOpen, setIsOpen] = useState(false); // State for dropdown visibility
     const dropdownRef = useRef<HTMLDivElement>(null); // Ref for the dropdown
     const navigate = useNavigate();
@@ -40,17 +40,6 @@ const UserDropdown: React.FC = () => {
             <div className="dropdown-trigger" onClick={toggleDropdown}>
                 <div className="avatar">
                     {user?.image ? (
-                        // <img
-                        //     src={user.image || '/default-avatar.svg'}
-                        //     alt={user.name || 'User'}
-                        //     className="user-avatar"
-                        //     onError={(e) => {
-                        //         console.log("Nie udało się załadować obrazu:", user.image);
-                        //         e.currentTarget.onerror = null;
-                        //         e.currentTarget.src = '/default-avatar.svg';
-                        //     }}
-                        // />
-
                         <img
                             src={user.image}
                             alt="Avatar użytkownika"
