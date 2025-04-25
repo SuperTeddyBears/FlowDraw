@@ -38,7 +38,7 @@ export function serializeDiagram(
   return json;
 }
 
-export function deserializesDiagram(
+export function deserializeDiagram(
   diagram: string,
   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
   setConnectionElements: Dispatch<SetStateAction<connection[]>>,
@@ -46,7 +46,20 @@ export function deserializesDiagram(
   try {
     const json = JSON.parse(diagram);
     setDiagramElements(json.diagramElements);
-    setConnectionElements(json.connectionElements);
+    const connections = json.connectionElements.map((connectionElement: any) => {
+      const conn = new connection(
+        connectionElement.id,
+        connectionElement.start.x,
+        connectionElement.start.y,
+        connectionElement.end.x,
+        connectionElement.end.y,
+        connectionElement.lineType,
+      );
+      conn.setStart(connectionElement.start.elementId, connectionElement.start.position);
+      conn.setEnd(connectionElement.end.elementId, connectionElement.end.position);
+      return conn;
+    });
+    setConnectionElements(connections);
   } catch (error) {
     console.error("Invalid diagram JSON:", error);
   }

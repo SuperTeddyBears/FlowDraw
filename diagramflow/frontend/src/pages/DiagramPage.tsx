@@ -7,7 +7,7 @@ import Canvas, {ExtendedDiagramElementProps} from '../components/DiagramPage/Can
 import Footer from '../components/DiagramPage/Footer/Footer';
 import {connection} from "../components/DiagramPage/connection.ts";
 import {useLocation} from "react-router-dom";
-import {deserializesDiagram} from "../components/DiagramPage/utils.ts";
+import {deserializeDiagram} from "../components/DiagramPage/utils.ts";
 
 export const DiagramPage = () => {
   const location = useLocation();
@@ -21,7 +21,10 @@ export const DiagramPage = () => {
   const [diagramName, setDiagramName] = useState<string>(location.state?.name || 'New Diagram');
 
   useEffect(() => {
-    deserializesDiagram(location.state?.diagram, setDiagramElements, setConnectionElements);
+    if (!location.state?.diagram) {
+      return;
+    }
+    deserializeDiagram(location.state?.diagram, setDiagramElements, setConnectionElements);
   }, [location.state?.diagram]);
   
   return (
