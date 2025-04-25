@@ -5,43 +5,57 @@ import networkImage from '../assets/network.png';
 import '../styles/HomePage.css';
 import { motion } from 'framer-motion';
 import logo from "../assets/logo.svg";
+import {useAuth} from "../contexts/AuthContext.tsx";
+import UserDropdown from "../components/DashboardPage/UserDrodown.tsx";
 
 import '../styles/App.css';
 export function HomePage() {
+  const {isAuthenticated, loading} = useAuth();
+
   return (
-    <div className='HomePage'>
-      <motion.div
-        className='RegisterLoginButtons'
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1, duration: 0.8 }}
-      >
-        <Link to="/register">
-          <motion.button
-            whileHover={{ 
-              scale: 1.15, 
-              boxShadow: "0px 5px 15px rgba(0, 174, 239, 0.4)" 
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            Register
-          </motion.button>
-        </Link>
-        <Link to="/login">
-          <motion.button 
-            className="Login"
-            whileHover={{ 
-              scale: 1.15, 
-              boxShadow: "0px 5px 15px rgba(0, 174, 239, 0.4)" 
-            }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          >
-            Login
-          </motion.button>
-        </Link>
-      </motion.div>
+      <div className='HomePage'>
+        <motion.div
+            className='RegisterLoginButtons'
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 0.8 }}
+        >
+          {isAuthenticated ? (
+              // Użytkownik zalogowany - pokaż ikonkę użytkownika
+              <div className="genericAvatar">
+                <UserDropdown />
+              </div>
+          ) : (
+              // Użytkownik niezalogowany - pokaż przyciski Register i Login
+              <>
+                <Link to="/register">
+                  <motion.button
+                      whileHover={{
+                        scale: 1.15,
+                        boxShadow: "0px 5px 15px rgba(0, 174, 239, 0.4)"
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    Register
+                  </motion.button>
+                </Link>
+                <Link to="/login">
+                  <motion.button
+                      className="Login"
+                      whileHover={{
+                        scale: 1.15,
+                        boxShadow: "0px 5px 15px rgba(0, 174, 239, 0.4)"
+                      }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                  >
+                    Login
+                  </motion.button>
+                </Link>
+              </>
+          )}
+        </motion.div>
   
       <motion.div
         className="WelcomeMessage"
