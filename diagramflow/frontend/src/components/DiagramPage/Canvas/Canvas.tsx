@@ -72,17 +72,12 @@ const Canvas = ({
       ...prev,
       { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
     ]);
-    console.log('Saving state. UndoStack size:', undoStack.length);
-    console.log('DiagramElements:', JSON.stringify(diagramElements, null, 2));
-    console.log('ConnectionElements:', JSON.stringify(connectionElements, null, 2));
     setRedoStack([]);
   };
 
   const handleUndo = () => {
-    console.log('Undoing. UndoStack size:', undoStack.length);
     if (undoStack.length > 0) {
       const lastState = undoStack.pop();
-      console.log('Restored state:', JSON.stringify(lastState, null, 2));
       setRedoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
