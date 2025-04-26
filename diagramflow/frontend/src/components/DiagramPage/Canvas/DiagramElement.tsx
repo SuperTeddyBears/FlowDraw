@@ -15,6 +15,8 @@ export interface DiagramElementProps {
     onAddTextElement: (x: number, y: number) => void;
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
     onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
+    onDragEndCustom?: () => void;
+    onSaveState?: () => void;
 }
 
 export const DiagramElement = ({
@@ -27,6 +29,7 @@ export const DiagramElement = ({
                                    onAddTextElement,
                                    onPositionChange,
                                    onContextMenu,
+                                   onSaveState,
                                }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
@@ -42,6 +45,14 @@ export const DiagramElement = ({
     // Ref typu Konva.Transformer (z modułu 'konva')
     const transformerRef = useRef<Konva.Transformer>(null);
     const [isSelected, setIsSelected] = useState(false);
+
+    useEffect(() => {
+        setShape((prev) => ({
+            ...prev,
+            x: posX,
+            y: posY,
+        }));
+    }, [posX, posY]);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         const newX = e.target.x();
@@ -147,7 +158,9 @@ export const DiagramElement = ({
                 onDblClick={handleDoubleClick}
                 onDragMove={updatePosition}
                 onTransform={updateSize}
-                onDragEnd={() => setIsSelected(false)}
+                onTransformStart={() => {if (onSaveState) onSaveState();}}
+                onDragEnd={() => {setIsSelected(false);}}
+                onDragStart={() => {if (onSaveState) onSaveState();}}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 

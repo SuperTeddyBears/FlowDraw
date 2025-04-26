@@ -266,6 +266,7 @@ const Canvas = ({
 
   const handleTextareaBlur = () => {
     if (activeTextarea) {
+      saveStateToUndoStack();
       setDiagramElements((prev) =>
         prev.map((el) => {
           return {
@@ -323,7 +324,6 @@ const Canvas = ({
     width: number,
     height: number
   ) => {
-    saveStateToUndoStack(); // Save state before updating position
     setDiagramElements((prev) =>
       prev.map((el) => {
         if (el.id === id) {
@@ -386,6 +386,7 @@ const Canvas = ({
                   onContextMenu={(e) =>
                     handleKonvaContextMenu(e, element.id)
                   }
+                  onSaveState={saveStateToUndoStack}
                 />
               </Fragment>
             ))}
