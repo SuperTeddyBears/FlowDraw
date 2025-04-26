@@ -1,6 +1,6 @@
 // Canvas.tsx
 import './Canvas.css';
-import {Layer, Stage} from "react-konva";
+import { Layer, Stage } from "react-konva";
 import {
   ChangeEvent,
   Dispatch,
@@ -12,14 +12,15 @@ import {
   useRef,
   useState
 } from "react";
-import {DiagramElement, DiagramElementProps} from "./DiagramElement.tsx";
-import {KonvaEventObject} from "konva/lib/Node";
+import { DiagramElement, DiagramElementProps } from "./DiagramElement.tsx";
+import { KonvaEventObject } from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
-import {connection, lineTypes} from "../connection.ts";
+import { connection, lineTypes } from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
+import Toolbar from "../Toolbar/Toolbar.tsx";
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
-  id: string; // dodany identyfikator
+  id: string;
   posX: number;
   posY: number;
   width: number;
@@ -34,50 +35,92 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements}:
-                {
-                  sidebarRef: RefObject<HTMLDivElement | null>,
-                  diagramElements: ExtendedDiagramElementProps[],
-                  setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
-                  connectionElements: connection[],
-                  setConnectionElements: Dispatch<SetStateAction<connection[]>>
-                }) => {
+const Canvas = ({
+  sidebarRef,
+  diagramElements,
+  setDiagramElements,
+  connectionElements,
+  setConnectionElements,
+}: {
+  sidebarRef: RefObject<HTMLDivElement | null>;
+  diagramElements: ExtendedDiagramElementProps[];
+  setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>;
+  connectionElements: connection[];
+  setConnectionElements: Dispatch<SetStateAction<connection[]>>;
+}) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
-  
-  // Stan aktywnego elementu do wprowadzania tekstu
-  const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
-  // Stan menu kontekstowego
+
+  const [activeTextarea, setActiveTextarea] = useState<{
+    x: number;
+    y: number;
+    text: string;
+    id: string;
+  } | null>(null);
+
   const [contextMenu, setContextMenu] = useState<ContextMenuProps>({
     visible: false,
     x: 0,
     y: 0,
     targetId: null,
   });
-  
+
+  const [undoStack, setUndoStack] = useState<{ diagramElements: ExtendedDiagramElementProps[]; connectionElements: connection[] }[]>([]);
+  const [redoStack, setRedoStack] = useState<{ diagramElements: ExtendedDiagramElementProps[]; connectionElements: connection[] }[]>([]);
+
+  const saveStateToUndoStack = () => {
+    setUndoStack((prev) => [
+      ...prev,
+      { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
+    ]);
+    setRedoStack([]);
+  };
+
+  const handleUndo = () => {
+    if (undoStack.length > 0) {
+      const lastState = undoStack.pop();
+      setRedoStack((prev) => [
+        ...prev,
+        { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
+      ]);
+      setDiagramElements(lastState?.diagramElements || []);
+      setConnectionElements(lastState?.connectionElements || []);
+    }
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const nextState = redoStack.pop();
+      setUndoStack((prev) => [
+        ...prev,
+        { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
+      ]);
+      setDiagramElements(nextState?.diagramElements || []);
+      setConnectionElements(nextState?.connectionElements || []);
+    }
+  };
+
   const handleKonvaContextMenu = (
     e: KonvaEventObject<PointerEvent>,
     index: string
   ) => {
     e.evt.preventDefault();
-    
     const sidebarWidth = sidebarRef.current?.offsetWidth || 0;
     const sidebarTop = sidebarRef.current?.getBoundingClientRect().top || 0;
-    
     const clickX = e.evt.clientX - sidebarWidth;
     const clickY = e.evt.clientY - sidebarTop;
-    
+
     setContextMenu({
       visible: true,
       x: clickX,
       y: clickY,
-      targetId: index
+      targetId: index,
     });
   };
-  
+
   const handleCloseContextMenu = () => {
-    setContextMenu((prev) => ({...prev, visible: false}));
+    setContextMenu((prev) => ({ ...prev, visible: false }));
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const menu = document.querySelector('.context-menu');
@@ -85,71 +128,84 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         handleCloseContextMenu();
       }
     };
-    
+
     if (contextMenu.visible) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [contextMenu.visible]);
-  
+
   const handleMenuAction = (
     action: 'bringToFront' | 'sendToBack' | 'delete'
   ) => {
+    saveStateToUndoStack(); // Save state before performing menu actions
     const id = contextMenu.targetId;
     if (!id) return;
-    
+
     const updated = [...diagramElements];
     const index = updated.findIndex((item) => item.id === id);
     if (index === -1) {
-      const connectionIndex = connectionElements.findIndex((conn) => conn.id.toString() === id);
+      const connectionIndex = connectionElements.findIndex(
+        (conn) => conn.id.toString() === id
+      );
       if (connectionIndex === -1) return;
-      
+
       const [connection] = connectionElements.splice(connectionIndex, 1);
-      
+
       if (action === 'bringToFront') {
         setConnectionElements((prev) => [...prev, connection]);
       } else if (action === 'sendToBack') {
         setConnectionElements((prev) => [connection, ...prev]);
       } else if (action === 'delete') {
-        setConnectionElements((prev) => prev.filter((_, i) => i !== connectionIndex));
+        setConnectionElements((prev) =>
+          prev.filter((_, i) => i !== connectionIndex)
+        );
       }
-      
+
       handleCloseContextMenu();
       return;
     }
-    
+
     const [item] = updated.splice(index, 1);
-    
+
     if (action === 'bringToFront') updated.push(item);
     else if (action === 'sendToBack') updated.unshift(item);
-    
+
     setDiagramElements(updated);
     handleCloseContextMenu();
   };
-  
+
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
+    saveStateToUndoStack(); // Save state before adding a new element
     const droppedPath = e.dataTransfer?.getData('text/plain');
-    
+
     if (droppedPath.includes('conn')) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (droppedPath && canvasRef.current && rect) {
         const offset = 50;
         let x = e.clientX - rect.left + canvasRef.current.scrollLeft;
         let y = e.clientY - rect.top + canvasRef.current.scrollTop;
-        
+
         x = Math.max(offset, Math.min(3000 - offset, x));
         y = Math.max(offset, Math.min(3000 - offset, y));
-        
-        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.straight);
+
+        const newConnection: connection = new connection(
+          Date.now(),
+          x - 50,
+          y + 50,
+          x + 50,
+          y - 50,
+          lineTypes.straight
+        );
         setConnectionElements((prev) => [...prev, newConnection]);
       }
       return;
     }
-    
+
     const rect = canvasRef.current?.getBoundingClientRect();
     if (droppedPath && canvasRef.current && rect) {
       const img = new window.Image();
@@ -157,13 +213,20 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       img.onload = () => {
         const width = img.width;
         const height = img.height;
-        // Generujemy unikalne id
         const newId = `element-${Date.now()}`;
         const newElement: ExtendedDiagramElementProps = {
           id: newId,
           path: droppedPath,
-          posX: e.clientX - rect.left + canvasRef.current!.scrollLeft - width / 2,
-          posY: e.clientY - rect.top + canvasRef.current!.scrollTop - height / 2,
+          posX:
+            e.clientX -
+            rect.left +
+            canvasRef.current!.scrollLeft -
+            width / 2,
+          posY:
+            e.clientY -
+            rect.top +
+            canvasRef.current!.scrollTop -
+            height / 2,
           width,
           height,
           onTextClick: handleTextClick,
@@ -175,44 +238,50 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         };
         setDiagramElements((prev) => [...prev, newElement]);
       };
-      
+
       img.onerror = () => {
         console.error('Failed to load the image:', droppedPath);
       };
     }
   };
-  
+
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
-  
-  const handleTextClick = (x: number, y: number, currentText: string, id: string) => {
-    setActiveTextarea({x, y, text: currentText, id});
+
+  const handleTextClick = (
+    x: number,
+    y: number,
+    currentText: string,
+    id: string
+  ) => {
+    setActiveTextarea({ x, y, text: currentText, id });
   };
-  
+
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (activeTextarea) {
-      setActiveTextarea({...activeTextarea, text: e.target.value});
+      setActiveTextarea({ ...activeTextarea, text: e.target.value });
     }
   };
-  
+
   const handleTextareaBlur = () => {
     if (activeTextarea) {
-      // Aktualizujemy tekst w odpowiednim elemencie
-      setDiagramElements(prev =>
-        prev.map(el => {
+      setDiagramElements((prev) =>
+        prev.map((el) => {
           return {
             ...el,
-            textElements: el.textElements.map(te =>
-              te.id === activeTextarea.id ? {...te, text: activeTextarea.text} : te
-            )
+            textElements: el.textElements.map((te) =>
+              te.id === activeTextarea.id
+                ? { ...te, text: activeTextarea.text }
+                : te
+            ),
           };
         })
       );
       setActiveTextarea(null);
     }
   };
-  
+
   const handleAddTextElement = (x: number, y: number) => {
     const newId = `text-${Date.now()}`;
     const newTextElement = {
@@ -221,36 +290,42 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       x,
       y,
     };
-    
+
     setDiagramElements((prev) => {
       return prev.map((el) => {
         if (el.hasText) {
           return el;
         }
-        
+
         const isWithinBounds =
           x >= el.posX &&
           x <= el.posX + el.width &&
           y >= el.posY &&
           y <= el.posY + el.height;
-        
+
         if (isWithinBounds) {
           return {
             ...el,
-            textElements: [newTextElement], // Replace any existing text element
-            hasText: true, // Mark as having text
+            textElements: [newTextElement],
+            hasText: true,
           };
         }
-        
-        return el; // Return the element unchanged if no conditions are met
+
+        return el;
       });
     });
   };
-  
-  // Callback aktualizujący pozycję i rozmiar elementu – wywoływany z DiagramElement przy drag/transform
-  const handlePositionChange = (id: string, x: number, y: number, width: number, height: number) => {
-    setDiagramElements(prev =>
-      prev.map(el => {
+
+  const handlePositionChange = (
+    id: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ) => {
+    saveStateToUndoStack(); // Save state before updating position
+    setDiagramElements((prev) =>
+      prev.map((el) => {
         if (el.id === id) {
           return {
             ...el,
@@ -258,30 +333,44 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
             posY: y,
             width,
             height,
-            textElements: el.textElements.map(te => ({
+            textElements: el.textElements.map((te) => ({
               ...te,
-              x: x + width / 2 - 50, // Center horizontally
-              y: y + height / 2 - 10, // Center vertically
+              x: x + width / 2 - 50,
+              y: y + height / 2 - 10,
             })),
           };
         }
         return el;
       })
     );
-    
   };
-  
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'z') {
+        handleUndo();
+      } else if (e.ctrlKey && e.key === 'y') {
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   return (
     <div
       className="canvas-container"
       ref={canvasRef}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      style={{position: 'relative', width: '100%', height: '100%'}}
+      style={{ position: 'relative', width: '100%', height: '100%' }}
     >
+      <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
       <div className="canvas-grid">
         <Stage width={3000} height={3000}>
-          {/* Warstwa rysująca elementy diagramu */}
           <Layer>
             {diagramElements.map((element) => (
               <Fragment key={element.id}>
@@ -294,15 +383,15 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   textElements={element.textElements}
                   onAddTextElement={handleAddTextElement}
                   onPositionChange={handlePositionChange}
-                  onContextMenu={(e) => handleKonvaContextMenu(e, element.id)}
+                  onContextMenu={(e) =>
+                    handleKonvaContextMenu(e, element.id)
+                  }
                 />
               </Fragment>
             ))}
           </Layer>
-          
-          {/* Warstwa rysująca połączenia */}
           <Layer>
-            {connectionElements.map((element) =>
+            {connectionElements.map((element) => (
               <Fragment key={element.id}>
                 <ConnectionElement
                   element={element}
@@ -310,11 +399,11 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   handleKonvaContextMenu={handleKonvaContextMenu}
                 />
               </Fragment>
-            )}
+            ))}
           </Layer>
         </Stage>
       </div>
-      
+
       {activeTextarea && (
         <textarea
           ref={(textarea) => {
@@ -345,7 +434,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
           autoFocus
         />
       )}
-      
+
       {contextMenu.visible && (
         <ContextMenu
           x={contextMenu.x}
