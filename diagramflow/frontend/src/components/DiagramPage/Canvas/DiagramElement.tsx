@@ -15,7 +15,6 @@ export interface DiagramElementProps {
     onAddTextElement: (x: number, y: number) => void;
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
     onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
-    onDragEndCustom?: () => void;
     onSaveState?: () => void;
 }
 
