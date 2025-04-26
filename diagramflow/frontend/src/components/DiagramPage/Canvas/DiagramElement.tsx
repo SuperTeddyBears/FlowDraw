@@ -10,6 +10,8 @@ export interface DiagramElementProps {
     path: string;
     posX: number;
     posY: number;
+    width: number;
+    height: number;
     onTextClick: (x: number, y: number, currentText: string, id: string) => void;
     textElements: { id: string; text: string; x: number; y: number }[];
     onAddTextElement: (x: number, y: number) => void;
@@ -23,6 +25,8 @@ export const DiagramElement = ({
                                    path,
                                    posX,
                                    posY,
+                                   width,
+                                   height,
                                    onTextClick,
                                    textElements,
                                    onAddTextElement,
@@ -50,8 +54,10 @@ export const DiagramElement = ({
             ...prev,
             x: posX,
             y: posY,
+            width: width || img.width || 100,
+            height: height || img.height || 100,
         }));
-    }, [posX, posY]);
+    }, [posX, posY,width, height]);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         const newX = e.target.x();
@@ -80,7 +86,7 @@ export const DiagramElement = ({
     
             const deltaX = (newWidth - shape.width) / 2;
             const deltaY = (newHeight - shape.height) / 2;
-    
+
             setShape((prev) => ({
                 ...prev,
                 x: prev.x - deltaX,
@@ -88,10 +94,10 @@ export const DiagramElement = ({
                 width: newWidth,
                 height: newHeight,
             }));
-    
+
             node.scaleX(1);
             node.scaleY(1);
-    
+
             if (onPositionChange && id) {
                 onPositionChange(id, shape.x - deltaX, shape.y - deltaY, newWidth, newHeight);
             }
@@ -155,11 +161,11 @@ export const DiagramElement = ({
                 draggable={true}
                 onClick={() => setIsSelected(!isSelected)}
                 onDblClick={handleDoubleClick}
-                onDragMove={updatePosition}
                 onTransform={updateSize}
                 onTransformStart={() => {if (onSaveState) onSaveState();}}
-                onDragEnd={() => {setIsSelected(false);}}
+                onDragMove={updatePosition}
                 onDragStart={() => {if (onSaveState) onSaveState();}}
+                onDragEnd={() => {setIsSelected(false);}}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 
