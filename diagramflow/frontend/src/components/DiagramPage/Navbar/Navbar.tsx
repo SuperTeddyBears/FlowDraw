@@ -1,10 +1,12 @@
-import {Dispatch, SetStateAction} from 'react';
+import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 import './Navbar.css';
 import {handleHelpClick, serializeDiagram} from '../utils.ts';
 import {connection} from "../connection.ts";
 import {ExtendedDiagramElementProps} from "../Canvas/Canvas.tsx";
 import {Link} from "react-router-dom";
 import {useAuth} from "../../../contexts/AuthContext.tsx";
+import EditIconBlack from '../../../assets/diagrampage_edit_icon_black.svg';
+import EditIconBlue from '../../../assets/diagrampage_edit_icon_blue.svg';
 import axios from "axios";
 
 const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName}:
@@ -17,14 +19,28 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   setDiagramName: Dispatch<SetStateAction<string>>,
 }) => {
   const {user} = useAuth();
-  
+
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [newDiagramName, setNewDiagramName] = useState(diagramName);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isHoveringTitle, setIsHoveringTitle] = useState(false);
+
   const handleRename = () => {
-    const newName = prompt('Enter new diagram name:', diagramName);
-    if (newName) {
-      setDiagramName(newName);
+    setNewDiagramName(diagramName);
+    setIsRenameModalOpen(true);
+  };
+
+  const handleRenameSave = () => {
+    if (newDiagramName.trim() !== '') {
+      setDiagramName(newDiagramName.trim());
     }
-  }
-  
+    setIsRenameModalOpen(false);
+  };
+
+  const handleRenameCancel = () => {
+    setIsRenameModalOpen(false);
+  };
+
   const handleSave = async () => {
     const json = serializeDiagram(diagramName, diagramElements, connectionElements);
     const userId = user?.id;
@@ -41,6 +57,13 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
     ).then(() => alert('Diagram saved successfully!'));
   }
 
+  useEffect(() => {
+    if (isRenameModalOpen && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isRenameModalOpen]);
+
   return (
     <div className="navbar">
       <div className="navbar-left">
@@ -48,9 +71,19 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
           <div className="logo">flow<span>draw</span>.</div>
         </Link>
         <div className="drawing-title">
-          <h1
-          onDoubleClick={handleRename}
-          >{diagramName}</h1>
+          <div
+              className="drawing-title-header"
+              onDoubleClick={handleRename}
+              onMouseEnter={() => setIsHoveringTitle(true)}
+              onMouseLeave={() => setIsHoveringTitle(false)}
+          >
+            <h1 className="drawing-title-text">{diagramName}</h1>
+            <img
+                src={isHoveringTitle ? EditIconBlue : EditIconBlack}
+                alt="Edit Diagram Name"
+                className="edit-icon"
+            />
+          </div>
           <div className="drawing-buttons">
             <button className="btn btn-primary" onClick={handleSave}>Save</button>
             <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
@@ -60,8 +93,33 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
         </div>
       </div>
       <div className="navbar-right">
-        <button className="btn btn-share" onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share</button>
+        <button className="btn btn-share"
+                onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share
+        </button>
       </div>
+      {isRenameModalOpen && (
+          <div className="modal-overlay" onClick={handleRenameCancel}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={handleRenameCancel}>×</button>
+            <h2 className="modal-title">Diagram name:</h2>
+            <input
+                ref={inputRef}
+                type="text"
+                value={newDiagramName}
+                onChange={(e) => setNewDiagramName(e.target.value)}
+                className="modal-input"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleRenameSave();
+                  if (e.key === 'Escape') handleRenameCancel();
+                }}
+            />
+            <div className="modal-buttons">
+              <button className="modal-button-cancel" onClick={handleRenameCancel}>Cancel</button>
+              <button className="modal-button-save" onClick={handleRenameSave}>Change name</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
