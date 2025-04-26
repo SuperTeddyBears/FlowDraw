@@ -7,10 +7,8 @@ pipeline {
     }
 
     stages {
-        stage('Windows') {
-            agent {
-                label 'windows'
-            }
+        stage('Linux') {
+            agent any
             when {
                 beforeAgent true
                 anyOf {
@@ -20,15 +18,30 @@ pipeline {
                 }
             }
             stages {
-                stage('Build application') {
-                    agent {
-                        docker {
-                            image ".../jenkins-build-containers-prod:ve-services-windows"
+                stage('Build Docker Image') {
+                    steps {
+                        dir('diagramflow') {
+                          sh 'docker-compose build'
+                          sh 'docker-compose up -d'
                         }
                     }
-                    steps {
-                        dir('diagramflow/deployment') {
-                          powershell './build.ps1'
+                }
+                stage('Clean Docker') {
+                    script {
+                        def userInput = input(
+                            message: 'Do you want to stop the containers now?',
+                            parameters: [
+                                choice(choices: ['Yes', 'No'], defaultValue: 'No'  )
+                            ],
+                            timeout: 1800
+                        )
+                        
+                        if (userInput == 'Yes') {
+                            sh 'docker-compose down'
+                        } else {
+                            sleep 3600
+                            echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
+                            sh 'docker-compose down'
                         }
                     }
                 }
