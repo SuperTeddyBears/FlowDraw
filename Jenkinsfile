@@ -27,21 +27,23 @@ pipeline {
                     }
                 }
                 stage('Clean Docker') {
-                    script {
-                        def userInput = input(
-                            message: 'Do you want to stop the containers now?',
-                            parameters: [
-                                choice(choices: ['Yes', 'No'], defaultValue: 'No'  )
-                            ],
-                            timeout: 1800
-                        )
-                        
-                        if (userInput == 'Yes') {
-                            sh 'docker-compose down'
-                        } else {
-                            sleep 3600
-                            echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
-                            sh 'docker-compose down'
+                    steps{
+                        script {
+                            def userInput = input(
+                                message: 'Do you want to stop the containers now?',
+                                parameters: [
+                                    choice(choices: ['Yes', 'No'], defaultValue: 'No'  )
+                                ],
+                                timeout: 1800
+                            )
+
+                            if (userInput == 'Yes') {
+                                sh 'docker-compose down'
+                            } else {
+                                sleep 3600
+                                echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
+                                sh 'docker-compose down'
+                            }
                         }
                     }
                 }
