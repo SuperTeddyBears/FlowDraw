@@ -147,3 +147,110 @@
         opacity: 1;
     }
 }
+
+.drawing-title-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.drawing-title-text {
+    margin: 0;
+    font-size: 20px;
+    font-weight: normal;
+    color: #1E1E1E;
+}
+
+.edit-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    margin-bottom: 6px;
+    transition: filter 0.3s;
+}
+
+.drawing-title-header:hover .drawing-title-text {
+    color: #00a8e8;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 10px;
+    min-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.modal-close {
+    position: absolute;
+    top: 3px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.modal-buttons .modal-button-cancel {
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: white;
+    color: #333;
+    border: 1px solid #ABABAB;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+.modal-buttons .modal-button-cancel:hover {
+    background: #f5f5f5;
+}
+
+.modal-buttons .modal-button-save {
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: #00A8E8;
+    color: white;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-buttons .modal-button-save:hover {
+    background: #008fc7;
+}
