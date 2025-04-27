@@ -8,7 +8,7 @@ pipeline {
 
     stages {
         stage('Linux') {
-            agent { label 'agent-default' }
+            agent any
             when {
                 beforeAgent true
                 anyOf {
@@ -19,6 +19,12 @@ pipeline {
             }
             stages {
                 stage('Build Docker Image') {
+                    agent {
+                        docker {
+                            reuseNode true
+                            image "docker-default"
+                        }
+                    }
                     steps {
                         dir('diagramflow') {
                           sh 'docker-compose build'
