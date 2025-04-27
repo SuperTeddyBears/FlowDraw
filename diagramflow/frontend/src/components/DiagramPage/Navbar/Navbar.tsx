@@ -24,6 +24,8 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   const [newDiagramName, setNewDiagramName] = useState(diagramName);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isHoveringTitle, setIsHoveringTitle] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleRename = () => {
     setNewDiagramName(diagramName);
@@ -55,7 +57,22 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
       { user: userId, data: json },
       { headers: { Authorization: `Bearer ${token}` } }
     ).then(() => alert('Diagram saved successfully!'));
-  }
+  };
+
+  // wywoływane po kliknięciu przycisku Save
+  const onSaveClick = () => {
+    setShowConfirm(true);
+  };
+
+  // użytkownik potwierdza zapis
+  const confirmSave = () => {
+    setShowConfirm(false);
+    handleSave();
+    setShowSuccess(true);
+  };
+
+  const cancelSave = () => setShowConfirm(false);
+  const closeSuccess = () => setShowSuccess(false);
 
   useEffect(() => {
     if (isRenameModalOpen && inputRef.current) {
@@ -65,44 +82,46 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   }, [isRenameModalOpen]);
 
   return (
-    <div className="navbar">
-      <div className="navbar-left">
-        <Link to={"/dashboard"}>
-          <div className="logo">flow<span>draw</span>.</div>
-        </Link>
-        <div className="drawing-title">
-          <div
-              className="drawing-title-header"
-              onDoubleClick={handleRename}
-              onMouseEnter={() => setIsHoveringTitle(true)}
-              onMouseLeave={() => setIsHoveringTitle(false)}
-          >
-            <h1 className="drawing-title-text">{diagramName}</h1>
-            <img
-                src={isHoveringTitle ? EditIconBlue : EditIconBlack}
-                alt="Edit Diagram Name"
-                className="edit-icon"
-            />
+      <>
+        <div className="navbar">
+          <div className="navbar-left">
+            <Link to={"/dashboard"}>
+              <div className="logo">flow<span>draw</span>.</div>
+            </Link>
+            <div className="drawing-title">
+              <div
+                className="drawing-title-header"
+                onDoubleClick={handleRename}
+                onMouseEnter={() => setIsHoveringTitle(true)}
+                onMouseLeave={() => setIsHoveringTitle(false)}
+              >
+                <h1 className="drawing-title-text">{diagramName}</h1>
+                <img
+                  src={isHoveringTitle ? EditIconBlue : EditIconBlack}
+                  alt="Edit Diagram Name"
+                  className="edit-icon"
+                />
+              </div>
+              <div className="drawing-buttons">
+                <button className="btn btn-primary" onClick={onSaveClick}>Save</button>
+                <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
+                <button className="btn btn-primary" onClick={handleHelpClick}>View</button>
+                <button className="btn btn-primary" onClick={handleHelpClick}>Help</button>
+              </div>
+            </div>
           </div>
-          <div className="drawing-buttons">
-            <button className="btn btn-primary" onClick={handleSave}>Save</button>
-            <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
-            <button className="btn btn-primary" onClick={handleHelpClick}>View</button>
-            <button className="btn btn-primary" onClick={handleHelpClick}>Help</button>
+          <div className="navbar-right">
+            <button className="btn btn-share" onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share</button>
           </div>
         </div>
-      </div>
-      <div className="navbar-right">
-        <button className="btn btn-share"
-                onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share
-        </button>
-      </div>
-      {isRenameModalOpen && (
+        
+        {/*Rename Modal*/}
+        {isRenameModalOpen && (
           <div className="modal-overlay" onClick={handleRenameCancel}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={handleRenameCancel}>×</button>
-            <h2 className="modal-title">Diagram name:</h2>
-            <input
+              <button className="modal-close" onClick={handleRenameCancel}>×</button>
+              <h2 className="modal-title">Diagram name:</h2>
+              <input
                 ref={inputRef}
                 type="text"
                 value={newDiagramName}
@@ -112,15 +131,44 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
                   if (e.key === 'Enter') handleRenameSave();
                   if (e.key === 'Escape') handleRenameCancel();
                 }}
-            />
-            <div className="modal-buttons">
-              <button className="modal-button-cancel" onClick={handleRenameCancel}>Cancel</button>
-              <button className="modal-button-save" onClick={handleRenameSave}>Change name</button>
+              />
+              <div className="modal-buttons">
+                <button className="modal-button-cancel" onClick={handleRenameCancel}>Cancel</button>
+                <button className="modal-button-save" onClick={handleRenameSave}>Change name</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {/* Confirmation Modal */}
+        {showConfirm && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <p>Czy na pewno chcesz zapisać diagram?</p>
+                <div className="modal-buttons">
+                  <button className="btn btn-primary" onClick={confirmSave}>
+                    Tak
+                  </button>
+                  <button className="btn btn-secondary" onClick={cancelSave}>
+                    Nie
+                  </button>
+                </div>
+              </div>
+            </div>
+        )}
+
+        {/* Success Modal */}
+        {showSuccess && (
+            <div className="modal-overlay success">
+              <div className="modal success-modal">
+                <p>Gratulacje! Zapisano!</p>
+                <button className="btn btn-primary" onClick={closeSuccess}>
+                  OK
+                </button>
+              </div>
+            </div>
+        )}
+      </>
   );
 };
 
