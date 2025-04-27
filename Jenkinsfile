@@ -8,7 +8,7 @@ pipeline {
 
     stages {
         stage('Linux') {
-            agent any
+            agent { label 'agent-default' }
             when {
                 beforeAgent true
                 anyOf {
