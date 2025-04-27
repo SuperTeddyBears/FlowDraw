@@ -116,8 +116,8 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
         
         {/*Rename Modal*/}
         {isRenameModalOpen && (
-          <div className="modal-overlay" onClick={handleRenameCancel}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-overlay" onMouseDown={handleRenameCancel}>
+            <div className="modal-content" onMouseDown={(e) => e.stopPropagation()}>
               <button className="modal-close" onClick={handleRenameCancel}>×</button>
               <h2 className="modal-title">Diagram name:</h2>
               <input
