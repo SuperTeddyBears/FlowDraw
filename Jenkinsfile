@@ -21,8 +21,8 @@ pipeline {
                 stage('Build Docker Image') {
                     steps {
                         dir('diagramflow') {
-                          sh 'docker-compose build'
-                          sh 'docker-compose up -d'
+                          sh 'sudo docker-compose build'
+                          sh 'sudo docker-compose up -d'
                         }
                     }
                 }
@@ -38,11 +38,11 @@ pipeline {
                             )
 
                             if (userInput == 'Yes') {
-                                sh 'docker-compose down'
+                                sh 'sudo docker-compose down'
                             } else {
                                 sleep 3600
                                 echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
-                                sh 'docker-compose down'
+                                sh 'sudo docker-compose down'
                             }
                         }
                     }
