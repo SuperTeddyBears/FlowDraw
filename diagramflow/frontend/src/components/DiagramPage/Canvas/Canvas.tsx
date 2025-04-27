@@ -339,7 +339,6 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     width: number,
     height: number
   ) => {
-    saveStateToUndoStack();
     setDiagramElements((prev) =>
       prev.map((el) => {
         if (el.id === id) {
