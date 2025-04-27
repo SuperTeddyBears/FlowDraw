@@ -8,14 +8,19 @@ import Footer from '../components/DiagramPage/Footer/Footer';
 
 export const DiagramPage: React.FC = () => {
     const sidebarRef = useRef<HTMLDivElement | null>(null);
+
+    const clearCanvasRef = useRef<(() => void) | null>(null);
+    const zoomInRef = useRef<(() => void) | null>(null);
+    const zoomOutRef = useRef<(() => void) | null>(null);
+
     return (
         <div className="app">
             <Navbar />
             <div className="main-content">
-                <Toolbar />
+                <Toolbar onDelete={() => clearCanvasRef.current?.()} onZoomIn={() => zoomInRef.current?.()} onZoomOut={() => zoomOutRef.current?.()}/>
                 <div className="workspace">
                     <Sidebar ref={sidebarRef} />
-                    <Canvas sidebarRef={sidebarRef}/>
+                    <Canvas sidebarRef={sidebarRef} onClearRef={clearCanvasRef} onZoomInRef={zoomInRef} onZoomOutRef={zoomOutRef}/>
                 </div>
             </div>
             <Footer />

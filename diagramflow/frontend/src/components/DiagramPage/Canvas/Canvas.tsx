@@ -17,13 +17,58 @@ export interface ExtendedDiagramElementProps extends DiagramElementProps {
   hasText: boolean;
 }
 
-const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) => {
+//Zmiana zooma na canvasie
+
+export const ZoomInBtn = () => {
+  alert("'Zoom in' Function not available yet");
+};
+export const ZoomOutBtn = () => {
+  alert("'Zoom out' Function not available yet");
+};
+
+
+
+
+const Canvas = ({sidebarRef, onClearRef, onZoomInRef, onZoomOutRef}:
+                { sidebarRef: RefObject<HTMLDivElement | null>, onClearRef: RefObject<(() => void) | null>, onZoomInRef: RefObject<(() => void) | null>, onZoomOutRef: RefObject<(() => void) | null>}) => {
   // Elementy – dodajemy dodatkowe pola: id, width, height. Początkowo width/height ustawiamy na 0.
   const [diagramElements, setDiagramElements] = useState<ExtendedDiagramElementProps[]>([]);
   // Połączenia między elementami
   const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
   
   const [connectionElements, setConnectionElements] = useState<connection[]>([]);
+
+  // Stan zooma
+  const [scale, setScale] = useState(1);
+
+  //Czyszczenie canvasu
+  const clearCanvas = () => {
+    setDiagramElements([]);
+    setConnectionElements([]);
+  };
+
+  useEffect(() => {
+    onClearRef.current = clearCanvas;
+  }, []);
+
+
+  //Zoom canvasu
+  const zoomInCanvas = () => {
+    setScale((prev) => Math.min(prev + 0.1, 2));
+  };
+
+  useEffect(() => {
+    onZoomInRef.current = zoomInCanvas;
+  }, []);
+
+  const zoomOutCanvas = () => {
+    setScale((prev) => Math.max(prev - 0.1, 0.2));
+  };
+
+  useEffect(() => {
+    onZoomOutRef.current = zoomOutCanvas;
+  }, []);
+
   
   // Stan menu kontekstowego
   const [contextMenu, setContextMenu] = useState<{
@@ -256,6 +301,9 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
     );
     
   };
+
+
+
   
   return (
     <div
@@ -266,7 +314,7 @@ const Canvas = ({sidebarRef}: { sidebarRef: RefObject<HTMLDivElement | null> }) 
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
       <div className="canvas-grid">
-        <Stage width={3000} height={3000}>
+        <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
           {/* Warstwa rysująca elementy diagramu */}
           <Layer>
             {diagramElements.map((element) => (
