@@ -18,6 +18,14 @@ pipeline {
                 }
             }
             stages {
+                stage('Test Internet Connectivity') {
+                    steps {
+                        script {
+                            // Sprawdzenie połączenia z internetem na maszynie Jenkins
+                            sh 'ping -c 4 google.com || exit 1'
+                        }
+                    }
+                }
                 stage('Build Docker Image') {
                     steps {
                         dir('diagramflow') {
