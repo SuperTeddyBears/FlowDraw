@@ -8,6 +8,7 @@ import {
   Fragment,
   RefObject,
   SetStateAction,
+  useCallback,
   useEffect,
   useRef,
   useState
@@ -75,29 +76,41 @@ const Canvas = ({
     setRedoStack([]);
   };
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (undoStack.length > 0) {
-      const lastState = undoStack.pop();
+      const newUndoStack = [...undoStack];
+      const lastState = newUndoStack.pop();
+  
+      setUndoStack(newUndoStack);
       setRedoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
       ]);
-      setDiagramElements(lastState?.diagramElements || []);
-      setConnectionElements(lastState?.connectionElements || []);
+  
+      if (lastState) {
+        setDiagramElements(lastState.diagramElements);
+        setConnectionElements(lastState.connectionElements);
+      }
     }
-  };
-
-  const handleRedo = () => {
+  }, [undoStack, diagramElements, connectionElements]);
+  
+  const handleRedo = useCallback(() => {
     if (redoStack.length > 0) {
-      const nextState = redoStack.pop();
+      const newRedoStack = [...redoStack];
+      const nextState = newRedoStack.pop();
+  
+      setRedoStack(newRedoStack);
       setUndoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
       ]);
-      setDiagramElements(nextState?.diagramElements || []);
-      setConnectionElements(nextState?.connectionElements || []);
+  
+      if (nextState) {
+        setDiagramElements(nextState.diagramElements);
+        setConnectionElements(nextState.connectionElements);
+      }
     }
-  };
+  }, [redoStack, diagramElements, connectionElements]);
 
   const handleKonvaContextMenu = (
     e: KonvaEventObject<PointerEvent>,
@@ -284,6 +297,7 @@ const Canvas = ({
   };
 
   const handleAddTextElement = (x: number, y: number) => {
+    saveStateToUndoStack();
     const newId = `text-${Date.now()}`;
     const newTextElement = {
       id: newId,
@@ -291,19 +305,19 @@ const Canvas = ({
       x,
       y,
     };
-
+  
     setDiagramElements((prev) => {
       return prev.map((el) => {
         if (el.hasText) {
           return el;
         }
-
+  
         const isWithinBounds =
           x >= el.posX &&
           x <= el.posX + el.width &&
           y >= el.posY &&
           y <= el.posY + el.height;
-
+  
         if (isWithinBounds) {
           return {
             ...el,
@@ -311,11 +325,12 @@ const Canvas = ({
             hasText: true,
           };
         }
-
+  
         return el;
       });
     });
   };
+  
 
   const handlePositionChange = (
     id: string,
@@ -324,6 +339,7 @@ const Canvas = ({
     width: number,
     height: number
   ) => {
+    saveStateToUndoStack();
     setDiagramElements((prev) =>
       prev.map((el) => {
         if (el.id === id) {
@@ -344,21 +360,24 @@ const Canvas = ({
       })
     );
   };
+  
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'z') {
-        handleUndo();
-      } else if (e.ctrlKey && e.key === 'y') {
-        handleRedo();
-      }
-    };
+useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      handleUndo();
+    } else if (e.ctrlKey && e.key.toLowerCase() === 'y') {
+      e.preventDefault();
+      handleRedo();
+    }
+  };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
+  window.addEventListener('keydown', handleKeyDown);
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, [handleUndo, handleRedo]); 
 
   return (
     <div
