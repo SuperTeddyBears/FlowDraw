@@ -23,6 +23,7 @@ pipeline {
                         docker {
                             reuseNode true
                             image "docker-default"
+                            args '-v /var/run/docker.sock:/var/run/docker.sock'
                         }
                     }
                     steps {
