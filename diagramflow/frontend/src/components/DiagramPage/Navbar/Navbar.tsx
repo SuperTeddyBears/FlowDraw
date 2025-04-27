@@ -52,11 +52,11 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
       console.error('Token not found');
       return;
     }
-    axios.post(
+    await axios.post(
       '/api/user/save_diagram',
-      { user: userId, data: json },
-      { headers: { Authorization: `Bearer ${token}` } }
-    ).then(() => alert('Diagram saved successfully!'));
+      {user: userId, data: json},
+      {headers: {Authorization: `Bearer ${token}`}}
+    );
   };
 
   // wywoływane po kliknięciu przycisku Save
@@ -67,8 +67,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   // użytkownik potwierdza zapis
   const confirmSave = () => {
     setShowConfirm(false);
-    handleSave();
-    setShowSuccess(true);
+    handleSave().then(() => setShowSuccess(true));
   };
 
   const cancelSave = () => setShowConfirm(false);
