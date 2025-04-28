@@ -1,3 +1,4 @@
+# Tests for authentication and registration
 import pytest
 from django.urls import reverse
 
