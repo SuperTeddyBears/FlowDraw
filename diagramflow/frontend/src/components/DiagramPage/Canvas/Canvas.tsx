@@ -19,6 +19,9 @@ import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
 import Toolbar from "../Toolbar/Toolbar.tsx";
+import Navbar from "../Navbar/Navbar";
+import Konva from 'konva';
+
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string;
@@ -48,10 +51,11 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   onZoomOutRef: RefObject<(() => void) | null>
                 }) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<Konva.Stage>(null);
 
   // Stan zooma
   const [scale, setScale] = useState(1);
-  
+
   useEffect(() => {
     //Czyszczenie canvasu
     onClearRef.current = () => {
@@ -77,7 +81,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   useEffect(() => {
     onZoomOutRef.current = zoomOutCanvas;
   }, [onZoomOutRef]);
-  
+
   // Stan aktywnego elementu do wprowadzania tekstu
   const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
   // Stan menu kontekstowego
@@ -99,35 +103,56 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     setRedoStack([]);
   };
 
+  const handleExportToImage = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const box = stage.getClientRect({ skipTransform: false }); // <-- najważniejsze!
+
+    const dataURL = stage.toDataURL({
+      x: box.x,
+      y: box.y,
+      width: box.width,
+      height: box.height,
+      pixelRatio: 2,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'diagram.png';
+    link.href = dataURL;
+    link.click();
+  };
+
+
   const handleUndo = useCallback(() => {
     if (undoStack.length > 0) {
       const newUndoStack = [...undoStack];
       const lastState = newUndoStack.pop();
-  
+
       setUndoStack(newUndoStack);
       setRedoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
       ]);
-  
+
       if (lastState) {
         setDiagramElements(lastState.diagramElements);
         setConnectionElements(lastState.connectionElements);
       }
     }
   }, [undoStack, diagramElements, connectionElements]);
-  
+
   const handleRedo = useCallback(() => {
     if (redoStack.length > 0) {
       const newRedoStack = [...redoStack];
       const nextState = newRedoStack.pop();
-  
+
       setRedoStack(newRedoStack);
       setUndoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
       ]);
-  
+
       if (nextState) {
         setDiagramElements(nextState.diagramElements);
         setConnectionElements(nextState.connectionElements);
@@ -136,8 +161,8 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   }, [redoStack, diagramElements, connectionElements]);
 
   const handleKonvaContextMenu = (
-    e: KonvaEventObject<PointerEvent>,
-    index: string
+      e: KonvaEventObject<PointerEvent>,
+      index: string
   ) => {
     e.evt.preventDefault();
     const sidebarWidth = sidebarRef.current?.offsetWidth || 0;
@@ -152,11 +177,11 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       targetId: index,
     });
   };
-  
+
   const handleCloseContextMenu = () => {
     setContextMenu((prev) => ({...prev, visible: false}));
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const menu = document.querySelector('.context-menu');
@@ -164,31 +189,31 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         handleCloseContextMenu();
       }
     };
-    
+
     if (contextMenu.visible) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [contextMenu.visible]);
-  
+
   const handleMenuAction = (
-    action: 'bringToFront' | 'sendToBack' | 'delete'
+      action: 'bringToFront' | 'sendToBack' | 'delete'
   ) => {
     saveStateToUndoStack(); // Save state before performing menu actions
     const id = contextMenu.targetId;
     if (!id) return;
-    
+
     const updated = [...diagramElements];
     const index = updated.findIndex((item) => item.id === id);
     if (index === -1) {
       const connectionIndex = connectionElements.findIndex((conn) => conn.id.toString() === id);
       if (connectionIndex === -1) return;
-      
+
       const [connection] = connectionElements.splice(connectionIndex, 1);
-      
+
       if (action === 'bringToFront') {
         setConnectionElements((prev) => [...prev, connection]);
       } else if (action === 'sendToBack') {
@@ -196,41 +221,41 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       } else if (action === 'delete') {
         setConnectionElements((prev) => prev.filter((_, i) => i !== connectionIndex));
       }
-      
+
       handleCloseContextMenu();
       return;
     }
-    
+
     const [item] = updated.splice(index, 1);
-    
+
     if (action === 'bringToFront') updated.push(item);
     else if (action === 'sendToBack') updated.unshift(item);
-    
+
     setDiagramElements(updated);
     handleCloseContextMenu();
   };
-  
+
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     saveStateToUndoStack(); // Save state before adding a new element
     const droppedPath = e.dataTransfer?.getData('text/plain');
-    
+
     if (droppedPath.includes('conn')) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (droppedPath && canvasRef.current && rect) {
         const offset = 50;
         let x = e.clientX - rect.left + canvasRef.current.scrollLeft;
         let y = e.clientY - rect.top + canvasRef.current.scrollTop;
-        
+
         x = Math.max(offset, Math.min(3000 - offset, x));
         y = Math.max(offset, Math.min(3000 - offset, y));
-        
+
         const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.straight);
         setConnectionElements((prev) => [...prev, newConnection]);
       }
       return;
     }
-    
+
     const rect = canvasRef.current?.getBoundingClientRect();
     if (droppedPath && canvasRef.current && rect) {
       const img = new window.Image();
@@ -256,46 +281,46 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         };
         setDiagramElements((prev) => [...prev, newElement]);
       };
-      
+
       img.onerror = () => {
         console.error('Failed to load the image:', droppedPath);
       };
     }
   };
-  
+
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
-  
+
   const handleTextClick = (x: number, y: number, currentText: string, id: string) => {
     setActiveTextarea({x, y, text: currentText, id});
   };
-  
+
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     if (activeTextarea) {
       setActiveTextarea({...activeTextarea, text: e.target.value});
     }
   };
-  
+
   const handleTextareaBlur = () => {
     if (activeTextarea) {
       saveStateToUndoStack();
       setDiagramElements((prev) =>
-        prev.map((el) => {
-          return {
-            ...el,
-            textElements: el.textElements.map((te) =>
-              te.id === activeTextarea.id
-                ? { ...te, text: activeTextarea.text }
-                : te
-            ),
-          };
-        })
+          prev.map((el) => {
+            return {
+              ...el,
+              textElements: el.textElements.map((te) =>
+                  te.id === activeTextarea.id
+                      ? { ...te, text: activeTextarea.text }
+                      : te
+              ),
+            };
+          })
       );
       setActiveTextarea(null);
     }
   };
-  
+
   const handleAddTextElement = (x: number, y: number) => {
     saveStateToUndoStack();
     const newId = `text-${Date.now()}`;
@@ -305,19 +330,19 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       x,
       y,
     };
-    
+
     setDiagramElements((prev) => {
       return prev.map((el) => {
         if (el.hasText) {
           return el;
         }
-        
+
         const isWithinBounds =
-          x >= el.posX &&
-          x <= el.posX + el.width &&
-          y >= el.posY &&
-          y <= el.posY + el.height;
-        
+            x >= el.posX &&
+            x <= el.posX + el.width &&
+            y >= el.posY &&
+            y <= el.posY + el.height;
+
         if (isWithinBounds) {
           return {
             ...el,
@@ -325,41 +350,41 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
             hasText: true, // Mark as having text
           };
         }
-        
+
         return el; // Return the element unchanged if no conditions are met
       });
     });
   };
-  
+
 
   const handlePositionChange = (
-    id: string,
-    x: number,
-    y: number,
-    width: number,
-    height: number
+      id: string,
+      x: number,
+      y: number,
+      width: number,
+      height: number
   ) => {
     setDiagramElements((prev) =>
-      prev.map((el) => {
-        if (el.id === id) {
-          return {
-            ...el,
-            posX: x,
-            posY: y,
-            width,
-            height,
-            textElements: el.textElements.map((te) => ({
-              ...te,
-              x: x + width / 2 - 50,
-              y: y + height / 2 - 10,
-            })),
-          };
-        }
-        return el;
-      })
+        prev.map((el) => {
+          if (el.id === id) {
+            return {
+              ...el,
+              posX: x,
+              posY: y,
+              width,
+              height,
+              textElements: el.textElements.map((te) => ({
+                ...te,
+                x: x + width / 2 - 50,
+                y: y + height / 2 - 10,
+              })),
+            };
+          }
+          return el;
+        })
     );
   };
-  
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key.toLowerCase() === 'z') {
@@ -370,7 +395,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         handleRedo();
       }
     };
-  
+
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
@@ -378,94 +403,104 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   }, [handleUndo, handleRedo]);
 
   return (
-    <div
-      className="canvas-container"
-      ref={canvasRef}
-      onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      style={{position: 'relative', width: '100%', height: '100%'}}
-    >
-      <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
-      <div className="canvas-grid">
-        <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
-          {/* Warstwa rysująca elementy diagramu */}
-          <Layer>
-            {diagramElements.map((element) => (
-              <Fragment key={element.id}>
-                <DiagramElement
-                  id={element.id}
-                  path={element.path}
-                  posX={element.posX}
-                  posY={element.posY}
-                  width={element.width}
-                  height={element.height}
-                  onTextClick={handleTextClick}
-                  textElements={element.textElements}
-                  onAddTextElement={handleAddTextElement}
-                  onPositionChange={handlePositionChange}
-                  onContextMenu={(e) =>
-                    handleKonvaContextMenu(e, element.id)
+      <div
+          className="canvas-container"
+          ref={canvasRef}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          style={{position: 'relative', width: '100%', height: '100%'}}
+      >
+        <Navbar
+            diagramElements={diagramElements}
+            setDiagramElements={setDiagramElements}
+            connectionElements={connectionElements}
+            setConnectionElements={setConnectionElements}
+            diagramName={"New Diagram"}
+            setDiagramName={() => {}}
+            onExport={handleExportToImage} // <<< to DODAJ
+        />
+
+        <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
+        <div className="canvas-grid">
+          <Stage ref={stageRef} width={3000} height={3000} scaleX={scale} scaleY={scale}>
+            {/* Warstwa rysująca elementy diagramu */}
+            <Layer>
+              {diagramElements.map((element) => (
+                  <Fragment key={element.id}>
+                    <DiagramElement
+                        id={element.id}
+                        path={element.path}
+                        posX={element.posX}
+                        posY={element.posY}
+                        width={element.width}
+                        height={element.height}
+                        onTextClick={handleTextClick}
+                        textElements={element.textElements}
+                        onAddTextElement={handleAddTextElement}
+                        onPositionChange={handlePositionChange}
+                        onContextMenu={(e) =>
+                            handleKonvaContextMenu(e, element.id)
+                        }
+                        onSaveState={saveStateToUndoStack}
+                    />
+                  </Fragment>
+              ))}
+            </Layer>
+
+            {/* Warstwa rysująca połączenia */}
+            <Layer>
+              {connectionElements.map((element) => (
+                  <Fragment key={element.id}>
+                    <ConnectionElement
+                        element={element}
+                        diagramElements={diagramElements}
+                        handleKonvaContextMenu={handleKonvaContextMenu}
+                    />
+                  </Fragment>
+              ))}
+            </Layer>
+          </Stage>
+        </div>
+
+        {activeTextarea && (
+            <textarea
+                ref={(textarea) => {
+                  if (textarea && textarea.value === 'Nowy tekst') {
+                    textarea.select();
                   }
-                  onSaveState={saveStateToUndoStack}
-                />
-              </Fragment>
-            ))}
-          </Layer>
-          
-          {/* Warstwa rysująca połączenia */}
-          <Layer>
-            {connectionElements.map((element) => (
-              <Fragment key={element.id}>
-                <ConnectionElement
-                  element={element}
-                  diagramElements={diagramElements}
-                  handleKonvaContextMenu={handleKonvaContextMenu}
-                />
-              </Fragment>
-            ))}
-          </Layer>
-        </Stage>
+                }}
+                value={activeTextarea.text}
+                onChange={handleTextChange}
+                onBlur={handleTextareaBlur}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleTextareaBlur();
+                  }
+                }}
+                style={{
+                  position: 'absolute',
+                  top: activeTextarea.y,
+                  left: activeTextarea.x,
+                  fontSize: '16px',
+                  border: '1px solid #ccc',
+                  padding: '2px',
+                  background: 'white',
+                  resize: 'none',
+                  zIndex: 10,
+                }}
+                autoFocus
+            />
+        )}
+
+        {contextMenu.visible && (
+            <ContextMenu
+                x={contextMenu.x}
+                y={contextMenu.y}
+                onAction={handleMenuAction}
+            />
+        )}
       </div>
-      
-      {activeTextarea && (
-        <textarea
-          ref={(textarea) => {
-            if (textarea && textarea.value === 'Nowy tekst') {
-              textarea.select();
-            }
-          }}
-          value={activeTextarea.text}
-          onChange={handleTextChange}
-          onBlur={handleTextareaBlur}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleTextareaBlur();
-            }
-          }}
-          style={{
-            position: 'absolute',
-            top: activeTextarea.y,
-            left: activeTextarea.x,
-            fontSize: '16px',
-            border: '1px solid #ccc',
-            padding: '2px',
-            background: 'white',
-            resize: 'none',
-            zIndex: 10,
-          }}
-          autoFocus
-        />
-      )}
-      
-      {contextMenu.visible && (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          onAction={handleMenuAction}
-        />
-      )}
-    </div>
   );
 };
 

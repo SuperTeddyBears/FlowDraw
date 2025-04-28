@@ -9,7 +9,7 @@ import EditIconBlack from '../../../assets/diagrampage_edit_icon_black.svg';
 import EditIconBlue from '../../../assets/diagrampage_edit_icon_blue.svg';
 import axios from "axios";
 
-const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName}:
+const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName, onExport}:
 {
   diagramElements: ExtendedDiagramElementProps[],
   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
@@ -17,6 +17,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   setConnectionElements: Dispatch<SetStateAction<connection[]>>,
   diagramName: string,
   setDiagramName: Dispatch<SetStateAction<string>>,
+  onExport: () => void,
 }) => {
   const {user} = useAuth();
 
@@ -106,6 +107,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
                 <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
                 <button className="btn btn-primary" onClick={handleHelpClick}>View</button>
                 <button className="btn btn-primary" onClick={handleHelpClick}>Help</button>
+                <button className="btn btn-primary" onClick={onExport}>Export to PNG</button>
               </div>
             </div>
           </div>
