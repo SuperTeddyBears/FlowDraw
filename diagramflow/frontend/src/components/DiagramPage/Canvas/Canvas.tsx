@@ -51,6 +51,8 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
 
   // Stan zooma
   const [scale, setScale] = useState(1);
+  //Stan tła (siatki) canvas
+  const [backgroundSize, setBackgroundSize] = useState(20);
   
   useEffect(() => {
     //Czyszczenie canvasu
@@ -64,6 +66,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   //Zoom canvasu
   const zoomInCanvas = () => {
     setScale((prev) => Math.min(prev + 0.1, 2));
+    setBackgroundSize((prev) => Math.min(prev + 1, 30));
   };
 
   useEffect(() => {
@@ -72,6 +75,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
 
   const zoomOutCanvas = () => {
     setScale((prev) => Math.max(prev - 0.1, 0.2));
+    setBackgroundSize((prev) => Math.max(prev - 1, 12));
   };
 
   useEffect(() => {
@@ -386,7 +390,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
       <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
-      <div className="canvas-grid">
+      <div className="canvas-grid" style = {{backgroundSize: `${backgroundSize}px ${backgroundSize}px`}}>
         <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
           {/* Warstwa rysująca elementy diagramu */}
           <Layer>
