@@ -18,6 +18,9 @@ import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
+import Navbar from "../Navbar/Navbar";
+import Konva from 'konva';
+
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string;
@@ -49,6 +52,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   onZoomOutRef: RefObject<(() => void) | null>
                 }) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<Konva.Stage>(null);
 
   // Stan zooma
   const [scale, setScale] = useState(1);
@@ -104,17 +108,38 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     setRedoStack([]);
   };
 
+  const handleExportToImage = () => {
+    const stage = stageRef.current;
+    if (!stage) return;
+
+    const box = stage.getClientRect({ skipTransform: false }); // <-- najważniejsze!
+
+    const dataURL = stage.toDataURL({
+      x: box.x,
+      y: box.y,
+      width: box.width,
+      height: box.height,
+      pixelRatio: 2,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'diagram.png';
+    link.href = dataURL;
+    link.click();
+  };
+
+
   const handleUndo = useCallback(() => {
     if (undoStack.length > 0) {
       const newUndoStack = [...undoStack];
       const lastState = newUndoStack.pop();
-  
+
       setUndoStack(newUndoStack);
       setRedoStack((prev) => [
         ...prev,
         { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
       ]);
-  
+
       if (lastState) {
         setDiagramElements(lastState.diagramElements);
         setConnectionElements(lastState.connectionElements);

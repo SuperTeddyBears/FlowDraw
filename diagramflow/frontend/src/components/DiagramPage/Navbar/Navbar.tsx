@@ -9,7 +9,7 @@ import EditIconBlack from '../../../assets/diagrampage_edit_icon_black.svg';
 import EditIconBlue from '../../../assets/diagrampage_edit_icon_blue.svg';
 import axios from "axios";
 
-const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName}:
+const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramName, onExport}:
 {
   diagramElements: ExtendedDiagramElementProps[],
   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
@@ -17,6 +17,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
   setConnectionElements: Dispatch<SetStateAction<connection[]>>,
   diagramName: string,
   setDiagramName: Dispatch<SetStateAction<string>>,
+  onExport: () => void,
 }) => {
   const {user} = useAuth();
 
@@ -59,11 +60,6 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
     );
   };
 
-  // wywoływane po kliknięciu przycisku Save
-  const onSaveClick = () => {
-    setShowConfirm(true);
-  };
-
   // użytkownik potwierdza zapis
   const confirmSave = () => {
     setShowConfirm(false);
@@ -101,7 +97,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
                   className="edit-icon"
                 />
               </div>
-              <button className="btn btn-share save-button" onClick={onSaveClick}>Save</button>
+              <button className="btn btn-share save-button" onClick={onExport}>Save</button>
             </div>
           </div>
           <div className="navbar-right">
@@ -111,8 +107,8 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
         
         {/*Rename Modal*/}
         {isRenameModalOpen && (
-          <div className="modal-overlay" onMouseDown={handleRenameCancel}>
-            <div className="modal-content" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="modal-overlay" onClick={handleRenameCancel}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <button className="modal-close" onClick={handleRenameCancel}>×</button>
               <h2 className="modal-title">Diagram name:</h2>
               <input
