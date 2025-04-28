@@ -11,7 +11,7 @@
 .canvas-grid {
     width: 3000px;
     height: 3000px;
-    background-size: 20px 20px;
+    /*background-size: 20px 20px; zmieniane w pliku Canvas.tsx przy bloku div*/
     background-image:
             linear-gradient(to right, #ddd 1px, transparent 1px),
             linear-gradient(to bottom, #ddd 1px, transparent 1px);

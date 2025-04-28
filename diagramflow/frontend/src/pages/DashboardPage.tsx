@@ -16,9 +16,10 @@ import {getDiagramName} from "../components/DiagramPage/utils.ts";
 const DashboardPage: FunctionComponent = () => {
   const scrollInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const {user} = useAuth();
-
+  
   const [recentDiagrams, setRecentDiagrams] = useState<string[]>([]);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchDiagrams = async () => {
       try {
@@ -32,22 +33,27 @@ const DashboardPage: FunctionComponent = () => {
           console.error('Token not found');
           return;
         }
-
+        
         // Call to backend api to retrieve all serialised diagrams
-        const response = await axios.get('/api/user/diagrams', { headers: { Authorization: `Bearer ${token}` } });
+        const response = await axios.get('/api/user/diagrams', {headers: {Authorization: `Bearer ${token}`}});
         const diagrams: string[] = []
         for (const entry of response.data) {
           diagrams.push(entry.data);
         }
+        diagrams.reverse();
         setRecentDiagrams(diagrams);
       } catch (error) {
         console.error('Failed to fetch recent diagrams:', error);
+      } finally {
+        setLoading(false);
       }
     };
-
-    fetchDiagrams();
+    
+    if (user) {
+      fetchDiagrams();
+    }
   }, [user]);
-
+  
   const scrollRight = () => {
     const carousel = document.getElementById('carousel');
     if (carousel) {
@@ -56,7 +62,7 @@ const DashboardPage: FunctionComponent = () => {
       }, 16);
     }
   };
-
+  
   const scrollLeft = () => {
     const carousel = document.getElementById('carousel');
     if (carousel) {
@@ -65,26 +71,25 @@ const DashboardPage: FunctionComponent = () => {
       }, 16);
     }
   };
-
+  
   const stopScroll = () => {
     if (scrollInterval.current) {
       clearInterval(scrollInterval.current);
     }
   };
-
+  
   return (
     <div className="userdashboard">
       {/* Header */}
       <div className="header">
-        <img className="header-logo" src={Logo} alt="FlowDraw Logo"/>
+        <Link to={{pathname: "/"}}>
+          <img className="header-logo" src={Logo} alt="FlowDraw Logo"/>
+        </Link>
+        
         <div className="headerRight">
-          <div className="headerButtons">
-            {['Home', 'About', 'Help'].map((label) => (
-              <div key={label} className="button"
-                   onClick={() => alert("This feature is not implemented yet")}>
-                <div className="buttonText">{label}</div>
-              </div>
-            ))}
+          <div key="Home" className="button"
+               onClick={() => window.location.href = '/'}>
+            <div className="buttonText">Home</div>
           </div>
           <div className="searchBar">
             <input className="searchInput" type="text" placeholder="Search FlowDraw"/>
@@ -95,7 +100,7 @@ const DashboardPage: FunctionComponent = () => {
           </div>
         </div>
       </div>
-
+      
       {/* Main Content */}
       <div className="pageSection">
         <div
@@ -106,43 +111,53 @@ const DashboardPage: FunctionComponent = () => {
           <div className="helloUsername">
             <span className="helloUsernameTxtContainer">
               <span>Welcome </span>
-              <span className="draw">{user?.name || '<username>'}</span>
+              <span className="draw">{user?.name || 'username'}</span>
                 <span>!</span>
             </span>
           </div>
-
+          
           {/* Recent Diagrams */}
-          {recentDiagrams.length > 0 && (
-            <div className="recentDiagramsWrapper">
-              <div className="recentDiagramsSection">
-                <div className="diagramText">Recent Diagrams</div>
-                <div className="carouselContainer">
-                  <div className="carousel" id="carousel">
-                    {recentDiagrams.map((diagram, index) => (
-                      <Fragment key={index}>
-                        <CarouselElement diagramName={getDiagramName(diagram)} diagramData={diagram}/>
-                      </Fragment>
-                    ))}
+          <div className="recentDiagramsWrapper">
+            <div className="recentDiagramsSection">
+              <div className="diagramText">Recent Diagrams</div>
+              {loading ? (
+                <div className="loadingText">Loading...</div>
+              ) : (
+                recentDiagrams.length > 0 ? (
+                  <div className="carouselContainer">
+                    <div className="carousel" id="carousel">
+                      {recentDiagrams.map((diagram, index) => (
+                        <Fragment key={index}>
+                          <CarouselElement
+                            diagramName={getDiagramName(diagram)}
+                            diagramData={diagram}
+                          />
+                        </Fragment>
+                      ))}
+                    </div>
+                    <div
+                      className="carouselArrow carouselArrowLeft"
+                      onMouseEnter={scrollLeft}
+                      onMouseLeave={stopScroll}
+                    >
+                      ←
+                    </div>
+                    <div
+                      className="carouselArrow carouselArrowRight"
+                      onMouseEnter={scrollRight}
+                      onMouseLeave={stopScroll}
+                    >
+                      →
+                    </div>
                   </div>
-                  <div
-                    className="carouselArrow carouselArrowLeft"
-                    onMouseEnter={scrollLeft}
-                    onMouseLeave={stopScroll}
-                  >
-                    ←
-                  </div>
-                  <div
-                    className="carouselArrow carouselArrowRight"
-                    onMouseEnter={scrollRight}
-                    onMouseLeave={stopScroll}
-                  >
-                    →
-                  </div>
-                </div>
-              </div>
+                ) : (
+                  <div className="loadingText">No diagrams yet</div>
+                )
+              )}
             </div>
-          )}
-
+          </div>
+          
+          
           {/* New Diagrams */}
           <div className="newDiagramWrapper">
             <div className="diagramText">New Diagram</div>
@@ -154,9 +169,9 @@ const DashboardPage: FunctionComponent = () => {
                   {src: NetDiagram, alt: 'Network Diagram'}
                 ].map((item, index) => (
                   <Fragment key={index}>
-                    <Link to={{pathname: "/diagrampage"}} state={{ name: `New ${item.alt}` }} >
+                    <Link to={{pathname: "/diagrampage"}} state={{name: `New ${item.alt}`}}>
                       <div className="diagramBox">
-                        <img src={item.src} alt={item.alt} />
+                        <img src={item.src} alt={item.alt}/>
                       </div>
                       <p className="carousel-caption">{item.alt}</p>
                     </Link>
@@ -167,7 +182,7 @@ const DashboardPage: FunctionComponent = () => {
           </div>
         </div>
       </div>
-
+      
       {/* Footer */}
       <footer className="footer">
         <img className="footer-logo" src={Logo} alt="FlowDraw Logo"/>

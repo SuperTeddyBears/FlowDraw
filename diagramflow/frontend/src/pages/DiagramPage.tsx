@@ -20,7 +20,15 @@ export const DiagramPage = () => {
   // Nazwa diagramu
   const [diagramName, setDiagramName] = useState<string>(location.state?.name || 'New Diagram');
 
-  useEffect(() => {
+    // Funkcje do obsługi przycisków z Toolbara
+    const undoRef = useRef<(() => void) | null>(null);
+    const redoRef = useRef<(() => void) | null>(null);
+    const clearCanvasRef = useRef<(() => void) | null>(null);
+    const zoomInRef = useRef<(() => void) | null>(null);
+    const zoomOutRef = useRef<(() => void) | null>(null);
+
+
+    useEffect(() => {
     if (!location.state?.diagram) {
       return;
     }
@@ -38,7 +46,13 @@ export const DiagramPage = () => {
         setDiagramName={setDiagramName}
       />
       <div className="main-content">
-        <Toolbar/>
+          <Toolbar
+            onUndo={() => undoRef.current?.()}
+            onRedo={() => redoRef.current?.()}
+            onDelete={() => clearCanvasRef.current?.()}
+            onZoomIn={() => zoomInRef.current?.()}
+            onZoomOut={() => zoomOutRef.current?.()}
+          />
         <div className="workspace">
           <Sidebar ref={sidebarRef}/>
           <Canvas
@@ -47,6 +61,11 @@ export const DiagramPage = () => {
             setDiagramElements={setDiagramElements}
             connectionElements={connectionElements}
             setConnectionElements={setConnectionElements}
+            onUndoRef={undoRef}
+            onRedoRef={redoRef}
+            onClearRef={clearCanvasRef}
+            onZoomInRef={zoomInRef}
+            onZoomOutRef={zoomOutRef}
           />
         </div>
       </div>

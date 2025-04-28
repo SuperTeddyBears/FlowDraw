@@ -10,11 +10,14 @@ export interface DiagramElementProps {
     path: string;
     posX: number;
     posY: number;
+    width: number;
+    height: number;
     onTextClick: (x: number, y: number, currentText: string, id: string) => void;
     textElements: { id: string; text: string; x: number; y: number }[];
     onAddTextElement: (x: number, y: number) => void;
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
     onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
+    onSaveState?: () => void;
 }
 
 export const DiagramElement = ({
@@ -22,11 +25,14 @@ export const DiagramElement = ({
                                    path,
                                    posX,
                                    posY,
+                                   width,
+                                   height,
                                    onTextClick,
                                    textElements,
                                    onAddTextElement,
                                    onPositionChange,
                                    onContextMenu,
+                                   onSaveState,
                                }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
@@ -42,6 +48,16 @@ export const DiagramElement = ({
     // Ref typu Konva.Transformer (z modułu 'konva')
     const transformerRef = useRef<Konva.Transformer>(null);
     const [isSelected, setIsSelected] = useState(false);
+
+    useEffect(() => {
+        setShape((prev) => ({
+            ...prev,
+            x: posX,
+            y: posY,
+            width: width || img.width || 100,
+            height: height || img.height || 100,
+        }));
+    }, [posX, posY,width, height]);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         const newX = e.target.x();
@@ -70,7 +86,7 @@ export const DiagramElement = ({
     
             const deltaX = (newWidth - shape.width) / 2;
             const deltaY = (newHeight - shape.height) / 2;
-    
+
             setShape((prev) => ({
                 ...prev,
                 x: prev.x - deltaX,
@@ -78,10 +94,10 @@ export const DiagramElement = ({
                 width: newWidth,
                 height: newHeight,
             }));
-    
+
             node.scaleX(1);
             node.scaleY(1);
-    
+
             if (onPositionChange && id) {
                 onPositionChange(id, shape.x - deltaX, shape.y - deltaY, newWidth, newHeight);
             }
@@ -145,9 +161,11 @@ export const DiagramElement = ({
                 draggable={true}
                 onClick={() => setIsSelected(!isSelected)}
                 onDblClick={handleDoubleClick}
-                onDragMove={updatePosition}
                 onTransform={updateSize}
-                onDragEnd={() => setIsSelected(false)}
+                onTransformStart={() => {if (onSaveState) onSaveState();}}
+                onDragMove={updatePosition}
+                onDragStart={() => {if (onSaveState) onSaveState();}}
+                onDragEnd={() => {setIsSelected(false);}}
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 

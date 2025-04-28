@@ -29,6 +29,7 @@ export function serializeDiagram(
           id: connection.id,
           start: connection.start,
           end: connection.end,
+          lineType: connection.lineType,
         }))
       : [],
   });
