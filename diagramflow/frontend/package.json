@@ -14,7 +14,7 @@
     "@material/web": "^2.2.0",
     "@react-oauth/google": "^0.12.1",
     "@tailwindcss/vite": "^4.0.15",
-    "axios": "^1.8.4",
+    "axios": "^1.9.0",
     "framer-motion": "^12.6.3",
     "jwt-decode": "^4.0.0",
     "react": "19.0.0",
