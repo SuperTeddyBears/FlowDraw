@@ -1,3 +1,4 @@
+# Test for DiagramSerializer
 import pytest
 from apps.accounts.models import Diagram
 from apps.accounts.serializer import DiagramSerializer
