@@ -8,17 +8,16 @@ import {
   Fragment,
   RefObject,
   SetStateAction,
+  useCallback,
   useEffect,
   useRef,
-  useState,
-  useCallback
+  useState
 } from "react";
 import {DiagramElement, DiagramElementProps} from "./DiagramElement.tsx";
 import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
-import Navbar from "../Navbar/Navbar";
 import Konva from 'konva';
 
 
@@ -38,7 +37,7 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef}:
+const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef, onExportRef}:
                 {
                   sidebarRef: RefObject<HTMLDivElement | null>,
                   diagramElements: ExtendedDiagramElementProps[],
@@ -49,7 +48,8 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   onRedoRef: RefObject<(() => void) | null>,
                   onClearRef: RefObject<(() => void) | null>,
                   onZoomInRef: RefObject<(() => void) | null>,
-                  onZoomOutRef: RefObject<(() => void) | null>
+                  onZoomOutRef: RefObject<(() => void) | null>,
+                  onExportRef: RefObject<(() => void) | null>,
                 }) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
@@ -107,26 +107,28 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     ]);
     setRedoStack([]);
   };
-
-  const handleExportToImage = () => {
-    const stage = stageRef.current;
-    if (!stage) return;
-
-    const box = stage.getClientRect({ skipTransform: false }); // <-- najważniejsze!
-
-    const dataURL = stage.toDataURL({
-      x: box.x,
-      y: box.y,
-      width: box.width,
-      height: box.height,
-      pixelRatio: 2,
-    });
-
-    const link = document.createElement('a');
-    link.download = 'diagram.png';
-    link.href = dataURL;
-    link.click();
-  };
+  
+  useEffect(() => {
+    onExportRef.current = () => {
+      const stage = stageRef.current;
+      if (!stage) return;
+      
+      const box = stage.getClientRect({skipTransform: false}); // <-- najważniejsze!
+      
+      const dataURL = stage.toDataURL({
+        x: box.x,
+        y: box.y,
+        width: box.width,
+        height: box.height,
+        pixelRatio: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.download = 'diagram.png';
+      link.href = dataURL;
+      link.click();
+    };
+  }, [onExportRef]);
 
 
   const handleUndo = useCallback(() => {
@@ -424,7 +426,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
       <div className="canvas-grid" style = {{backgroundSize: `${backgroundSize}px ${backgroundSize}px`}}>
-        <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
+        <Stage ref={stageRef} width={3000} height={3000} scaleX={scale} scaleY={scale}>
           {/* Warstwa rysująca elementy diagramu */}
           <Layer>
             {diagramElements.map((element) => (

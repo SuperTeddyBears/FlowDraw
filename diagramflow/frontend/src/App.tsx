@@ -5,7 +5,7 @@ import {LoginPage} from "./pages/LoginPage.tsx";
 import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {DiagramPage} from "./pages/DiagramPage.tsx";
 import {AuthProvider, useAuth} from './contexts/AuthContext';
-//import {AuthProvider} from './contexts/AuthContext';
+// import {AuthProvider} from './contexts/AuthContext';
 import GoogleOAuthProvider from './providers/GoogleOAuthProvider';
 import React from "react";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
@@ -37,9 +37,9 @@ export function AppWithProviders() {
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/register" element={<RegisterPage/>}/>
                         {/*For development purposes only uncommnet these two lines to access pages without a login */}
-                        <Route path="/dashboard" element={<DashboardPage/>}></Route>
-                        <Route path="/diagrampage" element={<DiagramPage/>}></Route>
-                        {/* <Route
+                        {/*<Route path="/dashboard" element={<DashboardPage/>}></Route>*/}
+                        {/*<Route path="/diagrampage" element={<DiagramPage/>}></Route>*/}
+                        <Route
                             path="/dashboard"
                             element={
                                 <ProtectedRoute>
@@ -54,7 +54,7 @@ export function AppWithProviders() {
                                     <DiagramPage/>
                                 </ProtectedRoute>
                             }
-                        /> */}
+                        />
                     </Routes>
                 </Router>
             </AuthProvider>

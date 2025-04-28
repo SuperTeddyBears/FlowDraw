@@ -60,6 +60,11 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
     );
   };
 
+  // wywoływane po kliknięciu przycisku Save
+  const onSaveClick = () => {
+    setShowConfirm(true);
+  };
+
   // użytkownik potwierdza zapis
   const confirmSave = () => {
     setShowConfirm(false);
@@ -97,11 +102,11 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
                   className="edit-icon"
                 />
               </div>
-              <button className="btn btn-share save-button" onClick={onExport}>Save</button>
+              <button className="btn btn-share save-button" onClick={onSaveClick}>Save</button>
             </div>
           </div>
           <div className="navbar-right">
-            <button className="btn btn-share" onClick={() => serializeDiagram(diagramName, diagramElements, connectionElements)}>Share</button>
+            <button className="btn btn-share" onClick={onExport}>Share</button>
           </div>
         </div>
         
