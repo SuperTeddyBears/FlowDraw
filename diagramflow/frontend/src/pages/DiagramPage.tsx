@@ -26,7 +26,7 @@ export const DiagramPage = () => {
     const clearCanvasRef = useRef<(() => void) | null>(null);
     const zoomInRef = useRef<(() => void) | null>(null);
     const zoomOutRef = useRef<(() => void) | null>(null);
-
+    const exportRef = useRef<(() => void) | null>(null);
 
     useEffect(() => {
     if (!location.state?.diagram) {
@@ -44,6 +44,7 @@ export const DiagramPage = () => {
         setConnectionElements={setConnectionElements}
         diagramName={diagramName}
         setDiagramName={setDiagramName}
+        onExport={() => exportRef.current?.()}
       />
       <div className="main-content">
           <Toolbar
@@ -66,6 +67,7 @@ export const DiagramPage = () => {
             onClearRef={clearCanvasRef}
             onZoomInRef={zoomInRef}
             onZoomOutRef={zoomOutRef}
+            onExportRef={exportRef}
           />
         </div>
       </div>
