@@ -28,7 +28,14 @@
 
 .drawing-title {
     display: flex;
-    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.save-button {
+    margin-left: auto;
 }
 
 .drawing-title h1 {

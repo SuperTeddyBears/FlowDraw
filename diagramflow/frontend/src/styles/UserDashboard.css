@@ -70,7 +70,6 @@ html, body {
   border: none;
   outline: none;
   font-size: 16px;
-  font-family: Inter;
   color: #000;
   background: transparent;
   width: 260px;
@@ -321,4 +320,13 @@ html, body {
 
 .footer-text {
   font-size: 12px;
+}
+
+.loadingText {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  font-size: 18px;
+  color: #555;
 }
