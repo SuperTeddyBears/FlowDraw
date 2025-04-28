@@ -36,16 +36,13 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onClearRef, onZoomInRef, onZoomOutRef}:
+const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements}:
                 {
                   sidebarRef: RefObject<HTMLDivElement | null>,
                   diagramElements: ExtendedDiagramElementProps[],
                   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
                   connectionElements: connection[],
                   setConnectionElements: Dispatch<SetStateAction<connection[]>>
-                  onClearRef: RefObject<(() => void) | null>,
-                  onZoomInRef: RefObject<(() => void) | null>,
-                  onZoomOutRef: RefObject<(() => void) | null>
                 }) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,33 +51,26 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   //Stan tła (siatki) canvas
   const [backgroundSize, setBackgroundSize] = useState(20);
   
-  useEffect(() => {
-    //Czyszczenie canvasu
-    onClearRef.current = () => {
-      setDiagramElements([]);
-      setConnectionElements([]);
-    };
-  }, [onClearRef]);
+
+  //Usuwanie całego diagramu
+  const handleOnDelete = () => {
+    setDiagramElements([]);
+    setConnectionElements([]);
+  };
 
 
   //Zoom canvasu
-  const zoomInCanvas = () => {
+  const handleZoomInCanvas = () => {
     setScale((prev) => Math.min(prev + 0.1, 2));
     setBackgroundSize((prev) => Math.min(prev + 1, 30));
   };
 
-  useEffect(() => {
-    onZoomInRef.current = zoomInCanvas;
-  }, [onZoomInRef]);
 
-  const zoomOutCanvas = () => {
+  const handleZoomOutCanvas = () => {
     setScale((prev) => Math.max(prev - 0.1, 0.2));
     setBackgroundSize((prev) => Math.max(prev - 1, 12));
   };
 
-  useEffect(() => {
-    onZoomOutRef.current = zoomOutCanvas;
-  }, [onZoomOutRef]);
   
   // Stan aktywnego elementu do wprowadzania tekstu
   const [activeTextarea, setActiveTextarea] = useState<{ x: number; y: number; text: string; id: string } | null>(null);
@@ -389,7 +379,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       onDragOver={handleDragOver}
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
-      <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
+      <Toolbar onUndo={handleUndo} onRedo={handleRedo} onDelete={handleOnDelete} onZoomOut={handleZoomOutCanvas} onZoomIn={handleZoomInCanvas}/>
       <div className="canvas-grid" style = {{backgroundSize: `${backgroundSize}px ${backgroundSize}px`}}>
         <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
           {/* Warstwa rysująca elementy diagramu */}

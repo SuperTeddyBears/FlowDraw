@@ -1,6 +1,6 @@
 import {Dispatch, SetStateAction, useEffect, useRef, useState} from 'react';
 import './Navbar.css';
-import {handleHelpClick, serializeDiagram} from '../utils.ts';
+import { serializeDiagram} from '../utils.ts';
 import {connection} from "../connection.ts";
 import {ExtendedDiagramElementProps} from "../Canvas/Canvas.tsx";
 import {Link} from "react-router-dom";
@@ -101,11 +101,8 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
                   className="edit-icon"
                 />
               </div>
-              <div className="drawing-buttons">
+              <div className="drawing-buttons" >
                 <button className="btn btn-primary" onClick={onSaveClick}>Save</button>
-                <button className="btn btn-primary" onClick={handleHelpClick}>Edit</button>
-                <button className="btn btn-primary" onClick={handleHelpClick}>View</button>
-                <button className="btn btn-primary" onClick={handleHelpClick}>Help</button>
               </div>
             </div>
           </div>

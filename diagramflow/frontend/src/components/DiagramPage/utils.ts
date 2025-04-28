@@ -2,9 +2,6 @@ import {ExtendedDiagramElementProps} from "./Canvas/Canvas.tsx";
 import {connection} from "./connection.ts";
 import {Dispatch, SetStateAction} from "react";
 
-export const handleHelpClick = () => {
-  alert("Function not available yet");
-};
 
 export function serializeDiagram(
   diagramName: string,

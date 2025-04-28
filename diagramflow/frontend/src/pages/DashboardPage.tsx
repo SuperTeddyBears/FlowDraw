@@ -79,12 +79,10 @@ const DashboardPage: FunctionComponent = () => {
         <img className="header-logo" src={Logo} alt="FlowDraw Logo"/>
         <div className="headerRight">
           <div className="headerButtons">
-            {['Home', 'About', 'Help'].map((label) => (
-              <div key={label} className="button"
+              <div key="Home" className="button"
                    onClick={() => alert("This feature is not implemented yet")}>
-                <div className="buttonText">{label}</div>
+                <div className="buttonText">Home</div>
               </div>
-            ))}
           </div>
           <div className="searchBar">
             <input className="searchInput" type="text" placeholder="Search FlowDraw"/>
