@@ -18,7 +18,6 @@ import {KonvaEventObject} from "konva/lib/Node";
 import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
-import Toolbar from "../Toolbar/Toolbar.tsx";
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
   id: string;
@@ -36,13 +35,15 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onClearRef, onZoomInRef, onZoomOutRef}:
+const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef}:
                 {
                   sidebarRef: RefObject<HTMLDivElement | null>,
                   diagramElements: ExtendedDiagramElementProps[],
                   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
                   connectionElements: connection[],
                   setConnectionElements: Dispatch<SetStateAction<connection[]>>
+                  onUndoRef: RefObject<(() => void) | null>,
+                  onRedoRef: RefObject<(() => void) | null>,
                   onClearRef: RefObject<(() => void) | null>,
                   onZoomInRef: RefObject<(() => void) | null>,
                   onZoomOutRef: RefObject<(() => void) | null>
@@ -60,7 +61,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       setDiagramElements([]);
       setConnectionElements([]);
     };
-  }, [onClearRef]);
+  }, [onClearRef, setConnectionElements, setDiagramElements]);
 
 
   //Zoom canvasu
@@ -119,7 +120,11 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         setConnectionElements(lastState.connectionElements);
       }
     }
-  }, [undoStack, diagramElements, connectionElements]);
+  }, [undoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
+  
+  useEffect(() => {
+    onUndoRef.current = handleUndo;
+  }, [handleUndo, onUndoRef]);
   
   const handleRedo = useCallback(() => {
     if (redoStack.length > 0) {
@@ -137,7 +142,11 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         setConnectionElements(nextState.connectionElements);
       }
     }
-  }, [redoStack, diagramElements, connectionElements]);
+  }, [redoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
+  
+  useEffect(() => {
+    onRedoRef.current = handleRedo;
+  }, [handleRedo, onRedoRef]);
 
   const handleKonvaContextMenu = (
     e: KonvaEventObject<PointerEvent>,
@@ -389,7 +398,6 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
       onDragOver={handleDragOver}
       style={{position: 'relative', width: '100%', height: '100%'}}
     >
-      <Toolbar onUndo={handleUndo} onRedo={handleRedo} />
       <div className="canvas-grid" style = {{backgroundSize: `${backgroundSize}px ${backgroundSize}px`}}>
         <Stage width={3000} height={3000} scaleX={scale} scaleY={scale}>
           {/* Warstwa rysująca elementy diagramu */}
