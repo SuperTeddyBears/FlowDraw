@@ -18,8 +18,12 @@ const UserDropdown: React.FC = () => {
     };
 
     const handleLogout = () => {
+      // First navigate, then logout
+      navigate('/', { replace: true });
+      // Dirty solution to prevent ProtectedRoute from sending the user to the login page
+      setTimeout(() => {
         logout();
-        navigate('/'); // Redirect to the main page after logout
+      }, 100);
     };
 
     // Close the dropdown if clicked outside

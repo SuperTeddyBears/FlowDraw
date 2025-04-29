@@ -10,7 +10,7 @@ import UserDropdown from "../components/DashboardPage/UserDrodown.tsx";
 
 import '../styles/App.css';
 export function HomePage() {
-  const {isAuthenticated, loading} = useAuth();
+  const {isAuthenticated} = useAuth();
 
   return (
       <div className='HomePage'>
