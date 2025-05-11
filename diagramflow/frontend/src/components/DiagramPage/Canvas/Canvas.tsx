@@ -265,7 +265,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         x = Math.max(offset, Math.min(3000 - offset, x));
         y = Math.max(offset, Math.min(3000 - offset, y));
         
-        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.straight);
+        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.jagged/*linetypes.straight*/);
         setConnectionElements((prev) => [...prev, newConnection]);
       }
       return;

@@ -152,7 +152,12 @@ const ConnectionElement = ({
           handleKonvaContextMenu={handleKonvaContextMenu}
         />
       ) : (
-        <JaggedLine coords={[startX, startY, endX, endY]} element={element} />
+        <JaggedLine
+            coords={[startX, startY, endX, endY]}
+            element={element}
+            collisionRadius={collisionRadius}
+            handleKonvaContextMenu={handleKonvaContextMenu}
+        />
       )}
       <Circle
         x={startX}
