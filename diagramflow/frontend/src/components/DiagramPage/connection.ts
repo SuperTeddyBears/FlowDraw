@@ -1,4 +1,5 @@
 import {ExtendedDiagramElementProps} from "./Canvas/Canvas.tsx";
+import { ConnectionType } from "./Canvas/ConnectionUtils.ts";
 
 interface connectionData {
   elementId: string;
@@ -20,12 +21,14 @@ export class connection {
   start: connectionData | position;
   end: connectionData | position;
   lineType: lineTypes;
+  connectionType: ConnectionType;
 
-  constructor(id: number, startX: number, startY: number, endX: number, endY: number, lineType: lineTypes) {
+  constructor(id: number, startX: number, startY: number, endX: number, endY: number, lineType: lineTypes, connectionType: ConnectionType = ConnectionType.Default) {
     this.id = id;
     this.start = {x: startX, y: startY};
     this.end = {x: endX, y: endY};
     this.lineType = lineType;
+    this.connectionType = connectionType;
   }
   
   getConnectionCoordinates(diagramElements: ExtendedDiagramElementProps[]): [number, number, number, number] {
@@ -92,5 +95,13 @@ export class connection {
     }
     const endElement = this.end as connectionData;
     return endElement.elementId;
+  }
+
+  setConnectionType(connectionType: ConnectionType) {
+    this.connectionType = connectionType;
+  }
+
+  getConnectionType(): ConnectionType {
+    return this.connectionType;
   }
 }
