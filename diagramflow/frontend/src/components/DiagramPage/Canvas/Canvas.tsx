@@ -255,7 +255,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     saveStateToUndoStack(); // Save state before adding a new element
     const droppedPath = e.dataTransfer?.getData('text/plain');
     
-    if (droppedPath.includes('conn')) {
+    if (droppedPath.includes('Entity-Relationship')) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (droppedPath && canvasRef.current && rect) {
         const offset = 50;

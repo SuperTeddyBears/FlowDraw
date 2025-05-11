@@ -1,11 +1,13 @@
 import Konva from "konva";
-import { Circle } from "react-konva";
+import { Circle, Image } from "react-konva";
 import { connection, lineTypes } from "../connection.ts";
 import { ExtendedDiagramElementProps } from "./Canvas.tsx";
 import { useCallback, useEffect, useState } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import JaggedLine from "./JaggedLine.tsx";
 import StraightLine from "./StraightLine.tsx";
+import useImage from 'use-image';
+
 
 const ConnectionElement = ({
   element,
@@ -23,16 +25,23 @@ const ConnectionElement = ({
   const [endY, setEndY] = useState(y2);
   const collisionRadius = 30;
 
-  const getCenterOfNearestWall = (diagramElement: ExtendedDiagramElementProps, x: number, y: number) => {
-    const { posX, posY, width, height } = diagramElement;
-    const walls = [
-      { wall: 'left',    x: posX,         y: posY + height / 2, distance: Math.hypot(x - posX, y - (posY + height / 2)) },
-      { wall: 'right',   x: posX + width, y: posY + height / 2, distance: Math.hypot(x - (posX + width), y - (posY + height / 2)) },
-      { wall: 'top',     x: posX + width / 2, y: posY, distance: Math.hypot(x - (posX + width / 2), y - posY) },
-      { wall: 'bottom',  x: posX + width / 2, y: posY + height, distance: Math.hypot(x - (posX + width / 2), y - (posY + height)) },
-    ];
-    return walls.reduce((a, b) => (a.distance < b.distance ? a : b));
-  };
+    // Load SVG image for connection endpoints
+    const [endpointImage] = useImage("src/assets/diagram-elements/Connections/to-1.svg");
+
+    // SVG image size properties
+    const imageWidth = 50;
+    const imageHeight = 50;
+
+    const getCenterOfNearestWall = (diagramElement: ExtendedDiagramElementProps, x: number, y: number) => {
+        const { posX, posY, width, height } = diagramElement;
+        const walls = [
+            { wall: 'left',    x: posX,         y: posY + height / 2, distance: Math.hypot(x - posX, y - (posY + height / 2)) },
+            { wall: 'right',   x: posX + width, y: posY + height / 2, distance: Math.hypot(x - (posX + width), y - (posY + height / 2)) },
+            { wall: 'top',     x: posX + width / 2, y: posY, distance: Math.hypot(x - (posX + width / 2), y - posY) },
+            { wall: 'bottom',  x: posX + width / 2, y: posY + height, distance: Math.hypot(x - (posX + width / 2), y - (posY + height)) },
+        ];
+        return walls.reduce((a, b) => (a.distance < b.distance ? a : b));
+    };
 
   const updatePosition = (e: Konva.KonvaEventObject<DragEvent>, point: string) => {
     const { clientX, clientY } = e.evt;
@@ -140,46 +149,84 @@ const ConnectionElement = ({
     updateSnappedElementPosition(element.getEndSnappedElementId(), setEndX, setEndY, startX, startY);
   }, [diagramElements, element, startX, startY, updateSnappedElementPosition]);
 
-  return (
-    <>
-      <Circle x={startX} y={startY} radius={3} fill="black" />
-      <Circle x={endX} y={endY} radius={3} fill="black" />
-      {element.lineType == lineTypes.straight ? (
-        <StraightLine
-          coords={[startX, startY, endX, endY]}
-          element={element}
-          collisionRadius={collisionRadius}
-          handleKonvaContextMenu={handleKonvaContextMenu}
-        />
-      ) : (
-        <JaggedLine coords={[startX, startY, endX, endY]} element={element} />
-      )}
-      <Circle
-        x={startX}
-        y={startY}
-        radius={collisionRadius}
-        fill="transparent"
-        draggable={true}
-        onDragMove={(e) => {
-          updatePosition(e, 'start');
-          e.target.x(startX);
-          e.target.y(startY);
-        }}
-      />
-      <Circle
-        x={endX}
-        y={endY}
-        radius={collisionRadius}
-        fill="transparent"
-        draggable={true}
-        onDragMove={(e) => {
-          updatePosition(e, 'end');
-          e.target.x(endX);
-          e.target.y(endY);
-        }}
-      />
-    </>
-  );
+    // Calculate direction vectors for endpoint rotations
+    const dx = endX - startX;
+    const dy = endY - startY;
+    const startAngle = (Math.atan2(dy, dx) * 180 / Math.PI) + 180; // Dodajemy 180 stopni
+    const endAngle = (Math.atan2(-dy, -dx) * 180 / Math.PI) + 180; // Dodajemy 180 stopni
+
+    return (
+        <>
+            {/* SVG images instead of circles */}
+            {endpointImage && (
+                <>
+                    <Image
+                        x={startX}
+                        y={startY}
+                        image={endpointImage}
+                        width={imageWidth}
+                        height={imageHeight}
+                        rotation={startAngle}
+                        offsetX={imageWidth}
+                        offsetY={imageHeight/2}
+                    />
+                    <Image
+                        x={endX}
+                        y={endY}
+                        image={endpointImage}
+                        width={imageWidth}
+                        height={imageHeight}
+                        rotation={endAngle}
+                        offsetX={imageWidth}
+                        offsetY={imageHeight/2}
+                    />
+                </>
+            )}
+
+            {/* Fallback circles if image fails to load */}
+            {!endpointImage && (
+                <>
+                    <Circle x={startX} y={startY} radius={3} fill="black" />
+                    <Circle x={endX} y={endY} radius={3} fill="black" />
+                </>
+            )}
+
+            {element.lineType == lineTypes.straight ? (
+                <StraightLine
+                    coords={[startX, startY, endX, endY]}
+                    element={element}
+                    collisionRadius={collisionRadius}
+                    handleKonvaContextMenu={handleKonvaContextMenu}
+                />
+            ) : (
+                <JaggedLine coords={[startX, startY, endX, endY]} element={element} />
+            )}
+            <Circle
+                x={startX}
+                y={startY}
+                radius={collisionRadius}
+                fill="transparent"
+                draggable={true}
+                onDragMove={(e) => {
+                    updatePosition(e, 'start');
+                    e.target.x(startX);
+                    e.target.y(startY);
+                }}
+            />
+            <Circle
+                x={endX}
+                y={endY}
+                radius={collisionRadius}
+                fill="transparent"
+                draggable={true}
+                onDragMove={(e) => {
+                    updatePosition(e, 'end');
+                    e.target.x(endX);
+                    e.target.y(endY);
+                }}
+            />
+        </>
+    );
 };
 
 export default ConnectionElement;

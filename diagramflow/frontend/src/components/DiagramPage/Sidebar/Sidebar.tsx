@@ -3,6 +3,7 @@ import './Sidebar.css';
 import {svgFileNamesUML} from '../../../svgListUML';
 import {svgFileNamesFlowChart} from '../../../svgListFlowChart';
 import {svgFileNamesNetwork} from '../../../svgListNetwork';
+import {svgFileNamesEntityRelationship} from "../../../svgListEntityRelationship.ts";
 
 interface CategoryItem {
   id: string;
@@ -50,6 +51,17 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
         iconPath: iconPath
       };
     });
+
+    const networkDiagramItemsEntityRelationship: CategoryItem[] = svgFileNamesEntityRelationship
+        .map((fileName) => {
+            const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
+            const iconPath = `src/assets/diagram-elements/Entity-Relationship/${fileName}.svg`;
+            return {
+                id: fileName,
+                name: iconName,
+                iconPath: iconPath
+            };
+        });
   
   const categories: Category[] = [
     {
@@ -70,11 +82,7 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
     {
       id: 'conns',
       name: '▶ Connections',
-      items: [{
-        id: 'line-simple',
-        name: 'simple line',
-        iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
-      }]
+      items: networkDiagramItemsEntityRelationship
     }
   ];
   
