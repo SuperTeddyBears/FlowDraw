@@ -16,7 +16,11 @@ interface Category {
   items: CategoryItem[];
 }
 
-const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
+interface SidebarProps {
+    selectedType: 'uml' | 'flowchart' | 'network';
+}
+
+const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   
   const networkDiagramItemsUML: CategoryItem[] = svgFileNamesUML
@@ -50,35 +54,39 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
         iconPath: iconPath
       };
     });
-  
-  const categories: Category[] = [
-    {
-      id: 'uml',
-      name: '▶ UML Diagram',
-      items: networkDiagramItemsUML
-    },
-    {
-      id: 'uml2',
-      name: '▶ FlowChart',
-      items: networkDiagramItemsFlowChart
-    },
-    {
-      id: 'uml3',
-      name: '▶ Network Diagram',
-      items: networkDiagramItemsNetwork
-    },
-    {
-      id: 'conns',
-      name: '▶ Connections',
-      items: [{
-        id: 'line-simple',
-        name: 'simple line',
-        iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
-      }]
-    }
-  ];
-  
-  const toggleCategory = (categoryId: string, event: React.MouseEvent<HTMLDivElement>) => {
+
+    const typeMap = {
+        uml: {
+            id: 'uml',
+            name: '▶ UML Diagram',
+            items: networkDiagramItemsUML
+        },
+        flowchart: {
+            id: 'uml2',
+            name: '▶ FlowChart',
+            items: networkDiagramItemsFlowChart
+        },
+        network: {
+            id: 'uml3',
+            name: '▶ Network Diagram',
+            items: networkDiagramItemsNetwork
+        }
+    };
+
+    const categories: Category[] = [
+        typeMap[selectedType],
+        {
+            id: 'conns',
+            name: '▶ Connections',
+            items: [{
+                id: 'line-simple',
+                name: 'simple line',
+                iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
+            }]
+        }
+    ];
+
+    const toggleCategory = (categoryId: string, event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (expandedCategory === categoryId) {
       setExpandedCategory(null);
