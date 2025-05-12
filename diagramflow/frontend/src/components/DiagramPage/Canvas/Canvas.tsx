@@ -19,7 +19,6 @@ import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
 import Konva from 'konva';
-import {getConnectionTypeFromPath} from "./ConnectionUtils.ts";
 
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {

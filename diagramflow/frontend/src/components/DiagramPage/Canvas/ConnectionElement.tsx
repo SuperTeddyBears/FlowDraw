@@ -178,7 +178,12 @@ const ConnectionElement = ({
                 handleKonvaContextMenu={handleKonvaContextMenu}
             />
         ) : (
-            <JaggedLine coords={[startX, startY, endX, endY]} element={element} />
+            <JaggedLine
+              coords={[startX, startY, endX, endY]}
+              element={element}
+              collisionRadius={collisionRadius}
+              handleKonvaContextMenu={handleKonvaContextMenu}
+            />
         )}
 
         {/* Drag handles */}
@@ -206,38 +211,6 @@ const ConnectionElement = ({
               e.target.y(endY);
             }}
         />
-      ) : (
-        <JaggedLine
-            coords={[startX, startY, endX, endY]}
-            element={element}
-            collisionRadius={collisionRadius}
-            handleKonvaContextMenu={handleKonvaContextMenu}
-        />
-      )}
-      <Circle
-        x={startX}
-        y={startY}
-        radius={collisionRadius}
-        fill="transparent"
-        draggable={true}
-        onDragMove={(e) => {
-          updatePosition(e, 'start');
-          e.target.x(startX);
-          e.target.y(startY);
-        }}
-      />
-      <Circle
-        x={endX}
-        y={endY}
-        radius={collisionRadius}
-        fill="transparent"
-        draggable={true}
-        onDragMove={(e) => {
-          updatePosition(e, 'end');
-          e.target.x(endX);
-          e.target.y(endY);
-        }}
-      />
     </>
   );
 };
