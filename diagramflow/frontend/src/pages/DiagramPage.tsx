@@ -11,6 +11,7 @@ import {deserializeDiagram} from "../components/DiagramPage/utils.ts";
 
 export const DiagramPage = () => {
   const location = useLocation();
+  const diagramType = location.state?.type || 'flowchart';
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   
   // Elementy diagramu
@@ -57,7 +58,7 @@ export const DiagramPage = () => {
             onZoomOut={() => zoomOutRef.current?.()}
           />
         <div className="workspace">
-          <Sidebar ref={sidebarRef}/>
+          <Sidebar ref={sidebarRef} selectedType={diagramType} />
           <Canvas
             sidebarRef={sidebarRef}
             diagramElements={diagramElements}

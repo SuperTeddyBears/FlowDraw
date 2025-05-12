@@ -17,7 +17,11 @@ interface Category {
   items: CategoryItem[];
 }
 
-const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
+interface SidebarProps {
+    selectedType: 'uml' | 'flowchart' | 'network';
+}
+
+const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   
   const networkDiagramItemsUML: CategoryItem[] = svgFileNamesUML
@@ -51,8 +55,8 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
         iconPath: iconPath
       };
     });
-
-    const networkDiagramItemsEntityRelationship: CategoryItem[] = svgFileNamesEntityRelationship
+  
+  const networkDiagramItemsEntityRelationship: CategoryItem[] = svgFileNamesEntityRelationship
         .map((fileName) => {
             const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
             const iconPath = `src/assets/diagram-elements/Entity-Relationship/${fileName}.svg`;
@@ -62,23 +66,41 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
                 iconPath: iconPath
             };
         });
+
+
+    const typeMap = {
+        uml: {
+            id: 'uml',
+            name: '▶ UML Diagram',
+            items: networkDiagramItemsUML
+        },
+        flowchart: {
+            id: 'uml2',
+            name: '▶ FlowChart',
+            items: networkDiagramItemsFlowChart
+        },
+        network: {
+            id: 'uml3',
+            name: '▶ Network Diagram',
+            items: networkDiagramItemsNetwork
+        }
+    };
+
+    const categories: Category[] = [
+        typeMap[selectedType],
+        {
+            id: 'conns',
+            name: '▶ Connections',
+            items: [{
+                id: 'line-simple',
+                name: 'simple line',
+                iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
+            }]
+        }
+    ];
   
   const categories: Category[] = [
-    {
-      id: 'uml',
-      name: '▶ UML Diagram',
-      items: networkDiagramItemsUML
-    },
-    {
-      id: 'uml2',
-      name: '▶ FlowChart',
-      items: networkDiagramItemsFlowChart
-    },
-    {
-      id: 'uml3',
-      name: '▶ Network Diagram',
-      items: networkDiagramItemsNetwork
-    },
+    typeMap[selectedType],
     {
       id: 'conns',
       name: '▶ Connections',
