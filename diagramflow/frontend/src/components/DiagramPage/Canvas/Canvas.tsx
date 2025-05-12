@@ -19,6 +19,7 @@ import ContextMenu from "./ContextMenu.tsx";
 import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
 import Konva from 'konva';
+import {getConnectionTypeFromPath} from "./ConnectionUtils.ts";
 
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
@@ -37,7 +38,7 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef, onExportRef}:
+const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef, onCopyRef, onExportRef}:
                 {
                   sidebarRef: RefObject<HTMLDivElement | null>,
                   diagramElements: ExtendedDiagramElementProps[],
@@ -49,6 +50,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                   onClearRef: RefObject<(() => void) | null>,
                   onZoomInRef: RefObject<(() => void) | null>,
                   onZoomOutRef: RefObject<(() => void) | null>,
+                  onCopyRef: RefObject<(() => void) | null>,
                   onExportRef: RefObject<(() => void) | null>,
                 }) => {
   const canvasRef = useRef<HTMLDivElement | null>(null);
@@ -58,7 +60,13 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   const [scale, setScale] = useState(1);
   //Stan tła (siatki) canvas
   const [backgroundSize, setBackgroundSize] = useState(20);
-  
+  // Stan zaznaczenia
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+
+  const handleSelectElement = (id: string) => {
+    setSelectedElementId(id);
+  };
+
   useEffect(() => {
     //Czyszczenie canvasu
     onClearRef.current = () => {
@@ -130,6 +138,30 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     };
   }, [onExportRef]);
 
+  useEffect(() => {
+    onCopyRef.current = () => {
+      if (!selectedElementId) return;
+
+      const selected = diagramElements.find(element => element.id === selectedElementId);
+      if (!selected) return;
+
+      const copiedElement: ExtendedDiagramElementProps = {
+        ...selected,
+        id: `element-${Date.now()}`,
+        posX: selected.posX + 10,
+        posY: selected.posY + 10,
+        textElements: selected.textElements.map(textElement => ({
+          ...textElement,
+          id: `text-${Date.now()}-${Math.random()}`,
+          x: textElement.x + 10,
+          y: textElement.y + 10,
+        })),
+      };
+
+      setDiagramElements(prev => [...prev, copiedElement]);
+      setSelectedElementId(null);
+    };
+  }, [selectedElementId, diagramElements, onCopyRef]);
 
   const handleUndo = useCallback(() => {
     if (undoStack.length > 0) {
@@ -255,7 +287,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
     saveStateToUndoStack(); // Save state before adding a new element
     const droppedPath = e.dataTransfer?.getData('text/plain');
     
-    if (droppedPath.includes('conn')) {
+    if (droppedPath.includes('Entity-Relationship')) {
       const rect = canvasRef.current?.getBoundingClientRect();
       if (droppedPath && canvasRef.current && rect) {
         const offset = 50;
@@ -264,8 +296,20 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         
         x = Math.max(offset, Math.min(3000 - offset, x));
         y = Math.max(offset, Math.min(3000 - offset, y));
-        
-        const newConnection: connection = new connection(Date.now(), x - 50, y + 50, x + 50, y - 50, lineTypes.straight);
+
+        // Extract connection type from the path
+        const connectionType = getConnectionTypeFromPath(droppedPath);
+
+        const newConnection: connection = new connection(
+            Date.now(),
+            x - 50,
+            y + 50,
+            x + 50,
+            y - 50,
+            lineTypes.straight,
+            connectionType
+        );
+
         setConnectionElements((prev) => [...prev, newConnection]);
       }
       return;
@@ -446,6 +490,7 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
                     handleKonvaContextMenu(e, element.id)
                   }
                   onSaveState={saveStateToUndoStack}
+                  onSelect={() => handleSelectElement(element.id)}
                 />
               </Fragment>
             ))}

@@ -3,6 +3,7 @@ import './Sidebar.css';
 import {svgFileNamesUML} from '../../../svgListUML';
 import {svgFileNamesFlowChart} from '../../../svgListFlowChart';
 import {svgFileNamesNetwork} from '../../../svgListNetwork';
+import {svgFileNamesEntityRelationship} from "../../../svgListEntityRelationship.ts";
 
 interface CategoryItem {
   id: string;
@@ -54,6 +55,18 @@ const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref)
         iconPath: iconPath
       };
     });
+  
+  const networkDiagramItemsEntityRelationship: CategoryItem[] = svgFileNamesEntityRelationship
+        .map((fileName) => {
+            const iconName = fileName.charAt(0).toUpperCase() + fileName.slice(1);
+            const iconPath = `src/assets/diagram-elements/Entity-Relationship/${fileName}.svg`;
+            return {
+                id: fileName,
+                name: iconName,
+                iconPath: iconPath
+            };
+        });
+
 
     const typeMap = {
         uml: {
@@ -85,8 +98,17 @@ const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref)
             }]
         }
     ];
-
-    const toggleCategory = (categoryId: string, event: React.MouseEvent<HTMLDivElement>) => {
+  
+  const categories: Category[] = [
+    typeMap[selectedType],
+    {
+      id: 'conns',
+      name: '▶ Connections',
+      items: networkDiagramItemsEntityRelationship
+    }
+  ];
+  
+  const toggleCategory = (categoryId: string, event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (expandedCategory === categoryId) {
       setExpandedCategory(null);

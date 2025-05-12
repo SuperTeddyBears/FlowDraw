@@ -1,18 +1,18 @@
 import React from 'react';
 import './Toolbar.css';
 import './SVG.tsx';
-import {CopyBtn} from './utils'
 import {ZoomInIcon,ZoomOutIcon, MoveBackwards, MoveForeward, Bin, Copy} from "./SVG";
 
 interface ToolbarProps {
     onUndo: () => void;
     onRedo: () => void;
     onDelete: () => void;
+    onCopy: () => void;
     onZoomIn: () => void;
     onZoomOut: () => void;
 }
 
-const Toolbar: React.FC<ToolbarProps> = ({onUndo, onRedo, onDelete, onZoomIn, onZoomOut}) => {
+const Toolbar: React.FC<ToolbarProps> = ({onUndo, onRedo, onDelete, onCopy, onZoomIn, onZoomOut}) => {
     return (
         <div className="toolbar">
             <div className="toolbar-buttons">
@@ -25,7 +25,7 @@ const Toolbar: React.FC<ToolbarProps> = ({onUndo, onRedo, onDelete, onZoomIn, on
                 <button className="toolbar-btn" title="Delete" onClick={onDelete}>
                     <Bin className="toolbar-icon" />
                 </button>
-                <button className="toolbar-btn" title="Copy" onClick={CopyBtn}>
+                <button className="toolbar-btn" title="Copy" onClick={onCopy}>
                     <Copy className="toolbar-icon" />
                 </button>
                 <button className="toolbar-btn" title="Undo" onClick={onUndo}>
