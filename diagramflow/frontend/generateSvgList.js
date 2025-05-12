@@ -9,6 +9,9 @@ const __dirname = join(__filename, '..');
 const svgDirUML = join(__dirname, 'src', 'assets', 'diagram-elements', 'UML');
 const outputFileUML = join(__dirname, 'src', 'svgListUML.ts');
 
+const svgDirEntityRelationship = join(__dirname, 'src', 'assets', 'diagram-elements', 'Entity-Relationship');
+const outputFileEntityRelationship = join(__dirname, 'src', 'svgListEntityRelationship.ts');
+
 const svgDirFlowChart = join(__dirname, 'src', 'assets', 'diagram-elements', 'FlowChart');
 const outputFileFlowChart = join(__dirname, 'src', 'svgListFlowChart.ts');
 
@@ -36,7 +39,8 @@ async function main() {
     await Promise.all([
         generateSvgList(svgDirUML, outputFileUML, 'svgFileNamesUML'),
         generateSvgList(svgDirFlowChart, outputFileFlowChart, 'svgFileNamesFlowChart'),
-        generateSvgList(svgDirNetwork, outputFileNetwork, 'svgFileNamesNetwork')
+        generateSvgList(svgDirNetwork, outputFileNetwork, 'svgFileNamesNetwork'),
+        generateSvgList(svgDirEntityRelationship, outputFileEntityRelationship, 'svgFileNamesEntityRelationship')
     ]);
 }
 
