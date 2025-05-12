@@ -85,19 +85,6 @@ const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref)
             items: networkDiagramItemsNetwork
         }
     };
-
-    const categories: Category[] = [
-        typeMap[selectedType],
-        {
-            id: 'conns',
-            name: '▶ Connections',
-            items: [{
-                id: 'line-simple',
-                name: 'simple line',
-                iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
-            }]
-        }
-    ];
   
   const categories: Category[] = [
     typeMap[selectedType],
