@@ -169,8 +169,13 @@ const DashboardPage: FunctionComponent = () => {
                   {src: NetDiagram, alt: 'Network Diagram'}
                 ].map((item, index) => (
                   <Fragment key={index}>
-                    <Link to={{pathname: "/diagrampage"}} state={{name: `New ${item.alt}`}}>
-                      <div className="diagramBox">
+                    <Link to={{
+                      pathname: "/diagrampage"
+                    }} state={{
+                      name: `New ${item.alt}`,
+                      type: item.alt.includes('UML') ? 'uml' : item.alt.includes('Network') ? 'network' : 'flowchart'
+                    }}>
+                    <div className="diagramBox">
                         <img src={item.src} alt={item.alt}/>
                       </div>
                       <p className="carousel-caption">{item.alt}</p>

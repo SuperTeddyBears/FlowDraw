@@ -18,6 +18,7 @@ export interface DiagramElementProps {
     onPositionChange?: (id: string, x: number, y: number, width: number, height: number) => void;
     onContextMenu: (e: KonvaEventObject<PointerEvent>, id: string) => void;
     onSaveState?: () => void;
+    onSelect?: () => void;
 }
 
 export const DiagramElement = ({
@@ -33,6 +34,7 @@ export const DiagramElement = ({
                                    onPositionChange,
                                    onContextMenu,
                                    onSaveState,
+                                   onSelect,
                                }: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
@@ -110,7 +112,7 @@ export const DiagramElement = ({
             transformerRef.current.getLayer()?.batchDraw();
         }
     }, [isSelected, shape]);
-    
+
     useEffect(() => {
         const handleClickOutside = () => {
             if (!imageRef.current) return;
@@ -159,13 +161,16 @@ export const DiagramElement = ({
                 width={shape.width}
                 height={shape.height}
                 draggable={true}
-                onClick={() => setIsSelected(!isSelected)}
+                onClick={() => {
+                    setIsSelected(true);
+                    if (onSelect) onSelect();
+                }}
                 onDblClick={handleDoubleClick}
                 onTransform={updateSize}
                 onTransformStart={() => {if (onSaveState) onSaveState();}}
                 onDragMove={updatePosition}
                 onDragStart={() => {if (onSaveState) onSaveState();}}
-                onDragEnd={() => {setIsSelected(false);}}
+                //onDragEnd={() => {setIsSelected(false);}} // wydaje mi sie ze jesli przesuwamy zaznaczony to lepiej zeby sie nie odznaczal
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 

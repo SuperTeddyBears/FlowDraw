@@ -6,6 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 import { KonvaEventObject } from "konva/lib/Node";
 import JaggedLine from "./JaggedLine.tsx";
 import StraightLine from "./StraightLine.tsx";
+import ConnectionEndpoint from "./ConnectionEndpoint.tsx";
+import { connectionEndpoints } from "./ConnectionUtils.ts";
 
 const ConnectionElement = ({
   element,
@@ -140,16 +142,69 @@ const ConnectionElement = ({
     updateSnappedElementPosition(element.getEndSnappedElementId(), setEndX, setEndY, startX, startY);
   }, [diagramElements, element, startX, startY, updateSnappedElementPosition]);
 
+  // Calculate direction vectors for endpoint rotations
+  const dx = endX - startX;
+  const dy = endY - startY;
+  const startAngle = (Math.atan2(dy, dx) * 180 / Math.PI) + 180; // Add 180 degrees
+  const endAngle = (Math.atan2(-dy, -dx) * 180 / Math.PI) + 180; // Add 180 degrees
+
+  // Get the endpoint images based on the connection type
+  const endpoints = connectionEndpoints[element.getConnectionType()];
+
   return (
-    <>
-      <Circle x={startX} y={startY} radius={3} fill="black" />
-      <Circle x={endX} y={endY} radius={3} fill="black" />
-      {element.lineType == lineTypes.straight ? (
-        <StraightLine
-          coords={[startX, startY, endX, endY]}
-          element={element}
-          collisionRadius={collisionRadius}
-          handleKonvaContextMenu={handleKonvaContextMenu}
+      <>
+        {/* Start endpoint */}
+        <ConnectionEndpoint
+            x={startX}
+            y={startY}
+            angle={startAngle}
+            imageName={endpoints.start}
+        />
+
+        {/* End endpoint */}
+        <ConnectionEndpoint
+            x={endX}
+            y={endY}
+            angle={endAngle}
+            imageName={endpoints.end}
+        />
+
+        {/* Connection Line */}
+        {element.lineType === lineTypes.straight ? (
+            <StraightLine
+                coords={[startX, startY, endX, endY]}
+                element={element}
+                collisionRadius={collisionRadius}
+                handleKonvaContextMenu={handleKonvaContextMenu}
+            />
+        ) : (
+            <JaggedLine coords={[startX, startY, endX, endY]} element={element} />
+        )}
+
+        {/* Drag handles */}
+        <Circle
+            x={startX}
+            y={startY}
+            radius={collisionRadius}
+            fill="transparent"
+            draggable={true}
+            onDragMove={(e) => {
+              updatePosition(e, 'start');
+              e.target.x(startX);
+              e.target.y(startY);
+            }}
+        />
+        <Circle
+            x={endX}
+            y={endY}
+            radius={collisionRadius}
+            fill="transparent"
+            draggable={true}
+            onDragMove={(e) => {
+              updatePosition(e, 'end');
+              e.target.x(endX);
+              e.target.y(endY);
+            }}
         />
       ) : (
         <JaggedLine

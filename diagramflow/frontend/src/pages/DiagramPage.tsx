@@ -11,6 +11,7 @@ import {deserializeDiagram} from "../components/DiagramPage/utils.ts";
 
 export const DiagramPage = () => {
   const location = useLocation();
+  const diagramType = location.state?.type || 'flowchart';
   const sidebarRef = useRef<HTMLDivElement | null>(null);
   
   // Elementy diagramu
@@ -24,6 +25,7 @@ export const DiagramPage = () => {
     const undoRef = useRef<(() => void) | null>(null);
     const redoRef = useRef<(() => void) | null>(null);
     const clearCanvasRef = useRef<(() => void) | null>(null);
+    const copyRef = useRef<() => void>(null);
     const zoomInRef = useRef<(() => void) | null>(null);
     const zoomOutRef = useRef<(() => void) | null>(null);
     const exportRef = useRef<(() => void) | null>(null);
@@ -51,11 +53,12 @@ export const DiagramPage = () => {
             onUndo={() => undoRef.current?.()}
             onRedo={() => redoRef.current?.()}
             onDelete={() => clearCanvasRef.current?.()}
+            onCopy={() => copyRef.current?.()}
             onZoomIn={() => zoomInRef.current?.()}
             onZoomOut={() => zoomOutRef.current?.()}
           />
         <div className="workspace">
-          <Sidebar ref={sidebarRef}/>
+          <Sidebar ref={sidebarRef} selectedType={diagramType} />
           <Canvas
             sidebarRef={sidebarRef}
             diagramElements={diagramElements}
@@ -65,6 +68,7 @@ export const DiagramPage = () => {
             onUndoRef={undoRef}
             onRedoRef={redoRef}
             onClearRef={clearCanvasRef}
+            onCopyRef={copyRef}
             onZoomInRef={zoomInRef}
             onZoomOutRef={zoomOutRef}
             onExportRef={exportRef}
