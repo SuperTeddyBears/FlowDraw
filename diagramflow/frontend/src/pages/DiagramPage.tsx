@@ -24,6 +24,7 @@ export const DiagramPage = () => {
     const undoRef = useRef<(() => void) | null>(null);
     const redoRef = useRef<(() => void) | null>(null);
     const clearCanvasRef = useRef<(() => void) | null>(null);
+    const copyRef = useRef<() => void>(null);
     const zoomInRef = useRef<(() => void) | null>(null);
     const zoomOutRef = useRef<(() => void) | null>(null);
     const exportRef = useRef<(() => void) | null>(null);
@@ -51,6 +52,7 @@ export const DiagramPage = () => {
             onUndo={() => undoRef.current?.()}
             onRedo={() => redoRef.current?.()}
             onDelete={() => clearCanvasRef.current?.()}
+            onCopy={() => copyRef.current?.()}
             onZoomIn={() => zoomInRef.current?.()}
             onZoomOut={() => zoomOutRef.current?.()}
           />
@@ -65,6 +67,7 @@ export const DiagramPage = () => {
             onUndoRef={undoRef}
             onRedoRef={redoRef}
             onClearRef={clearCanvasRef}
+            onCopyRef={copyRef}
             onZoomInRef={zoomInRef}
             onZoomOutRef={zoomOutRef}
             onExportRef={exportRef}
