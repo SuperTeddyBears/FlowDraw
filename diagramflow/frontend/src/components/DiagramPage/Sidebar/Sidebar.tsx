@@ -73,7 +73,7 @@ const Sidebar = forwardRef<HTMLDivElement>((_props, ref) => {
       items: [{
         id: 'line-simple',
         name: 'simple line',
-        iconPath: 'src/assets/diagram-elements/Connections-old/conn-simple.svg'
+        iconPath: 'src/assets/diagram-elements/connections/conn-simple.svg'
       }]
     }
   ];
