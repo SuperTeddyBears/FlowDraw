@@ -1,6 +1,6 @@
 export const svgFileNamesEntityRelationship = [
   "0-to-1",
-  // "0-to-many-optional", problem z plikiem
+  "0-to-many-optional",
   "1-mandatory-to-1-optional",
   "1-mandatory-to-many-mandatory",
   "1-mandatory-to-many-optional",
