@@ -4,15 +4,34 @@ import {FC} from "react";
 import Konva from "konva";
 
 interface JaggedLineProps {
-  coords: [number, number, number, number];
+  coords: [number, number, number, number, number, number,  string, string];
   element: connection;
   collisionRadius: number;
   handleKonvaContextMenu: (e: Konva.KonvaEventObject<PointerEvent>, id: string) => void;
 }
 
 const JaggedLine: FC<JaggedLineProps> = ({coords, element, collisionRadius, handleKonvaContextMenu}) => {
-    const [x1, y1, x2, y2] = coords;
+    let [x1, y1, x2, y2, startAngle, endAngle, imageStart, imageEnd] = coords;
     const margin = 20;
+
+
+    //adjust the start and end points of the line to be at the start of the connection endpoints
+    //If circle is an endpoint, nothing happened
+    if (imageStart) {
+        const moveX = Math.cos(startAngle * Math.PI / 180) * (50);
+        const moveY = Math.sin(startAngle * Math.PI / 180) * (50);
+
+        x1 = x1 - moveX;
+        y1 = y1 - moveY;
+    }
+
+    if(imageEnd) {
+        const moveX2 = Math.cos(endAngle * Math.PI / 180) * (50);
+        const moveY2 = Math.sin(endAngle * Math.PI / 180) * (50);
+        x2 = x2 - moveX2;
+        y2 = y2 - moveY2;
+    }
+    //////////////////////////////////
 
     let points: number[];
 

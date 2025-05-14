@@ -83,6 +83,7 @@ const ConnectionElement = ({
           element.setEnd(endSnappedId, wall.wall);
         }
       }
+
     } else {
       element.setEnd(null, null);
       const distance = Math.hypot(newX - startX, newY - startY);
@@ -109,6 +110,7 @@ const ConnectionElement = ({
         }
       }
     }
+
   };
 
   const updateSnappedElementPosition = useCallback((
@@ -134,13 +136,18 @@ const ConnectionElement = ({
     }
   }, [diagramElements]);
 
+
+
   useEffect(() => {
     updateSnappedElementPosition(element.getStartSnappedElementId(), setStartX, setStartY, endX, endY);
   }, [diagramElements, element, endX, endY, updateSnappedElementPosition]);
 
   useEffect(() => {
     updateSnappedElementPosition(element.getEndSnappedElementId(), setEndX, setEndY, startX, startY);
+
   }, [diagramElements, element, startX, startY, updateSnappedElementPosition]);
+
+
 
   // Calculate direction vectors for endpoint rotations
   const dx = endX - startX;
@@ -150,6 +157,8 @@ const ConnectionElement = ({
 
   // Get the endpoint images based on the connection type
   const endpoints = connectionEndpoints[element.getConnectionType()];
+
+
 
   return (
       <>
@@ -179,7 +188,7 @@ const ConnectionElement = ({
             />
         ) : (
             <JaggedLine
-              coords={[startX, startY, endX, endY]}
+              coords={[startX, startY, endX, endY, startAngle, endAngle, endpoints.start, endpoints.end]}
               element={element}
               collisionRadius={collisionRadius}
               handleKonvaContextMenu={handleKonvaContextMenu}
