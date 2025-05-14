@@ -1,10 +1,3 @@
-//veracode
-//blackduck
-//sonercube
-
-//--testy
-
-
 pipeline {
     agent none
 
@@ -28,19 +21,19 @@ pipeline {
                 stage('Build Docker Image') {
                     steps {
                         dir('diagramflow') {
-                          sh 'sudo docker compose build'
-                          sh 'sudo docker compose up -d'
+                            sh 'sudo docker compose build'
+                            sh 'sudo docker compose up -d'
                         }
                     }
                 }
                 stage('Clean Docker') {
-                    steps{
+                    steps {
                         script {
                             timeout(time: 30, unit: 'MINUTES') {
                                 def userInput = input(
                                     message: 'Do you want to stop the containers now?',
                                     parameters: [
-                                        choice(choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
+                                        choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
                                     ]
                                 )
 
