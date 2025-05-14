@@ -21,8 +21,10 @@ const ConnectionElement = ({
   const [x1, y1, x2, y2]: [number, number, number, number] = element.getConnectionCoordinates(diagramElements);
   const [startX, setStartX] = useState(x1);
   const [startY, setStartY] = useState(y1);
+  const [startAngle, setStartAngle] = useState(0);
   const [endX, setEndX] = useState(x2);
   const [endY, setEndY] = useState(y2);
+  const [endAngle, setEndAngle] = useState(0);
   const collisionRadius = 30;
 
   const getCenterOfNearestWall = (diagramElement: ExtendedDiagramElementProps, x: number, y: number) => {
@@ -112,6 +114,16 @@ const ConnectionElement = ({
     }
 
   };
+  
+  const getWallAngle = (wall: string): number => {
+    switch (wall) {
+      case 'left': return 0;
+      case 'right': return 180;
+      case 'top': return 90;
+      case 'bottom': return 270;
+      default: return 0;
+    }
+  };
 
   const updateSnappedElementPosition = useCallback((
     snappedElementId: string | null,
@@ -128,13 +140,15 @@ const ConnectionElement = ({
     const wall = getCenterOfNearestWall(diagramElement, oppositeX, oppositeY);
     setX(wall.x);
     setY(wall.y);
-
+    
     if (setX === setStartX) {
       element.setStart(snappedElementId, wall.wall);
+      setStartAngle(getWallAngle(wall.wall));
     } else {
       element.setEnd(snappedElementId, wall.wall);
+      setEndAngle(getWallAngle(wall.wall));
     }
-  }, [diagramElements]);
+  }, [diagramElements, element]);
 
 
 
@@ -147,18 +161,8 @@ const ConnectionElement = ({
 
   }, [diagramElements, element, startX, startY, updateSnappedElementPosition]);
 
-
-
-  // Calculate direction vectors for endpoint rotations
-  const dx = endX - startX;
-  const dy = endY - startY;
-  const startAngle = (Math.atan2(dy, dx) * 180 / Math.PI) + 180; // Add 180 degrees
-  const endAngle = (Math.atan2(-dy, -dx) * 180 / Math.PI) + 180; // Add 180 degrees
-
   // Get the endpoint images based on the connection type
   const endpoints = connectionEndpoints[element.getConnectionType()];
-
-
 
   return (
       <>
