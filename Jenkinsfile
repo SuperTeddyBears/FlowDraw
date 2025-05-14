@@ -1,3 +1,10 @@
+//veracode
+//blackduck
+//sonercube
+
+//--testy
+
+
 pipeline {
     agent none
 
@@ -29,20 +36,21 @@ pipeline {
                 stage('Clean Docker') {
                     steps{
                         script {
-                            def userInput = input(
-                                message: 'Do you want to stop the containers now?',
-                                parameters: [
-                                    choice(choices: ['Yes', 'No'], defaultValue: 'No'  )
-                                ],
-                                timeout: 1800
-                            )
+                            timeout(time: 30, unit: 'MINUTES') {
+                                def userInput = input(
+                                    message: 'Do you want to stop the containers now?',
+                                    parameters: [
+                                        choice(choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
+                                    ]
+                                )
 
-                            if (userInput == 'Yes') {
-                                sh 'sudo docker compose down'
-                            } else {
-                                sleep 3600
-                                echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
-                                sh 'sudo docker compose down'
+                                if (userInput == 'Yes') {
+                                    sh 'sudo docker compose down'
+                                } else {
+                                    sleep 3600
+                                    echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
+                                    sh 'sudo docker compose down'
+                                }
                             }
                         }
                     }
