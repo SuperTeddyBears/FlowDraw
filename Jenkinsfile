@@ -36,13 +36,17 @@ pipeline {
                                         choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
                                     ]
                                 )
-
+                                
                                 if (userInput == 'Yes') {
-                                    sh 'sudo docker compose down'
+                                    sh 'docker stop $(docker ps -aq) || true'
+                                    sh 'docker rm $(docker ps -aq) || true'
+                                    sh 'docker rmi $(docker images -q) || true'
                                 } else {
                                     sleep 3600
-                                    echo 'Zatrzymanie i usunięcie kontenerów po godzinie...'
-                                    sh 'sudo docker compose down'
+                                    echo 'Cleaning up after an hour...'
+                                    sh 'docker stop $(docker ps -aq) || true'
+                                    sh 'docker rm $(docker ps -aq) || true'
+                                    sh 'docker rmi $(docker images -q) || true'
                                 }
                             }
                         }
