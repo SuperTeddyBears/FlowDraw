@@ -21,10 +21,9 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
-
 class Diagram(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='diagrams')
-    name = models.CharField(max_length=255)  # Nowe pole dla nazwy diagramu
+    name = models.CharField(max_length=255, default="New Flowchart Diagram")
     data = models.JSONField()
     created_at = models.DateTimeField(auto_now_add=True)
     google_drive_file_id = models.CharField(max_length=255, blank=True, null=True)
@@ -33,4 +32,4 @@ class Diagram(models.Model):
         return f"Diagram {self.name} for {self.user.email}"
 
     class Meta:
-        unique_together = ('user', 'name')  # Zapewnia unikalność nazwy diagramu dla użytkownika
+        unique_together = ('user', 'name')
