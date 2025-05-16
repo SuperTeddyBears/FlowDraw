@@ -4,4 +4,4 @@ from .models import Diagram
 class DiagramSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagram
-        fields = ['id', 'user', 'data']  # Zawiera pola: id, użytkownik i dane diagramu
+        fields = ['id', 'user', 'name', 'data']  # Dodajemy pole 'name'

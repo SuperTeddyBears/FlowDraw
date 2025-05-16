@@ -246,73 +246,37 @@ class LogoutView(APIView):
             return Response({'error': str(e)},
                             status=status.HTTP_400_BAD_REQUEST
                             )
+
 class SaveUserDiagramView(APIView):
     """
-    Widok do zapisywania nowego diagramu do bazy danych i Google Drive.
+    Widok do zapisywania lub aktualizowania diagramu w bazie danych.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         """
-        Zapisz nowy diagram do bazy danych i Google Drive.
+        Zapisz lub nadpisz diagram w bazie danych.
         """
-        data = request.data
-        data['user'] = request.user.id  # Ustaw użytkownika na aktualnie zalogowanego
+        data = request.data.copy()  # Kopiujemy dane, aby móc je modyfikować
+        data['user'] = request.user.id  # Ustawiamy użytkownika na aktualnie zalogowanego
 
-        # Serializuj dane
-        serializer = DiagramSerializer(data=data)
+        # Pobieramy nazwę diagramu
+        diagram_name = data.get('name')
+        if not diagram_name:
+            return Response({'error': 'Diagram name is required'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Sprawdzamy, czy diagram o danej nazwie już istnieje dla użytkownika
+        try:
+            existing_diagram = Diagram.objects.get(user=request.user, name=diagram_name)
+            # Nadpisz istniejący diagram
+            serializer = DiagramSerializer(existing_diagram, data=data, partial=True)
+        except Diagram.DoesNotExist:
+            # Stwórz nowy diagram
+            serializer = DiagramSerializer(data=data)
+
+        # Walidacja i zapis
         if serializer.is_valid():
-            # Zapisz diagram do bazy danych
             diagram = serializer.save()
-
-            # Save to Google Drive if user has authenticated
-            if request.user.google_drive_access_token:
-                try:
-                    # Create or refresh credentials
-                    credentials = Credentials(
-                        token=request.user.google_drive_access_token,
-                        refresh_token=request.user.google_drive_refresh_token,
-                        token_uri='https://oauth2.googleapis.com/token',
-                        client_id=os.environ.get('GOOGLE_CLIENT_ID'),
-                        client_secret=os.environ.get('GOOGLE_CLIENT_SECRET')
-                    )
-
-                    # Build Google Drive service
-                    drive_service = build('drive', 'v3', credentials=credentials)
-
-                    # Create file metadata
-                    file_metadata = {
-                        'name': f'Diagram_{diagram.id}.json',
-                        'mimeType': 'application/json'
-                    }
-
-                    # Convert diagram data to JSON string
-                    diagram_data = json.dumps(serializer.data)
-
-                    # Create media upload
-                    media = MediaInMemoryUpload(
-                        diagram_data.encode('utf-8'),
-                        mimetype='application/json',
-                        resumable=True
-                    )
-
-                    # Upload to Google Drive
-                    file = drive_service.files().create(
-                        body=file_metadata,
-                        media_body=media,
-                        fields='id'
-                    ).execute()
-
-                    # Save Google Drive file ID to the diagram
-                    diagram.google_drive_file_id = file.get('id')
-                    diagram.save()
-
-                except Exception as e:
-                    print(f"Błąd zapisu na Google Drive: {str(e)}")
-                    # Continue even if Google Drive save fails
-                    pass
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -331,6 +295,88 @@ class FetchUserDiagramsView(generics.ListAPIView):
 
     serializer_class = DiagramSerializer
 
+class ShareUserDiagramView(APIView):
+    """
+    Widok do przesyłania pliku PNG diagramu na Google Drive.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """
+        Prześlij plik PNG na Google Drive i zapisz google_drive_file_id.
+        """
+        diagram_name = request.data.get('name')
+        png_file = request.FILES.get('png')
+
+        # Walidacja wymaganych pól
+        if not diagram_name:
+            return Response({'error': 'Diagram name is required'}, status=status.HTTP_400_BAD_REQUEST)
+        if not png_file:
+            return Response({'error': 'PNG file is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Sprawdzamy, czy diagram istnieje
+        try:
+            diagram = Diagram.objects.get(user=request.user, name=diagram_name)
+        except Diagram.DoesNotExist:
+            return Response({'error': 'Diagram with this name does not exist'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Sprawdzamy, czy użytkownik ma uwierzytelnienie Google Drive
+        if not request.user.google_drive_access_token:
+            return Response({'error': 'Google Drive authentication required'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            # Tworzenie lub odświeżanie poświadczeń
+            credentials = Credentials(
+                token=request.user.google_drive_access_token,
+                refresh_token=request.user.google_drive_refresh_token,
+                token_uri='https://oauth2.googleapis.com/token',
+                client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+                client_secret=os.environ.get('GOOGLE_CLIENT_SECRET')
+            )
+
+            # Budowanie serwisu Google Drive
+            drive_service = build('drive', 'v3', credentials=credentials)
+
+            # Metadane pliku
+            file_metadata = {
+                'name': f'{diagram.name}.png',
+                'mimeType': 'image/png'
+            }
+
+            # Przygotowanie danych PNG
+            media = MediaInMemoryUpload(
+                png_file.read(),
+                mimetype='image/png',
+                resumable=True
+            )
+
+            # Jeśli diagram ma google_drive_file_id, aktualizujemy plik
+            if diagram.google_drive_file_id:
+                file = drive_service.files().update(
+                    fileId=diagram.google_drive_file_id,
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id'
+                ).execute()
+            else:
+                # W przeciwnym razie tworzymy nowy plik
+                file = drive_service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id'
+                ).execute()
+
+            # Zapis ID pliku Google Drive
+            diagram.google_drive_file_id = file.get('id')
+            diagram.save()
+
+            # Serializacja diagramu do odpowiedzi
+            serializer = DiagramSerializer(diagram)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            print(f"Błąd zapisu na Google Drive: {str(e)}")
+            return Response({'error': f'Failed to upload to Google Drive: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GoogleDriveAuthView(APIView):
     """
