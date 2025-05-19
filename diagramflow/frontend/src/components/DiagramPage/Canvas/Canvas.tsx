@@ -20,6 +20,7 @@ import {connection, lineTypes} from "../connection.ts";
 import ConnectionElement from "./ConnectionElement.tsx";
 import Konva from 'konva';
 import {getConnectionTypeFromPath} from "./ConnectionUtils.ts";
+import axios from "axios";
 
 
 export interface ExtendedDiagramElementProps extends DiagramElementProps {
@@ -118,6 +119,9 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   
   useEffect(() => {
     onExportRef.current = () => {
+      const token = localStorage.getItem('flow_auth_token');
+      if (!token) return;
+      
       const stage = stageRef.current;
       if (!stage) return;
       
@@ -131,10 +135,16 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         pixelRatio: 2,
       });
       
-      const link = document.createElement('a');
-      link.download = 'diagram.png';
-      link.href = dataURL;
-      link.click();
+      axios.post(
+        '/api/user/share_diagram',
+        {body: dataURL},
+        {headers: {Authorization: `Bearer ${token}`}}
+      ).then(() => console.log("Zapisano do Google Drive"));
+      
+      // const link = document.createElement('a');
+      // link.download = 'diagram.png';
+      // link.href = dataURL;
+      // link.click();
     };
   }, [onExportRef]);
 
