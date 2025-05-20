@@ -51,7 +51,7 @@ pipeline {
                                     } else {
                                         sleep 3600
                                         echo 'Cleaning up after an hour...'
-                                        sh 'clean-up.sh'
+                                        sh 'bash clean-up.sh'
                                     }
                                 }
                             }   
