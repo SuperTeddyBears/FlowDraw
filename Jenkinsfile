@@ -46,11 +46,11 @@ pipeline {
                                 )
                                 
                                 if (userInput == 'Yes') {
-                                    sh 'clean-up.sh'
+                                    sh 'bash ../../diagramflow/deploymentclean-up.sh'
                                 } else {
                                     sleep 3600
                                     echo 'Cleaning up after an hour...'
-                                    sh 'bash ../..diagramflow/deployment/clean-up.sh'
+                                    sh 'bash ../../diagramflow/deployment/clean-up.sh'
                                 }
                             }
                         }   
