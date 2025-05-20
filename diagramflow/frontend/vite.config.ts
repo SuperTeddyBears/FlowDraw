@@ -8,15 +8,22 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-      svgr()
+    svgr()
   ],
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://flowdraw.northeurope.cloudapp.azure.com:8080',
         changeOrigin: true,
       },
     },
+    allowedHosts: [
+      "flowdraw.northeurope.cloudapp.azure.com",
+      "localhost",
+      "127.0.0.1",
+      "20.251.160.204"
+    ],
+    host: '0.0.0.0',
+    port: 5173,
   },
 })
-
