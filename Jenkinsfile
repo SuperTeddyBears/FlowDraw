@@ -12,9 +12,15 @@ pipeline {
             when {
                 beforeAgent true
                 anyOf {
-                    branch pattern: '.*dev.*', comparator: 'REGEXP'
                     branch 'master'
-                    changeRequest()
+                    allOf {
+                        branch pattern: '.*dev.*', comparator: 'REGEXP'
+                        triggeredBy 'UserIdCause'
+                    }
+                    allOf {
+                        changeRequest()
+                        triggeredBy 'UserIdCause'
+                    }
                 }
             }
             stages {
