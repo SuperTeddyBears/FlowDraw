@@ -50,7 +50,7 @@ pipeline {
                                 } else {
                                     sleep 3600
                                     echo 'Cleaning up after an hour...'
-                                    sh 'bash diagramflow/deployment/clean-up.sh'
+                                    sh 'bash ../..diagramflow/deployment/clean-up.sh'
                                 }
                             }
                         }   
