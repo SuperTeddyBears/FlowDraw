@@ -36,7 +36,7 @@ pipeline {
                 }
                 stage('Clean Docker') {
                     steps {
-                        dir('deployment') {
+                        dir('diagramflow/deployment') {
                             script {
                                 timeout(time: 30, unit: 'MINUTES') {
                                     def userInput = input(
