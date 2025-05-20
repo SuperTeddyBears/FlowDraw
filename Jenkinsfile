@@ -18,6 +18,14 @@ pipeline {
                 }
             }
             stages {
+                stage('Prepare Enviroment') {
+                    steps {
+                        sh '''
+                            cp /home/STB/frontend/.env "$WORKSPACE/diagramflow/frontend/.env"
+                            cp /home/STB/backend/.env "$WORKSPACE//diagramflow/backend/.env"
+                        '''
+                    }
+                }
                 stage('Build Docker Image') {
                     steps {
                         dir('diagramflow') {
@@ -28,27 +36,25 @@ pipeline {
                 }
                 stage('Clean Docker') {
                     steps {
-                        script {
-                            timeout(time: 30, unit: 'MINUTES') {
-                                def userInput = input(
-                                    message: 'Do you want to stop the containers now?',
-                                    parameters: [
-                                        choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
-                                    ]
-                                )
-                                
-                                if (userInput == 'Yes') {
-                                    sh 'docker stop $(docker ps -aq) || true'
-                                    sh 'docker rm $(docker ps -aq) || true'
-                                    sh 'docker rmi $(docker images -q) || true'
-                                } else {
-                                    sleep 3600
-                                    echo 'Cleaning up after an hour...'
-                                    sh 'docker stop $(docker ps -aq) || true'
-                                    sh 'docker rm $(docker ps -aq) || true'
-                                    sh 'docker rmi $(docker images -q) || true'
+                        dir('deployment') {
+                            script {
+                                timeout(time: 30, unit: 'MINUTES') {
+                                    def userInput = input(
+                                        message: 'Do you want to stop the containers now?',
+                                        parameters: [
+                                            choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
+                                        ]
+                                    )
+                                    
+                                    if (userInput == 'Yes') {
+                                        sh 'pwsh clean-up.ps1'
+                                    } else {
+                                        sleep 3600
+                                        echo 'Cleaning up after an hour...'
+                                        sh 'pwsh clean-up.ps1'
+                                    }
                                 }
-                            }
+                            }   
                         }
                     }
                 }
