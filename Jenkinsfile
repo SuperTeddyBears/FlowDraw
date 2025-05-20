@@ -36,26 +36,24 @@ pipeline {
                 }
                 stage('Clean Docker') {
                     steps {
-                        dir('diagramflow/deployment') {
-                            script {
-                                timeout(time: 30, unit: 'MINUTES') {
-                                    def userInput = input(
-                                        message: 'Do you want to stop the containers now?',
-                                        parameters: [
-                                            choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
-                                        ]
-                                    )
-                                    
-                                    if (userInput == 'Yes') {
-                                        sh 'clean-up.sh'
-                                    } else {
-                                        sleep 3600
-                                        echo 'Cleaning up after an hour...'
-                                        sh 'bash clean-up.sh'
-                                    }
+                        script {
+                            timeout(time: 30, unit: 'MINUTES') {
+                                def userInput = input(
+                                    message: 'Do you want to stop the containers now?',
+                                    parameters: [
+                                        choice(name: 'StopContainers', choices: ['Yes', 'No'], description: 'Choose whether to stop the containers now.')
+                                    ]
+                                )
+                                
+                                if (userInput == 'Yes') {
+                                    sh 'clean-up.sh'
+                                } else {
+                                    sleep 3600
+                                    echo 'Cleaning up after an hour...'
+                                    sh 'bash diagramflow/deployment/clean-up.sh'
                                 }
-                            }   
-                        }
+                            }
+                        }   
                     }
                 }
             }
