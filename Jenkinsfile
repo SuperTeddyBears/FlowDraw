@@ -47,11 +47,11 @@ pipeline {
                                     )
                                     
                                     if (userInput == 'Yes') {
-                                        sh 'pwsh clean-up.ps1'
+                                        sh 'clean-up.sh'
                                     } else {
                                         sleep 3600
                                         echo 'Cleaning up after an hour...'
-                                        sh 'pwsh clean-up.ps1'
+                                        sh 'clean-up.sh'
                                     }
                                 }
                             }   
