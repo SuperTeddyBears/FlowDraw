@@ -46,7 +46,7 @@ pipeline {
                                 )
                                 
                                 if (userInput == 'Yes') {
-                                    sh 'bash diagramflow/deploymentclean-up.sh'
+                                    sh 'bash diagramflow/deployment/clean-up.sh'
                                 } else {
                                     sleep 3600
                                     echo 'Cleaning up after an hour...'
