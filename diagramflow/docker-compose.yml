@@ -22,3 +22,8 @@ services:
       - "8080:8080"
     volumes:
       - ./backend:/app
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+      - POETRY_VIRTUALENVS_CREATE=false
+      - POETRY_HOME=/usr/local/lib/python3.12/site-packages
