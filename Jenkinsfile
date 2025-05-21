@@ -8,7 +8,7 @@ pipeline {
 
     stages {
         stage('Linux') {
-            agent any
+            agent none
             when {
                 beforeAgent true
                 anyOf {
@@ -67,7 +67,9 @@ pipeline {
     }
     post {
         success {
-            cleanWs()
+            node {
+                cleanWs()
+            }
         }
     }
 }
