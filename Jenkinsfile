@@ -53,21 +53,18 @@ pipeline {
                                 
                                 if (userInput == 'Yes') {
                                     sh 'bash diagramflow/deployment/clean-up.sh'
+                                    cleanWs()
                                 } else {
                                     sleep 3600
                                     echo 'Cleaning up after an hour...'
                                     sh 'bash diagramflow/deployment/clean-up.sh'
+                                    cleanWs()
                                 }
                             }
                         }   
                     }
                 }
             }
-        }
-    }
-    post {
-        success {
-            cleanWs()
         }
     }
 }
