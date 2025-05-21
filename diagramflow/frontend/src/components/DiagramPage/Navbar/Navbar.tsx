@@ -55,7 +55,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
     }
     await axios.post(
       '/api/user/save_diagram',
-      {user: userId, data: json},
+      {user: userId, data: json, name: diagramName},
       {headers: {Authorization: `Bearer ${token}`}}
     );
   };
