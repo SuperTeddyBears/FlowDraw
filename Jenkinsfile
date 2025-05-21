@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
 
     options {
         parallelsAlwaysFailFast()
@@ -8,7 +8,7 @@ pipeline {
 
     stages {
         stage('Linux') {
-            agent none
+            agent any
             when {
                 beforeAgent true
                 anyOf {
@@ -67,9 +67,7 @@ pipeline {
     }
     post {
         success {
-            node {
-                cleanWs()
-            }
+            cleanWs()
         }
     }
 }
