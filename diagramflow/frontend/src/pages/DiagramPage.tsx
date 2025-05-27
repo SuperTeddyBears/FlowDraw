@@ -61,6 +61,7 @@ export const DiagramPage = () => {
           <Sidebar ref={sidebarRef} selectedType={diagramType} />
           <Canvas
             sidebarRef={sidebarRef}
+            diagramName={diagramName}
             diagramElements={diagramElements}
             setDiagramElements={setDiagramElements}
             connectionElements={connectionElements}

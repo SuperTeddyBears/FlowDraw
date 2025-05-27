@@ -39,9 +39,30 @@ interface ContextMenuProps {
   targetId: string | null;
 }
 
-const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef, onCopyRef, onExportRef}:
+const initiateGoogleDriveAuth = async () => {
+  const token = localStorage.getItem('flow_auth_token');
+  if (!token) return;
+
+  try {
+    const response = await axios.get('/api/auth/google-drive', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    // Redirect the user to Google's authorization page
+    if (response.data.authorization_url) {
+      window.location.href = response.data.authorization_url;
+    }
+  } catch (error) {
+    console.error('Failed to initiate Google Drive authorization:', error);
+  }
+};
+
+const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, connectionElements, setConnectionElements, onUndoRef, onRedoRef, onClearRef, onZoomInRef, onZoomOutRef, onCopyRef, onExportRef}:
                 {
                   sidebarRef: RefObject<HTMLDivElement | null>,
+                  diagramName: string,
                   diagramElements: ExtendedDiagramElementProps[],
                   setDiagramElements: Dispatch<SetStateAction<ExtendedDiagramElementProps[]>>,
                   connectionElements: connection[],
@@ -118,14 +139,14 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
   };
   
   useEffect(() => {
-    onExportRef.current = () => {
+    onExportRef.current = async () => {
       const token = localStorage.getItem('flow_auth_token');
       if (!token) return;
       
       const stage = stageRef.current;
       if (!stage) return;
       
-      const box = stage.getClientRect({skipTransform: false}); // <-- najważniejsze!
+      const box = stage.getClientRect({skipTransform: false});
       
       const dataURL = stage.toDataURL({
         x: box.x,
@@ -133,20 +154,46 @@ const Canvas = ({sidebarRef, diagramElements, setDiagramElements, connectionElem
         width: box.width,
         height: box.height,
         pixelRatio: 2,
+        mimeType: 'image/png'
       });
+
+      // Convert base64 to blob
+      const base64Data = dataURL.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteArrays = [];
+    
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArrays.push(byteCharacters.charCodeAt(i));
+      }
+    
+      const blob = new Blob([new Uint8Array(byteArrays)], { type: 'image/png' });
       
-      axios.post(
-        '/api/user/share_diagram',
-        {body: dataURL},
-        {headers: {Authorization: `Bearer ${token}`}}
-      ).then(() => console.log("Zapisano do Google Drive"));
-      
-      // const link = document.createElement('a');
-      // link.download = 'diagram.png';
-      // link.href = dataURL;
-      // link.click();
+      // Create FormData and append the file with the correct field name
+      const formData = new FormData();
+      formData.append('png', blob, `${diagramName}.png`); // Backend expects 'png' field
+      formData.append('name', diagramName);
+
+      try {
+        await axios.post('/api/user/share_diagram', formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log("Zapisano do Google Drive");
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error) && error.response?.data?.error === 'Google Drive authentication required') {
+          if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
+            initiateGoogleDriveAuth();
+          }
+        } else {
+          const errorMessage = axios.isAxiosError(error)
+            ? error.response?.data || error.message
+            : 'An unknown error occurred';
+          console.error("Error uploading diagram:", errorMessage);
+        }
+      }
     };
-  }, [onExportRef]);
+  }, [onExportRef, diagramName]);
 
   useEffect(() => {
     onCopyRef.current = () => {
