@@ -21,10 +21,10 @@ const ConnectionElement = ({
   const [x1, y1, x2, y2]: [number, number, number, number] = element.getConnectionCoordinates(diagramElements);
   const [startX, setStartX] = useState(x1);
   const [startY, setStartY] = useState(y1);
-  const [startAngle, setStartAngle] = useState(0);
+  const [startAngle, setStartAngle] = useState(180);
   const [endX, setEndX] = useState(x2);
   const [endY, setEndY] = useState(y2);
-  const [endAngle, setEndAngle] = useState(180);
+  const [endAngle, setEndAngle] = useState(0);
   const collisionRadius = 30;
 
   const getCenterOfNearestWall = (diagramElement: ExtendedDiagramElementProps, x: number, y: number) => {
