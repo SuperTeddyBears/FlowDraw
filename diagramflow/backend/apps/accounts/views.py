@@ -1,24 +1,23 @@
-import json
-from tokenize import TokenError
-
-from rest_framework import status, generics
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
-from google.oauth2 import id_token
-from google.auth.transport import requests
-import os
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
-from .models import Diagram
-from .serializer import DiagramSerializer
-from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaInMemoryUpload
+import json
+import os
+from tokenize import TokenError
+
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
+from google.auth.transport import requests
+from google.oauth2 import id_token
+from google_auth_oauthlib.flow import InstalledAppFlow
+from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import Diagram
+from .serializer import DiagramSerializer
 
 User = get_user_model()
 
@@ -385,21 +384,44 @@ class GoogleDriveAuthView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'path/to/client_secrets.json',  # Update with the path to your credentials file
-            scopes=['https://www.googleapis.com/auth/drive.file']
-        )
-        flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                           'http://localhost:8000/auth/google-drive-callback')
+        try:
+            # Zamiast pliku client_secrets.json, używamy zmiennych środowiskowych
+            client_config = {
+                "web": {
+                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
+                }
+            }
+            
+            flow = InstalledAppFlow.from_client_config(
+                client_config,
+                scopes=[
+                    'https://www.googleapis.com/auth/drive.file',
+                    'https://www.googleapis.com/auth/drive.metadata.readonly'
+                ]
+            )
+            
+            # Używamy parametru z ustawień lub zmiennej środowiskowej
+            base_url = os.environ.get('BASE_URL', 'http://localhost:8000')
+            flow.redirect_uri = f"{base_url}/auth/google-drive-callback"
 
-        authorization_url, state = flow.authorization_url(
-            access_type='offline',
-            include_granted_scopes='true'
-        )
+            authorization_url, state = flow.authorization_url(
+                access_type='offline',
+                include_granted_scopes='true'
+            )
 
-        # Store state in session to verify later
-        request.session['oauth_state'] = state
-        return Response({'authorization_url': authorization_url}, status=status.HTTP_200_OK)
+            # Store state in session to verify later
+            request.session['oauth_state'] = state
+            return Response({'authorization_url': authorization_url}, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Błąd inicjalizacji autoryzacji Google Drive: {str(e)}")
+            return Response({
+                'error': 'Nie udało się zainicjalizować autoryzacji Google Drive. Spróbuj ponownie.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GoogleDriveCallbackView(APIView):
@@ -409,25 +431,52 @@ class GoogleDriveCallbackView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        state = request.GET.get('state')
-        if state != request.session.get('oauth_state'):
-            return Response({'error': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            state = request.GET.get('state')
+            if state != request.session.get('oauth_state'):
+                return Response({
+                    'error': 'Nieprawidłowy parametr autoryzacji. Spróbuj ponownie.'
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'path/to/client_secrets.json',  # Update with the path to your credentials file
-            scopes=['https://www.googleapis.com/auth/drive.file']
-        )
-        flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                           'http://localhost:8000/auth/google-drive-callback')
+            # Zamiast pliku client_secrets.json, używamy zmiennych środowiskowych
+            client_config = {
+                "web": {
+                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
+                }
+            }
+            
+            flow = InstalledAppFlow.from_client_config(
+                client_config,
+                scopes=[
+                    'https://www.googleapis.com/auth/drive.file',
+                    'https://www.googleapis.com/auth/drive.metadata.readonly'
+                ]
+            )
+            
+            # Używamy parametru z ustawień lub zmiennej środowiskowej
+            base_url = os.environ.get('BASE_URL', 'http://localhost:8000')
+            flow.redirect_uri = f"{base_url}/auth/google-drive-callback"
 
-        # Fetch the token
-        flow.fetch_token(authorization_response=request.build_absolute_uri())
-        credentials = flow.credentials
+            # Fetch the token
+            flow.fetch_token(authorization_response=request.build_absolute_uri())
+            credentials = flow.credentials
 
-        # Save tokens to the user
-        user = request.user
-        user.google_drive_access_token = credentials.token
-        user.google_drive_refresh_token = credentials.refresh_token
-        user.save()
+            # Save tokens to the user
+            user = request.user
+            user.google_drive_access_token = credentials.token
+            user.google_drive_refresh_token = credentials.refresh_token
+            user.save()
 
-        return Response({'message': 'Google Drive authentication successful'}, status=status.HTTP_200_OK)
+            return Response({
+                'message': 'Autoryzacja Google Drive zakończona pomyślnie'
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Błąd callback autoryzacji Google Drive: {str(e)}")
+            return Response({
+                'error': 'Nie udało się zakończyć autoryzacji Google Drive. Spróbuj ponownie.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
