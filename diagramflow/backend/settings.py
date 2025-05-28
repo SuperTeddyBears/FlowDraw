@@ -58,9 +58,8 @@ TEMPLATES = [
     },
 ]
 
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_URLCONF = 'urls'
 
 # Ustawienia plików statycznych
@@ -95,10 +94,19 @@ DATABASES = {
     )
 }
 
-# CORS config
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
-    "http://localhost:5173",  # VITE PORT
+    "http://localhost:5173",
+    "http://20.251.160.204:5173",
+    "http://flowdraw.northeurope.cloudapp.azure.com:5173"
+]
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "0.0.0.0",
+    "20.251.160.204",
+    "flowdraw.northeurope.cloudapp.azure.com"
 ]
 
 # DEFAULT_AUTO_FIELD
