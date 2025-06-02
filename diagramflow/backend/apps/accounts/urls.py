@@ -9,7 +9,8 @@ from .views import (
     FetchUserDiagramsView,
     SaveUserDiagramView,
     GoogleDriveAuthView,
-    GoogleDriveCallbackView, ShareUserDiagramView
+    GoogleDriveCallbackView, ShareUserDiagramView,
+    CheckGoogleDriveAuthView
 )
 
 # This is the URL configuration for the accounts' app.
@@ -25,4 +26,5 @@ urlpatterns = [
     path('user/share_diagram', ShareUserDiagramView.as_view(), name='share-user-diagram'),  # Nowy endpoint
     path('auth/google-drive', GoogleDriveAuthView.as_view(), name='auth-google-drive'),
     path('auth/google-drive-callback', GoogleDriveCallbackView.as_view(), name='google-drive-callback'),
+    path('auth/check-google-drive', CheckGoogleDriveAuthView.as_view(), name='check-google-drive'),
 ]

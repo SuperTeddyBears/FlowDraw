@@ -19,7 +19,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaInMemoryUpload
-
+import base64
+from datetime import datetime
 User = get_user_model()
 
 
@@ -295,37 +296,29 @@ class FetchUserDiagramsView(generics.ListAPIView):
 
     serializer_class = DiagramSerializer
 
+
 class ShareUserDiagramView(APIView):
-    """
-    Widok do przesyłania pliku PNG diagramu na Google Drive.
-    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        """
-        Prześlij plik PNG na Google Drive i zapisz google_drive_file_id.
-        """
-        diagram_name = request.data.get('name')
-        png_file = request.FILES.get('png')
-
-        # Walidacja wymaganych pól
-        if not diagram_name:
-            return Response({'error': 'Diagram name is required'}, status=status.HTTP_400_BAD_REQUEST)
-        if not png_file:
-            return Response({'error': 'PNG file is required'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Sprawdzamy, czy diagram istnieje
         try:
-            diagram = Diagram.objects.get(user=request.user, name=diagram_name)
-        except Diagram.DoesNotExist:
-            return Response({'error': 'Diagram with this name does not exist'}, status=status.HTTP_404_NOT_FOUND)
+            # Pobierz dane PNG z formData
+            png_data = request.data.get('png', '')
 
-        # Sprawdzamy, czy użytkownik ma uwierzytelnienie Google Drive
-        if not request.user.google_drive_access_token:
-            return Response({'error': 'Google Drive authentication required'}, status=status.HTTP_403_FORBIDDEN)
+            # Konwertuj base64 na dane binarne
+            if png_data.startswith('data:image/png;base64,'):
+                png_data = png_data.split(',')[1]
+            png_binary = base64.b64decode(png_data)
 
-        try:
-            # Tworzenie lub odświeżanie poświadczeń
+            # Generuj nazwę pliku
+            file_name = f'diagram_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+
+            # Sprawdź czy użytkownik ma token Google Drive
+            if not request.user.google_drive_access_token:
+                return Response({'error': 'Wymagana autoryzacja Google Drive'},
+                                status=status.HTTP_403_FORBIDDEN)
+
+            # Przygotuj credentials
             credentials = Credentials(
                 token=request.user.google_drive_access_token,
                 refresh_token=request.user.google_drive_refresh_token,
@@ -334,49 +327,35 @@ class ShareUserDiagramView(APIView):
                 client_secret=os.environ.get('GOOGLE_CLIENT_SECRET')
             )
 
-            # Budowanie serwisu Google Drive
-            drive_service = build('drive', 'v3', credentials=credentials)
+            # Utwórz serwis Drive
+            service = build('drive', 'v3', credentials=credentials)
 
-            # Metadane pliku
-            file_metadata = {
-                'name': f'{diagram.name}.png',
-                'mimeType': 'image/png'
-            }
-
-            # Przygotowanie danych PNG
+            # Przygotuj metadane i plik
+            file_metadata = {'name': file_name}
             media = MediaInMemoryUpload(
-                png_file.read(),
+                png_binary,
                 mimetype='image/png',
                 resumable=True
             )
 
-            # Jeśli diagram ma google_drive_file_id, aktualizujemy plik
-            if diagram.google_drive_file_id:
-                file = drive_service.files().update(
-                    fileId=diagram.google_drive_file_id,
-                    body=file_metadata,
-                    media_body=media,
-                    fields='id'
-                ).execute()
-            else:
-                # W przeciwnym razie tworzymy nowy plik
-                file = drive_service.files().create(
-                    body=file_metadata,
-                    media_body=media,
-                    fields='id'
-                ).execute()
+            # Zapisz plik na Google Drive
+            file = service.files().create(
+                body=file_metadata,
+                media_body=media,
+                fields='id,webViewLink'
+            ).execute()
 
-            # Zapis ID pliku Google Drive
-            diagram.google_drive_file_id = file.get('id')
-            diagram.save()
-
-            # Serializacja diagramu do odpowiedzi
-            serializer = DiagramSerializer(diagram)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({
+                'file_id': file.get('id'),
+                'web_link': file.get('webViewLink')
+            }, status=status.HTTP_200_OK)
 
         except Exception as e:
             print(f"Błąd zapisu na Google Drive: {str(e)}")
-            return Response({'error': f'Failed to upload to Google Drive: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {'error': f'Błąd zapisu na Google Drive: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class GoogleDriveAuthView(APIView):
     """
@@ -403,31 +382,56 @@ class GoogleDriveAuthView(APIView):
 
 
 class GoogleDriveCallbackView(APIView):
-    """
-    Handles the Google Drive OAuth 2.0 callback.
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        state = request.GET.get('state')
-        if state != request.session.get('oauth_state'):
-            return Response({'error': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            state = request.GET.get('state')
+            if state != request.session.get('oauth_state'):
+                return Response(
+                    {'error': 'Nieprawidłowy parametr state'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'path/to/client_secrets.json',  # Update with the path to your credentials file
-            scopes=['https://www.googleapis.com/auth/drive.file']
+            client_config = {
+                "web": {
+                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                }
+            }
+
+            flow = InstalledAppFlow.from_client_config(
+                client_config,
+                scopes=['https://www.googleapis.com/auth/drive.file']
+            )
+
+            flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
+                                               'http://localhost:8080/api/auth/google-drive-callback')
+
+            flow.fetch_token(authorization_response=request.build_absolute_uri())
+            credentials = flow.credentials
+
+            user = request.user
+            user.google_drive_access_token = credentials.token
+            user.google_drive_refresh_token = credentials.refresh_token
+            user.save()
+
+            return Response({'message': 'Autoryzacja Google Drive zakończona sukcesem'})
+
+        except Exception as e:
+            return Response(
+                {'error': f'Błąd podczas callback Google Drive: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class CheckGoogleDriveAuthView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        is_authorized = bool(
+            request.user.google_drive_access_token and
+            request.user.google_drive_refresh_token
         )
-        flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                           'http://localhost:8000/auth/google-drive-callback')
-
-        # Fetch the token
-        flow.fetch_token(authorization_response=request.build_absolute_uri())
-        credentials = flow.credentials
-
-        # Save tokens to the user
-        user = request.user
-        user.google_drive_access_token = credentials.token
-        user.google_drive_refresh_token = credentials.refresh_token
-        user.save()
-
-        return Response({'message': 'Google Drive authentication successful'}, status=status.HTTP_200_OK)
+        return Response({'is_authorized': is_authorized})
