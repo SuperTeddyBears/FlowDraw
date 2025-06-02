@@ -97,16 +97,16 @@ DATABASES = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
-    "http://20.251.160.204:5173",
-    "http://flowdraw.northeurope.cloudapp.azure.com:5173"
+    "http://98.71.49.113:5173",
+    "http://flowdraw1.northeurope.cloudapp.azure.com:5173"
 ]
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "0.0.0.0",
-    "20.251.160.204",
-    "flowdraw.northeurope.cloudapp.azure.com"
+    "98.71.49.113",
+    "flowdraw1.northeurope.cloudapp.azure.com"
 ]
 
 # DEFAULT_AUTO_FIELD

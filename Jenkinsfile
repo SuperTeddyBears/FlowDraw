@@ -21,6 +21,10 @@ pipeline {
                         changeRequest()
                         triggeredBy 'UserIdCause'
                     }
+                    allOf {
+                        branch pattern: '.*tests.*', comparator: 'REGEXP'
+                        triggeredBy 'UserIdCause'
+                    }
                 }
             }
             stages {
