@@ -302,6 +302,11 @@ class ShareUserDiagramView(APIView):
 
     def post(self, request):
         try:
+            if check_google_drive_auth(request.user):
+                return Response(
+                    {'message': 'Użytkownik jest już zautoryzowany'},
+                    status=status.HTTP_200_OK
+                )
             # Pobierz dane PNG z formData
             png_data = request.data.get('png', '')
 
@@ -359,27 +364,59 @@ class ShareUserDiagramView(APIView):
 
 class GoogleDriveAuthView(APIView):
     """
-    Initiates Google Drive OAuth 2.0 authentication flow.
+    Inicjuje proces uwierzytelniania OAuth 2.0 dla Google Drive.
     """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'path/to/client_secrets.json',  # Update with the path to your credentials file
-            scopes=['https://www.googleapis.com/auth/drive.file']
-        )
-        flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                           'http://localhost:8000/auth/google-drive-callback')
+        try:
+            if check_google_drive_auth(request.user):
+                return Response(
+                    {'message': 'Użytkownik jest już zautoryzowany'},
+                    status=status.HTTP_200_OK
+                )
+            client_config = {
+                "web": {
+                    "client_id": os.environ.get('GOOGLE_CLIENT_ID'),
+                    "client_secret": os.environ.get('GOOGLE_CLIENT_SECRET'),
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [
+                        os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
+                                     'http://localhost:8080/api/auth/google-drive-callback')
+                    ]
+                }
+            }
 
-        authorization_url, state = flow.authorization_url(
-            access_type='offline',
-            include_granted_scopes='true'
-        )
+            # Sprawdź czy wymagane zmienne środowiskowe są ustawione
+            if not client_config["web"]["client_id"] or not client_config["web"]["client_secret"]:
+                raise ValueError("Brak wymaganych zmiennych środowiskowych GOOGLE_CLIENT_ID lub GOOGLE_CLIENT_SECRET")
 
-        # Store state in session to verify later
-        request.session['oauth_state'] = state
-        return Response({'authorization_url': authorization_url}, status=status.HTTP_200_OK)
+            flow = InstalledAppFlow.from_client_config(
+                client_config,
+                scopes=['https://www.googleapis.com/auth/drive.file']
+            )
 
+            flow.redirect_uri = client_config["web"]["redirect_uris"][0]
+
+            authorization_url, state = flow.authorization_url(
+                access_type='offline',
+                include_granted_scopes='true'
+            )
+
+            request.session['oauth_state'] = state
+            return Response({'authorization_url': authorization_url})
+
+        except ValueError as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Błąd konfiguracji Google Drive: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 class GoogleDriveCallbackView(APIView):
     permission_classes = [IsAuthenticated]
