@@ -81,26 +81,3 @@
     font-style: italic;
 }
 
-.toolbar-search {
-    display: flex;
-    justify-content: center;
-    padding: 8px 0;
-    width: 100%;
-    border-width: 0;
-}
-
-
-.toolbar-search input {
-    padding: 5px 40px 5px 5px ;
-    border-radius: 25px;
-    font-size: 12px;
-    border-width: 0;
-    outline: none;
-    transition: border-color 0.2s ease;
-}
-
-.toolbar-search input:focus {
-    border-color: #000000;
-    border-style: solid;
-    border-width: 1px;
-}

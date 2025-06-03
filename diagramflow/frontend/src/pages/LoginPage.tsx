@@ -119,7 +119,7 @@ export const LoginPage = () => {
                         </form>
 
                         <div className="login-hint">
-                            <p>Jeśli zarejestrowałeś się przez Google, użyj tej samej metody do logowania.</p>
+                            <p>If you registered using Google, use the same method to log in.</p>
                         </div>
 
 
@@ -150,7 +150,7 @@ export const LoginPage = () => {
             <footer className="footer">
                 <img className="footer-logo" src={logo} alt="FlowDraw Logo"/>
                 <p className="footer-text">
-                    Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.
+                    Copyright © 2025 FlowDraw. All rights reserved.
                 </p>
             </footer>
         </>

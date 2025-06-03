@@ -59,12 +59,12 @@ const UserDropdown: React.FC = () => {
             {isOpen && (
                 <div className="dropdown-menu">
                     <div className="dropdown-header">
-                        <strong>{user?.name || 'Uzytkownik'}</strong>
-                        <p>{user?.email || 'Brak emaila'}</p>
+                        <strong>{user?.name || 'User'}</strong>
+                        <p>{user?.email || 'no email'}</p>
                     </div>
                     <div className="dropdown-divider"></div>
                     <button className="dropdown-item" onClick={handleLogout}>
-                        Wyloguj
+                        Log out
                     </button>
                 </div>
             )}

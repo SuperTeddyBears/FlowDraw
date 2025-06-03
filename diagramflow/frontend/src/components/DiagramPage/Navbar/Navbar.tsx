@@ -139,13 +139,13 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
         {showConfirm && (
             <div className="modal-overlay">
               <div className="modal">
-                <p>Czy na pewno chcesz zapisać diagram?</p>
+                <p>Are you sure you want to save the diagram?</p>
                 <div className="modal-buttons">
                   <button className="btn btn-primary" onClick={confirmSave}>
-                    Tak
+                    Yes
                   </button>
                   <button className="btn btn-secondary" onClick={cancelSave}>
-                    Nie
+                    No
                   </button>
                 </div>
               </div>
@@ -156,7 +156,7 @@ const Navbar = ({diagramElements, connectionElements, diagramName, setDiagramNam
         {showSuccess && (
             <div className="modal-overlay success">
               <div className="modal success-modal">
-                <p>Gratulacje! Zapisano!</p>
+                <p>Congratulations! Saved!</p>
                 <button className="btn btn-primary" onClick={closeSuccess}>
                   OK
                 </button>

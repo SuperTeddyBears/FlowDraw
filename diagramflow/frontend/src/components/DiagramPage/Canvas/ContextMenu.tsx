@@ -10,9 +10,9 @@ interface ContextMenuProps {
 const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, onAction }) => {
     return (
         <ul className="context-menu" style={{ top: y, left: x, position: 'absolute' }}>
-            <li onClick={() => onAction('bringToFront')}>Na wierzch</li>
-            <li onClick={() => onAction('sendToBack')}>Na spód</li>
-            <li onClick={() => onAction('delete')}>Usuń warstwę</li>
+            <li onClick={() => onAction('bringToFront')}>Move on top</li>
+            <li onClick={() => onAction('sendToBack')}>Move on bottom</li>
+            <li onClick={() => onAction('delete')}>Remove layer</li>
         </ul>
     );
 };

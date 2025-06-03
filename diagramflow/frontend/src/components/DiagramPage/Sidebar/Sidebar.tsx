@@ -106,9 +106,6 @@ const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ selectedType }, ref)
   
   return (
     <div className="sidebar_diagram" ref={ref}>
-      <div className="toolbar-search">
-        <input type="text" placeholder="Search..."/>
-      </div>
       <div className="categories">
         {categories.map(category => (
           <div key={category.id} className="category">

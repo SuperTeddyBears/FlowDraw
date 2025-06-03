@@ -6,7 +6,7 @@ export function Footer() {
         <span className="text-black">draw.</span>
       </div>
       <div>
-        Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.
+          Copyright © 2025 FlowDraw. All rights reserved.
       </div>
       <div className="mx-16"/>
     </div>
