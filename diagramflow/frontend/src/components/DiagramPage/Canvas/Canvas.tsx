@@ -203,6 +203,8 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       const selected = diagramElements.find(element => element.id === selectedElementId);
       if (!selected) return;
 
+      saveStateToUndoStack();
+
       const copiedElement: ExtendedDiagramElementProps = {
         ...selected,
         id: `element-${Date.now()}`,
