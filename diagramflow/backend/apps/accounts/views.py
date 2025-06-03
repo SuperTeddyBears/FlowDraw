@@ -362,6 +362,11 @@ class ShareUserDiagramView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+
+def check_google_drive_auth(user):
+    return bool(user.google_drive_access_token and user.google_drive_refresh_token)
+
+
 class GoogleDriveAuthView(APIView):
     """
     Inicjuje proces uwierzytelniania OAuth 2.0 dla Google Drive.
