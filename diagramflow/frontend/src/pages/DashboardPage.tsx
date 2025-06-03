@@ -191,7 +191,7 @@ const DashboardPage: FunctionComponent = () => {
       {/* Footer */}
       <footer className="footer">
         <img className="footer-logo" src={Logo} alt="FlowDraw Logo"/>
-        <p className="footer-text">Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.</p>
+        <p className="footer-text">Copyright © 2025 FlowDraw. All rights reserved.</p>
       </footer>
     </div>
   );

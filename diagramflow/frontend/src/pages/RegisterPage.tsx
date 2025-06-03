@@ -170,7 +170,7 @@ export const RegisterPage = () => {
             <footer className="footer">
                 <img className="footer-logo" src={logo} alt="FlowDraw Logo"/>
                 <p className="footer-text">
-                    Copyright © 2025 FlowDraw. Wszelkie prawa zastrzeżone.
+                    Copyright © 2025 FlowDraw. All rights reserved.
                 </p>
             </footer>
         </>
