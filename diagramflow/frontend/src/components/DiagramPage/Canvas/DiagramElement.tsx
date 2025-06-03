@@ -1,4 +1,3 @@
-// DiagramElement.tsx
 import { Image, Text, Transformer } from 'react-konva';
 import { useState, useEffect, useRef } from 'react';
 import { KonvaEventObject } from 'konva/lib/Node';
@@ -22,20 +21,20 @@ export interface DiagramElementProps {
 }
 
 export const DiagramElement = ({
-                                   id,
-                                   path,
-                                   posX,
-                                   posY,
-                                   width,
-                                   height,
-                                   onTextClick,
-                                   textElements,
-                                   onAddTextElement,
-                                   onPositionChange,
-                                   onContextMenu,
-                                   onSaveState,
-                                   onSelect,
-                               }: DiagramElementProps) => {
+    id,
+    path,
+    posX,
+    posY,
+    width,
+    height,
+    onTextClick,
+    textElements,
+    onAddTextElement,
+    onPositionChange,
+    onContextMenu,
+    onSaveState,
+    onSelect,
+}: DiagramElementProps) => {
     const img = new window.Image();
     img.src = path;
 
@@ -50,6 +49,8 @@ export const DiagramElement = ({
     // Ref typu Konva.Transformer (z modułu 'konva')
     const transformerRef = useRef<Konva.Transformer>(null);
     const [isSelected, setIsSelected] = useState(false);
+    const [isInteracting, setIsInteracting] = useState(false);
+    const [interactionTimeout, setInteractionTimeout] = useState<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         setShape((prev) => ({
@@ -59,7 +60,7 @@ export const DiagramElement = ({
             width: width || img.width || 100,
             height: height || img.height || 100,
         }));
-    }, [posX, posY,width, height]);
+    }, [posX, posY, width, height]);
 
     const updatePosition = (e: KonvaEventObject<DragEvent>) => {
         const newX = e.target.x();
@@ -76,16 +77,16 @@ export const DiagramElement = ({
             }
         }
     };
-    
+
     const updateSize = () => {
         const node = imageRef.current;
         if (node) {
             const scaleX = node.scaleX();
             const scaleY = node.scaleY();
-    
+
             const newWidth = node.width() * scaleX;
             const newHeight = node.height() * scaleY;
-    
+
             const deltaX = (newWidth - shape.width) / 2;
             const deltaY = (newHeight - shape.height) / 2;
 
@@ -105,7 +106,7 @@ export const DiagramElement = ({
             }
         }
     };
-    
+
     useEffect(() => {
         if (transformerRef.current && imageRef.current) {
             transformerRef.current.nodes([imageRef.current]);
@@ -115,24 +116,45 @@ export const DiagramElement = ({
 
     useEffect(() => {
         const handleClickOutside = () => {
-            if (!imageRef.current) return;
-            
-            const pos = imageRef.current!.getStage()?.getPointerPosition();
+            if (!imageRef.current || !isSelected || isInteracting) return;
+
+            const stage = imageRef.current.getStage();
+            if (!stage) return;
+
+            const pos = stage.getPointerPosition();
             if (!pos) return;
-            
-            if (pos.x >= shape.x && pos.x <= shape.x + shape.width && pos.y >= shape.y && pos.y <= shape.y + shape.height) {
-                return;
+
+            const targetNode = stage.getIntersection(pos);
+
+            if (
+                !targetNode ||
+                (targetNode !== imageRef.current &&
+                (!transformerRef.current || !targetNode.getAncestors().includes(transformerRef.current)))
+            ) {
+                setIsSelected(false);
             }
-            
-            setIsSelected(false);
         };
-    
+
+        const handleMouseUp = () => {
+            if (interactionTimeout) {
+                clearTimeout(interactionTimeout);
+            }
+            setInteractionTimeout(setTimeout(() => {
+                setIsInteracting(false);
+            }, 100));
+        };
+
         window.addEventListener('click', handleClickOutside);
-    
+        window.addEventListener('mouseup', handleMouseUp);
+
         return () => {
             window.removeEventListener('click', handleClickOutside);
+            window.removeEventListener('mouseup', handleMouseUp);
+            if (interactionTimeout) {
+                clearTimeout(interactionTimeout);
+            }
         };
-    }, [shape, imageRef, setIsSelected]);
+    }, [isSelected, shape, isInteracting, interactionTimeout]);
 
     const handleDoubleClick = () => {
         const pos = imageRef.current?.getStage()?.getPointerPosition();
@@ -143,12 +165,12 @@ export const DiagramElement = ({
             pos.y >= shape.y &&
             pos.y <= shape.y + shape.height
         ) {
-            onAddTextElement(shape.x + shape.width / 2 - 50, shape.y + shape.height / 2 - 10);
+            onAddTextElement(shape.x + shape.width / 2 - 50, shape.y + height / 2 - 10);
         }
     };
 
     const handleTextClick = (elemId: string, text: string) => {
-        onTextClick(shape.x + shape.width / 2 - 50, shape.y + shape.height / 2 - 10, text, elemId);
+        onTextClick(shape.x + shape.width / 2 - 50, shape.y + height / 2 - 10, text, elemId);
     };
 
     return (
@@ -167,10 +189,21 @@ export const DiagramElement = ({
                 }}
                 onDblClick={handleDoubleClick}
                 onTransform={updateSize}
-                onTransformStart={() => {if (onSaveState) onSaveState();}}
+                onTransformStart={() => {
+                    setIsInteracting(true);
+                    if (onSaveState) onSaveState();
+                }}
+                onTransformEnd={() => {
+                    updateSize();
+                }}
+                onDragStart={() => {
+                    setIsInteracting(true);
+                    if (onSaveState) onSaveState();
+                }}
+                onDragEnd={() => {
+
+                }}
                 onDragMove={updatePosition}
-                onDragStart={() => {if (onSaveState) onSaveState();}}
-                //onDragEnd={() => {setIsSelected(false);}} // wydaje mi sie ze jesli przesuwamy zaznaczony to lepiej zeby sie nie odznaczal
                 onContextMenu={(e) => onContextMenu(e, path)}
             />
 
