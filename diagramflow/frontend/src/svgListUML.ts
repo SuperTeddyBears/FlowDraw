@@ -8,7 +8,6 @@ export const svgFileNamesUML = [
   "assocation-2",
   "association-1",
   "association-3",
-  "boundary-lifeline-1",
   "boundary-lifeline",
   "boundary-object",
   "callback",
