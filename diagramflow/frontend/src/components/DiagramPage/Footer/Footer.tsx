@@ -6,7 +6,7 @@ const Footer: React.FC = () => {
         <div className="footer">
             <div className="footer-logo">flow<span>draw</span>.</div>
             <div className="footer-copyright">
-                Copyright © 2025 FlowDraw. Wszystkie prawa zastrzeżone.
+                Copyright © 2025 FlowDraw. All rights reserved.
             </div>
         </div>
     );
