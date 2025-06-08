@@ -272,10 +272,13 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
     index: string
   ) => {
     e.evt.preventDefault();
-    const sidebarWidth = sidebarRef.current?.offsetWidth || 0;
-    const sidebarTop = sidebarRef.current?.getBoundingClientRect().top || 0;
-    const clickX = e.evt.clientX - sidebarWidth;
-    const clickY = e.evt.clientY - sidebarTop;
+
+    const canvasBounds = canvasRef.current?.getBoundingClientRect();
+    const scrollTop = canvasRef.current?.scrollTop || 0;
+    const scrollLeft = canvasRef.current?.scrollLeft || 0;
+
+    const clickX = e.evt.clientX - (canvasBounds?.left || 0) + scrollLeft;
+    const clickY = e.evt.clientY - (canvasBounds?.top || 0) + scrollTop;
 
     setContextMenu({
       visible: true,
@@ -283,6 +286,34 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       y: clickY,
       targetId: index,
     });
+
+    setTimeout(() => {
+      const menu = document.querySelector('.context-menu') as HTMLElement | null;
+      if (!menu || !canvasRef.current) return;
+
+      const menuRect = menu.getBoundingClientRect();
+      const canvasBounds = canvasRef.current.getBoundingClientRect();
+
+      let adjustedX = clickX;
+      let adjustedY = clickY;
+
+      const wouldOverflowBottom = menuRect.bottom > canvasBounds.bottom;
+      const wouldOverflowRight = menuRect.right > canvasBounds.right;
+
+      if (wouldOverflowBottom && clickY - menuRect.height >= canvasBounds.top) {
+        adjustedY = clickY - menuRect.height;
+      }
+
+      if (wouldOverflowRight && clickX - menuRect.width >= canvasBounds.left) {
+        adjustedX = clickX - menuRect.width;
+      }
+
+      setContextMenu(prev => ({
+        ...prev,
+        x: adjustedX,
+        y: adjustedY,
+      }));
+    }, 0);
   };
   
   const handleCloseContextMenu = () => {
@@ -305,7 +336,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [contextMenu.visible]);
-  
+
   const handleMenuAction = (
     action: 'bringToFront' | 'sendToBack' | 'delete'
   ) => {
