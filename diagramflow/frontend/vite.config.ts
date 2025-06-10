@@ -13,15 +13,15 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://flowdraw1.northeurope.cloudapp.azure.com:8080',
+        target: 'http://flowdraw2.northeurope.cloudapp.azure.com:8080',
         changeOrigin: true,
       },
     },
     allowedHosts: [
-      "flowdraw1.northeurope.cloudapp.azure.com",
+      "flowdraw2.northeurope.cloudapp.azure.com",
       "localhost",
       "127.0.0.1",
-      "98.71.49.113"
+      "40.69.31.144"
     ],
     host: '0.0.0.0',
     port: 5173,
