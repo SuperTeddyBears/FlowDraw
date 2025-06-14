@@ -21,7 +21,7 @@ const ProtectedRoute = ({children}: { children: React.ReactNode }) => {
     }
     // If the user is not authenticated, redirect to the login page
     if (!isAuthenticated) {
-        return <Navigate to="/login"/>;
+        return <Navigate to="/register"/>;
     }
     // Else save on rendering the children
     return <>{children}</>;
@@ -37,8 +37,8 @@ export function AppWithProviders() {
                         <Route path="/login" element={<LoginPage/>}/>
                         <Route path="/register" element={<RegisterPage/>}/>
                         {/*For development purposes only uncommnet these two lines to access pages without a login */}
-                        <Route path="/dashboard" element={<DashboardPage/>}></Route>
-                        <Route path="/diagrampage" element={<DiagramPage/>}></Route>
+                        {/*<Route path="/dashboard" element={<DashboardPage/>}></Route>*/}
+                        {/*<Route path="/diagrampage" element={<DiagramPage/>}></Route>*/}
                         <Route
                             path="/dashboard"
                             element={
