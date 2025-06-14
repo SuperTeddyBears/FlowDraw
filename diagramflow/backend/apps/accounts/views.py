@@ -544,7 +544,7 @@ class GoogleDriveAuthView(APIView):
                     "token_uri": "https://oauth2.googleapis.com/token",
                     "redirect_uris": [
                         os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                       'http://localhost:8080/api/auth/google-drive-callback')
+                                       'http://flowdraw2.northeurope.cloudapp.azure.com:8080/api/auth/google-drive-callback')
                     ]
                 }
             }
@@ -655,13 +655,15 @@ class GoogleDriveCallbackView(APIView):
                 print(f"⚠️  Test Drive API failed: {str(e)}")
 
             print("=== Google Drive Callback SUCCESS ===")
-            return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_connected=true")
+            frontend_url = os.environ.get('FRONTEND_URL', 'http://flowdraw2.northeurope.cloudapp.azure.com:5173')
+            return redirect(f"{frontend_url}/dashboard?drive_connected=true")
 
         except Exception as e:
+            frontend_url = os.environ.get('FRONTEND_URL', 'http://flowdraw2.northeurope.cloudapp.azure.com:5173')
             print(f"❌ Google Drive callback error: {str(e)}")
             import traceback
             print(f"Traceback: {traceback.format_exc()}")
-            return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_error=callback_failed")
+            return redirect(f"{frontend_url}/dashboard?drive_error=callback_failed")
 
 
 class CheckGoogleDriveAuthView(APIView):
