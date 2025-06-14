@@ -13,7 +13,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://flowdraw2.northeurope.cloudapp.azure.com:8080',
+        target: 'https://flowdraw2.northeurope.cloudapp.azure.com:8080',
         changeOrigin: true,
       },
     },
