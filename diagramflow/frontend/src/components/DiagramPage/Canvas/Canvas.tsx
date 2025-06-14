@@ -219,7 +219,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
 
     } catch (error) {
       console.error('❌ Export error:', error); // ← DODAJ
-      if (error.response?.data?.requires_auth) {
+      if (axios.isAxiosError(error) && error.response?.data?.requires_auth) {
         if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
           initiateGoogleDriveAuth();
         }
