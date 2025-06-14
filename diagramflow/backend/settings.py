@@ -25,8 +25,6 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'backend.middleware.DisableHTTPSHeadersMiddleware',  # ✅ Dodaj na górę
-    'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
