@@ -139,11 +139,23 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   };
   
   useEffect(() => {
+  console.log('🔧 Setting up export function...'); // ← DODAJ
+
   onExportRef.current = async () => {
+    console.log('🚀 EXPORT FUNCTION CALLED!'); // ← DODAJ
+    console.log('Current stage ref:', stageRef.current); // ← DODAJ
+
     const token = localStorage.getItem('flow_auth_token');
-    if (!token) return;
+    console.log('Auth token:', token ? 'EXISTS' : 'MISSING'); // ← DODAJ
+
+    if (!token) {
+      console.log('❌ No auth token found');
+      return;
+    }
 
     try {
+      console.log('Checking Google Drive auth...'); // ← DODAJ
+
       // First check if user is authenticated with Google Drive
       const authCheck = await axios.get('/api/auth/check-google-drive', {
         headers: {
@@ -151,7 +163,10 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
         }
       });
 
+      console.log('Auth check response:', authCheck.data); // ← DODAJ
+
       if (!authCheck.data.is_authorized) {
+        console.log('Not authorized, showing prompt...'); // ← DODAJ
         if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
           initiateGoogleDriveAuth();
         }
@@ -159,9 +174,14 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       }
 
       const stage = stageRef.current;
-      if (!stage) return;
+      if (!stage) {
+        console.log('❌ No stage reference'); // ← DODAJ
+        return;
+      }
 
+      console.log('Generating stage data...'); // ← DODAJ
       const box = stage.getClientRect({skipTransform: false});
+      console.log('Stage box:', box); // ← DODAJ
 
       // Get the image data as base64
       const dataURL = stage.toDataURL({
@@ -173,30 +193,32 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
         mimeType: 'image/png'
       });
 
-      console.log('Generated PNG data:', dataURL.substring(0, 50)); // Debug
-      console.log('PNG data length:', dataURL.length); // Debug
+      console.log('Generated PNG data length:', dataURL.length); // ← DODAJ
+      console.log('PNG data preview:', dataURL.substring(0, 50)); // ← DODAJ
 
-      // Wyślij jako JSON, nie FormData
-    const response = await axios.post('/api/user/share_diagram',
+      console.log('Sending to backend...'); // ← DODAJ
+
+      // ✅ SPRAWDŹ CZY TO JEST POPRAWNY ENDPOINT
+      const response = await axios.post('/api/user/share_diagram', // ← POTWIERDŹ ŻE TO JEST UŻYWANE
         {
           name: diagramName,
-          png: dataURL // ✅ Wyślij jako JSON
+          png: dataURL
         },
         {
           headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json' // ✅ JSON nie FormData
+            'Content-Type': 'application/json'
           }
         }
       );
 
-      console.log("Zapisano do Google Drive:", response.data);
+      console.log('✅ Backend response:', response.data); // ← DODAJ
       alert(`Diagram saved to Google Drive: ${response.data.file_name}`);
 
       return response.data;
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('❌ Export error:', error); // ← DODAJ
       if (error.response?.data?.requires_auth) {
         if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
           initiateGoogleDriveAuth();
@@ -207,6 +229,8 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       throw error;
     }
   };
+
+  console.log('✅ Export function set up complete'); // ← DODAJ
 }, [onExportRef, diagramName]);
 
   useEffect(() => {

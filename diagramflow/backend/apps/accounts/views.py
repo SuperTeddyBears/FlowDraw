@@ -663,9 +663,18 @@ class GoogleDriveCallbackView(APIView):
             print(f"Traceback: {traceback.format_exc()}")
             return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_error=callback_failed")
 
-class CheckGoogleDriveAuthView(APIView):
-    permission_classes = [IsAuthenticated]
 
+class CheckGoogleDriveAuthView(APIView):
     def get(self, request):
-        is_authorized = check_google_drive_auth(request.user)
+        # Sprawdź TYLKO sesję (bo tam są tokeny)
+        is_authorized = bool(
+            request.session.get('google_drive_access_token') and
+            request.session.get('google_drive_authorized')
+        )
+
+        print(f"🔍 Google Drive auth check:")
+        print(f"   - Session has access_token: {'YES' if request.session.get('google_drive_access_token') else 'NO'}")
+        print(f"   - Session authorized flag: {'YES' if request.session.get('google_drive_authorized') else 'NO'}")
+        print(f"   - Final result: {is_authorized}")
+
         return Response({'is_authorized': is_authorized})
