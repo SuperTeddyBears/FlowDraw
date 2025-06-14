@@ -139,62 +139,75 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   };
   
   useEffect(() => {
-    onExportRef.current = async () => {
-      const token = localStorage.getItem('flow_auth_token');
-      if (!token) return;
-      
-      try {
-        // First check if user is authenticated with Google Drive
-        const authCheck = await axios.get('/api/auth/check-google-drive', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!authCheck.data.is_authorized) {
-          if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
-            initiateGoogleDriveAuth();
-          }
-          return;
+  onExportRef.current = async () => {
+    const token = localStorage.getItem('flow_auth_token');
+    if (!token) return;
+
+    try {
+      // First check if user is authenticated with Google Drive
+      const authCheck = await axios.get('/api/auth/check-google-drive', {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-        
-        const stage = stageRef.current;
-        if (!stage) return;
-        
-        const box = stage.getClientRect({skipTransform: false});
-        
-        // Get the image data as base64
-        const dataURL = stage.toDataURL({
-          x: box.x,
-          y: box.y,
-          width: box.width,
-          height: box.height,
-          pixelRatio: 2,
-          mimeType: 'image/png'
-        });
-        
-        const formData = new FormData();
-        formData.append('name', diagramName);
-        formData.append('png', dataURL);
-        
-        const response = await axios.post('/api/user/share_diagram',
-          formData,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-        );
-        console.log("Zapisano do Google Drive");
-        return response.data;
-        
-      } catch (error) {
-        console.error('Error:', error);
-        throw error;
+      });
+
+      if (!authCheck.data.is_authorized) {
+        if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
+          initiateGoogleDriveAuth();
+        }
+        return;
       }
-    };
-  }, [onExportRef, diagramName]);
+
+      const stage = stageRef.current;
+      if (!stage) return;
+
+      const box = stage.getClientRect({skipTransform: false});
+
+      // Get the image data as base64
+      const dataURL = stage.toDataURL({
+        x: box.x,
+        y: box.y,
+        width: box.width,
+        height: box.height,
+        pixelRatio: 2,
+        mimeType: 'image/png'
+      });
+
+      console.log('Generated PNG data:', dataURL.substring(0, 50)); // Debug
+      console.log('PNG data length:', dataURL.length); // Debug
+
+      // Wyślij jako JSON, nie FormData
+    const response = await axios.post('/api/user/share_diagram',
+        {
+          name: diagramName,
+          png: dataURL // ✅ Wyślij jako JSON
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json' // ✅ JSON nie FormData
+          }
+        }
+      );
+
+      console.log("Zapisano do Google Drive:", response.data);
+      alert(`Diagram saved to Google Drive: ${response.data.file_name}`);
+
+      return response.data;
+
+    } catch (error) {
+      console.error('Error:', error);
+      if (error.response?.data?.requires_auth) {
+        if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
+          initiateGoogleDriveAuth();
+        }
+      } else {
+        alert('Failed to save diagram to Google Drive');
+      }
+      throw error;
+    }
+  };
+}, [onExportRef, diagramName]);
 
   useEffect(() => {
     onCopyRef.current = () => {
