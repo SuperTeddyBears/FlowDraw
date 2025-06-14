@@ -655,11 +655,11 @@ class GoogleDriveCallbackView(APIView):
                 print(f"⚠️  Test Drive API failed: {str(e)}")
 
             print("=== Google Drive Callback SUCCESS ===")
-            frontend_url = os.environ.get('FRONTEND_URL', 'https://flowdraw2.northeurope.cloudapp.azure.com:5173')
+            frontend_url = os.environ.get('FRONTEND_URL', 'http://flowdraw2.northeurope.cloudapp.azure.com:5173')
             return redirect(f"{frontend_url}/dashboard?drive_connected=true")
 
         except Exception as e:
-            frontend_url = os.environ.get('FRONTEND_URL', 'https://flowdraw2.northeurope.cloudapp.azure.com:5173')
+            frontend_url = os.environ.get('FRONTEND_URL', 'http://flowdraw2.northeurope.cloudapp.azure.com:5173')
             print(f"❌ Google Drive callback error: {str(e)}")
             import traceback
             print(f"Traceback: {traceback.format_exc()}")
