@@ -306,70 +306,211 @@ class ShareUserDiagramView(APIView):
 
     def post(self, request):
         try:
-            # Sprawdź autoryzację Google Drive
-            if not check_google_drive_auth(request.user):
+            print("=== ShareUserDiagramView START ===")
+            print(f"User: {request.user.email}")
+            print(f"Request data keys: {list(request.data.keys())}")
+
+            # Sprawdź autoryzację - najpierw sesja, potem użytkownik
+            access_token = request.session.get('google_drive_access_token')
+            refresh_token = request.session.get('google_drive_refresh_token')
+
+            print(f"Session access_token: {'YES' if access_token else 'NO'}")
+            print(f"Session refresh_token: {'YES' if refresh_token else 'NO'}")
+
+            if not access_token:
+                print("Sprawdzam tokeny użytkownika...")
+                if not check_google_drive_auth(request.user):
+                    print("❌ Brak autoryzacji Google Drive")
+                    return Response(
+                        {'error': 'Wymagana autoryzacja Google Drive', 'requires_auth': True},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+                access_token = request.user.google_drive_access_token
+                refresh_token = request.user.google_drive_refresh_token
+                print("✅ Używam tokenów użytkownika")
+            else:
+                print("✅ Używam tokenów z sesji")
+
+            # Pobierz dane PNG z request
+            png_data = request.data.get('png', '')
+            diagram_name = request.data.get('name', 'diagram')
+
+            print(f"Diagram name: '{diagram_name}'")
+            print(f"PNG data length: {len(png_data)} znaków")
+            print(f"PNG data starts with: {png_data[:50] if png_data else 'EMPTY'}")
+
+            if not png_data:
+                print("❌ Brak danych PNG")
                 return Response(
-                    {'error': 'Wymagana autoryzacja Google Drive', 'requires_auth': True},
-                    status=status.HTTP_403_FORBIDDEN
+                    {'error': 'Brak danych PNG diagramu'},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Pobierz dane PNG z formData
-            png_data = request.data.get('png', '')
-
             # Konwertuj base64 na dane binarne
-            if png_data.startswith('data:image/png;base64,'):
-                png_data = png_data.split(',')[1]
-            png_binary = base64.b64decode(png_data)
+            try:
+                print("Dekodowanie base64...")
+                if png_data.startswith('data:image/png;base64,'):
+                    png_data = png_data.split(',')[1]
+                    print("✅ Usunięto prefix data:image/png;base64,")
 
-            # Generuj nazwę pliku
-            file_name = f'diagram_{datetime.now().strftime("%Y%m%d_%H%M%S")}.png'
+                png_binary = base64.b64decode(png_data)
+                print(f"✅ Zdekodowano PNG: {len(png_binary)} bajtów")
+
+            except Exception as e:
+                print(f"❌ Błąd dekodowania PNG: {str(e)}")
+                return Response(
+                    {'error': f'Błąd dekodowania PNG: {str(e)}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Przygotuj credentials
+            print("Tworzenie credentials...")
             credentials = Credentials(
-                token=request.user.google_drive_access_token,
-                refresh_token=request.user.google_drive_refresh_token,
+                token=access_token,
+                refresh_token=refresh_token,
                 token_uri='https://oauth2.googleapis.com/token',
                 client_id=os.environ.get('GOOGLE_CLIENT_ID'),
                 client_secret=os.environ.get('GOOGLE_CLIENT_SECRET')
             )
 
-            # Odśwież token jeśli wygasł
+            # Sprawdź czy token wygasł
+            print(f"Token expired: {credentials.expired}")
             if credentials.expired:
-                credentials.refresh(requests.Request())
-                # Zapisz nowy token
-                request.user.google_drive_access_token = credentials.token
-                request.user.save()
+                print("🔄 Token wygasł, odświeżam...")
+                try:
+                    credentials.refresh(requests.Request())
+                    print("✅ Token odświeżony")
+                    # Zapisz nowy token
+                    request.session['google_drive_access_token'] = credentials.token
+                    if hasattr(request.user, 'google_drive_access_token'):
+                        request.user.google_drive_access_token = credentials.token
+                        request.user.save()
+                        print("✅ Nowy token zapisany")
+                except Exception as e:
+                    print(f"❌ Błąd odświeżania tokenu: {str(e)}")
+                    return Response(
+                        {'error': f'Błąd odświeżania tokenu: {str(e)}'},
+                        status=status.HTTP_401_UNAUTHORIZED
+                    )
 
             # Utwórz serwis Drive
-            service = build('drive', 'v3', credentials=credentials)
+            print("Tworzenie serwisu Google Drive...")
+            try:
+                service = build('drive', 'v3', credentials=credentials)
+                print("✅ Serwis Google Drive utworzony")
+            except Exception as e:
+                print(f"❌ Błąd tworzenia serwisu: {str(e)}")
+                return Response(
+                    {'error': f'Błąd połączenia z Google Drive: {str(e)}'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
-            # Przygotuj metadane i plik
-            file_metadata = {'name': file_name}
+            # Znajdź lub utwórz folder FlowDraw
+            folder_name = 'FlowDraw Diagrams'
+            print(f"Szukam folderu: {folder_name}")
+
+            try:
+                # Sprawdź czy folder istnieje
+                folder_query = f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+                folder_results = service.files().list(q=folder_query, fields='files(id, name)').execute()
+                folders = folder_results.get('files', [])
+
+                if folders:
+                    folder_id = folders[0]['id']
+                    print(f"✅ Znaleziono folder: {folder_name} (ID: {folder_id})")
+                else:
+                    print(f"📁 Tworzę nowy folder: {folder_name}")
+                    folder_metadata = {
+                        'name': folder_name,
+                        'mimeType': 'application/vnd.google-apps.folder'
+                    }
+                    folder = service.files().create(body=folder_metadata, fields='id').execute()
+                    folder_id = folder.get('id')
+                    print(f"✅ Utworzono folder: {folder_name} (ID: {folder_id})")
+
+            except Exception as e:
+                print(f"⚠️  Błąd z folderem, zapisuję w root: {str(e)}")
+                folder_id = None
+
+            # Generuj nazwę pliku
+            safe_name = "".join(c for c in diagram_name if c.isalnum() or c in (' ', '-', '_')).rstrip()
+            if not safe_name:
+                safe_name = 'diagram'
+
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            file_name = f'{safe_name}_{timestamp}.png'
+            print(f"Nazwa pliku: {file_name}")
+
+            # Przygotuj metadane pliku
+            file_metadata = {
+                'name': file_name,
+                'description': f'FlowDraw diagram: {diagram_name} - Created by {request.user.name or request.user.email}',
+            }
+
+            # Dodaj folder jako parent jeśli istnieje
+            if folder_id:
+                file_metadata['parents'] = [folder_id]
+                print(f"📁 Plik zostanie zapisany w folderze: {folder_id}")
+            else:
+                print("📁 Plik zostanie zapisany w root")
+
+            # Przygotuj plik do uploadu
+            print("Przygotowuję upload...")
             media = MediaInMemoryUpload(
                 png_binary,
                 mimetype='image/png',
                 resumable=True
             )
+            print(f"✅ Media prepared: {len(png_binary)} bytes")
 
             # Zapisz plik na Google Drive
-            file = service.files().create(
-                body=file_metadata,
-                media_body=media,
-                fields='id,webViewLink'
-            ).execute()
+            print("🚀 Rozpoczynam upload do Google Drive...")
+            try:
+                file = service.files().create(
+                    body=file_metadata,
+                    media_body=media,
+                    fields='id,webViewLink,name,size,parents'
+                ).execute()
 
-            return Response({
-                'file_id': file.get('id'),
-                'web_link': file.get('webViewLink')
-            }, status=status.HTTP_200_OK)
+                print(f"🎉 SUKCES! Plik zapisany na Google Drive:")
+                print(f"   - Nazwa: {file.get('name')}")
+                print(f"   - ID: {file.get('id')}")
+                print(f"   - Rozmiar: {file.get('size')} bajtów")
+                print(f"   - Link: {file.get('webViewLink')}")
+                print(f"   - Folder: {file.get('parents')}")
+
+                return Response({
+                    'success': True,
+                    'message': 'Diagram zapisany na Google Drive',
+                    'file_id': file.get('id'),
+                    'file_name': file.get('name'),
+                    'web_link': file.get('webViewLink'),
+                    'file_size': file.get('size'),
+                    'folder_id': folder_id,
+                    'folder_name': folder_name if folder_id else 'Root'
+                }, status=status.HTTP_200_OK)
+
+            except Exception as e:
+                print(f"❌ Błąd uploadu: {str(e)}")
+                print(f"   Error type: {type(e).__name__}")
+                if hasattr(e, 'content'):
+                    print(f"   Error content: {e.content}")
+                return Response(
+                    {'error': f'Błąd uploadu do Google Drive: {str(e)}'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
         except Exception as e:
-            print(f"Błąd zapisu na Google Drive: {str(e)}")
+            print(f"💥 OGÓLNY BŁĄD w ShareUserDiagramView: {str(e)}")
+            print(f"   Error type: {type(e).__name__}")
+            import traceback
+            print(f"   Traceback: {traceback.format_exc()}")
             return Response(
-                {'error': f'Błąd zapisu na Google Drive: {str(e)}'},
+                {'error': f'Błąd serwera: {str(e)}'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
+        finally:
+            print("=== ShareUserDiagramView END ===\n")
 
 def check_google_drive_auth(user):
     """Helper function to check if user has Google Drive authentication"""
@@ -414,6 +555,7 @@ class GoogleDriveAuthView(APIView):
 
             flow = Flow.from_client_config(
                 client_config,
+                # ✅ TYLKO Google Drive scope - bez profile/email
                 scopes=['https://www.googleapis.com/auth/drive.file']
             )
 
@@ -421,12 +563,15 @@ class GoogleDriveAuthView(APIView):
 
             authorization_url, state = flow.authorization_url(
                 access_type='offline',
-                include_granted_scopes='true',
+                include_granted_scopes='false',  # ✅ Wyłącz automatyczne dodawanie scope
                 prompt='consent'
             )
 
             # Zapisz state w sesji dla weryfikacji
             request.session['oauth_state'] = state
+
+            print(f"Generated auth URL: {authorization_url}")
+            print(f"State: {state}")
 
             return Response({'authorization_url': authorization_url})
 
@@ -445,15 +590,23 @@ class GoogleDriveAuthView(APIView):
 class GoogleDriveCallbackView(APIView):
     def get(self, request):
         try:
+            print("=== Google Drive Callback START ===")
             code = request.GET.get('code')
             state = request.GET.get('state')
+            received_scope = request.GET.get('scope', '')
+
+            print(f"Received code: {code[:20] if code else 'None'}...")
+            print(f"Received state: {state}")
+            print(f"Received scope: {received_scope}")
 
             if not code:
+                print("❌ Brak kodu autoryzacji")
                 return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_error=no_code")
 
-            # Weryfikacja state (jeśli używana)
+            # Weryfikacja state
             if 'oauth_state' in request.session:
                 if state != request.session.get('oauth_state'):
+                    print("❌ Nieprawidłowy state")
                     return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_error=invalid_state")
 
             client_config = {
@@ -466,27 +619,49 @@ class GoogleDriveCallbackView(APIView):
                 }
             }
 
+            print("Tworzę flow...")
             flow = Flow.from_client_config(
                 client_config,
+                # ✅ Tylko Drive scope
                 scopes=['https://www.googleapis.com/auth/drive.file']
             )
             flow.redirect_uri = os.environ.get('GOOGLE_DRIVE_REDIRECT_URI')
 
+            print("Wymieniam kod na token...")
             # Exchange code for token
             flow.fetch_token(code=code)
             credentials = flow.credentials
 
-            # Tu możesz przypisać tokeny do użytkownika jeśli jest zalogowany
-            # Dla uproszczenia, zapisujemy w sesji
+            print(f"✅ Otrzymano credentials:")
+            print(f"   - Access token: {credentials.token[:20]}...")
+            print(f"   - Refresh token: {'YES' if credentials.refresh_token else 'NO'}")
+            print(f"   - Expires: {credentials.expiry}")
+
+            # Zapisz tokeny w sesji
             request.session['google_drive_access_token'] = credentials.token
             request.session['google_drive_refresh_token'] = credentials.refresh_token
+            request.session['google_drive_authorized'] = True
+            request.session['google_drive_expires'] = credentials.expiry.isoformat() if credentials.expiry else None
 
+            print("✅ Tokeny zapisane w sesji")
+
+            # Testuj od razu połączenie z Drive API
+            try:
+                from googleapiclient.discovery import build
+                service = build('drive', 'v3', credentials=credentials)
+                about = service.about().get(fields='user').execute()
+                print(f"✅ Test Drive API - użytkownik: {about.get('user', {}).get('emailAddress')}")
+            except Exception as e:
+                print(f"⚠️  Test Drive API failed: {str(e)}")
+
+            print("=== Google Drive Callback SUCCESS ===")
             return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_connected=true")
 
         except Exception as e:
-            print(f"Google Drive callback error: {str(e)}")
+            print(f"❌ Google Drive callback error: {str(e)}")
+            import traceback
+            print(f"Traceback: {traceback.format_exc()}")
             return redirect(f"{os.environ.get('FRONTEND_URL')}/dashboard?drive_error=callback_failed")
-
 
 class CheckGoogleDriveAuthView(APIView):
     permission_classes = [IsAuthenticated]
