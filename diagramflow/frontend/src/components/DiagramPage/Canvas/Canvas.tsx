@@ -133,7 +133,10 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   const saveStateToUndoStack = () => {
     setUndoStack((prev) => [
       ...prev,
-      { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
+      {
+        diagramElements: [...diagramElements], 
+        connectionElements: connectionElements.map(conn => conn.clone()),
+      },
     ]);
     setRedoStack([]);
   };
@@ -219,7 +222,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
 
     } catch (error) {
       console.error('❌ Export error:', error); // ← DODAJ
-      if (error.response?.data?.requires_auth) {
+      if (axios.isAxiosError(error) && error.response?.data?.requires_auth) {
         if (confirm('You need to authenticate with Google Drive first. Would you like to do that now?')) {
           initiateGoogleDriveAuth();
         }
@@ -261,22 +264,37 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   }, [selectedElementId, diagramElements, onCopyRef]);
 
   const handleUndo = useCallback(() => {
-    if (undoStack.length > 0) {
-      const newUndoStack = [...undoStack];
-      const lastState = newUndoStack.pop();
+  if (undoStack.length > 0) {
+    const newUndoStack = [...undoStack];
+    const lastState = newUndoStack.pop();
 
-      setUndoStack(newUndoStack);
-      setRedoStack((prev) => [
-        ...prev,
-        { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
-      ]);
+    setUndoStack(newUndoStack);
+    setRedoStack((prev) => [
+      ...prev,
+      {
+        diagramElements: [...diagramElements],
+        connectionElements: connectionElements.map((conn) => conn.clone()),
+      },
+    ]);
 
-      if (lastState) {
-        setDiagramElements(lastState.diagramElements);
-        setConnectionElements(lastState.connectionElements);
-      }
+    if (lastState) {
+      console.log('Restoring state:', {
+        diagramElements: lastState.diagramElements,
+        connectionElements: lastState.connectionElements.map((conn) => ({
+          id: conn.id,
+          startSnapped: conn.getStartSnappedElementId(),
+          startWall: conn.getStartSnappedWall(),
+          endSnapped: conn.getEndSnappedElementId(),
+          endWall: conn.getEndSnappedWall(),
+          start: conn.start,
+          end: conn.end,
+        })),
+      });
+      setDiagramElements(lastState.diagramElements);
+      setConnectionElements(lastState.connectionElements);
     }
-  }, [undoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
+  }
+}, [undoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
   
   useEffect(() => {
     onUndoRef.current = handleUndo;
@@ -309,10 +327,13 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
     index: string
   ) => {
     e.evt.preventDefault();
-    const sidebarWidth = sidebarRef.current?.offsetWidth || 0;
-    const sidebarTop = sidebarRef.current?.getBoundingClientRect().top || 0;
-    const clickX = e.evt.clientX - sidebarWidth;
-    const clickY = e.evt.clientY - sidebarTop;
+
+    const canvasBounds = canvasRef.current?.getBoundingClientRect();
+    const scrollTop = canvasRef.current?.scrollTop || 0;
+    const scrollLeft = canvasRef.current?.scrollLeft || 0;
+
+    const clickX = e.evt.clientX - (canvasBounds?.left || 0) + scrollLeft;
+    const clickY = e.evt.clientY - (canvasBounds?.top || 0) + scrollTop;
 
     setContextMenu({
       visible: true,
@@ -320,6 +341,34 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       y: clickY,
       targetId: index,
     });
+
+    setTimeout(() => {
+      const menu = document.querySelector('.context-menu') as HTMLElement | null;
+      if (!menu || !canvasRef.current) return;
+
+      const menuRect = menu.getBoundingClientRect();
+      const canvasBounds = canvasRef.current.getBoundingClientRect();
+
+      let adjustedX = clickX;
+      let adjustedY = clickY;
+
+      const wouldOverflowBottom = menuRect.bottom > canvasBounds.bottom;
+      const wouldOverflowRight = menuRect.right > canvasBounds.right;
+
+      if (wouldOverflowBottom && clickY - menuRect.height >= canvasBounds.top) {
+        adjustedY = clickY - menuRect.height;
+      }
+
+      if (wouldOverflowRight && clickX - menuRect.width >= canvasBounds.left) {
+        adjustedX = clickX - menuRect.width;
+      }
+
+      setContextMenu(prev => ({
+        ...prev,
+        x: adjustedX,
+        y: adjustedY,
+      }));
+    }, 0);
   };
   
   const handleCloseContextMenu = () => {
@@ -342,7 +391,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [contextMenu.visible]);
-  
+
   const handleMenuAction = (
     action: 'bringToFront' | 'sendToBack' | 'delete'
   ) => {
@@ -598,6 +647,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
                   element={element}
                   diagramElements={diagramElements}
                   handleKonvaContextMenu={handleKonvaContextMenu}
+                  onSaveState={saveStateToUndoStack}
                 />
               </Fragment>
             ))}
