@@ -133,7 +133,10 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   const saveStateToUndoStack = () => {
     setUndoStack((prev) => [
       ...prev,
-      { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
+      {
+        diagramElements: [...diagramElements], 
+        connectionElements: connectionElements.map(conn => conn.clone()),
+      },
     ]);
     setRedoStack([]);
   };
@@ -261,22 +264,37 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
   }, [selectedElementId, diagramElements, onCopyRef]);
 
   const handleUndo = useCallback(() => {
-    if (undoStack.length > 0) {
-      const newUndoStack = [...undoStack];
-      const lastState = newUndoStack.pop();
+  if (undoStack.length > 0) {
+    const newUndoStack = [...undoStack];
+    const lastState = newUndoStack.pop();
 
-      setUndoStack(newUndoStack);
-      setRedoStack((prev) => [
-        ...prev,
-        { diagramElements: [...diagramElements], connectionElements: [...connectionElements] },
-      ]);
+    setUndoStack(newUndoStack);
+    setRedoStack((prev) => [
+      ...prev,
+      {
+        diagramElements: [...diagramElements],
+        connectionElements: connectionElements.map((conn) => conn.clone()),
+      },
+    ]);
 
-      if (lastState) {
-        setDiagramElements(lastState.diagramElements);
-        setConnectionElements(lastState.connectionElements);
-      }
+    if (lastState) {
+      console.log('Restoring state:', {
+        diagramElements: lastState.diagramElements,
+        connectionElements: lastState.connectionElements.map((conn) => ({
+          id: conn.id,
+          startSnapped: conn.getStartSnappedElementId(),
+          startWall: conn.getStartSnappedWall(),
+          endSnapped: conn.getEndSnappedElementId(),
+          endWall: conn.getEndSnappedWall(),
+          start: conn.start,
+          end: conn.end,
+        })),
+      });
+      setDiagramElements(lastState.diagramElements);
+      setConnectionElements(lastState.connectionElements);
     }
-  }, [undoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
+  }
+}, [undoStack, diagramElements, connectionElements, setDiagramElements, setConnectionElements]);
   
   useEffect(() => {
     onUndoRef.current = handleUndo;
@@ -598,6 +616,7 @@ const Canvas = ({sidebarRef, diagramName, diagramElements, setDiagramElements, c
                   element={element}
                   diagramElements={diagramElements}
                   handleKonvaContextMenu={handleKonvaContextMenu}
+                  onSaveState={saveStateToUndoStack}
                 />
               </Fragment>
             ))}
