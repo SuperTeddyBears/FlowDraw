@@ -543,8 +543,7 @@ class GoogleDriveAuthView(APIView):
                     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                     "token_uri": "https://oauth2.googleapis.com/token",
                     "redirect_uris": [
-                        os.environ.get('GOOGLE_DRIVE_REDIRECT_URI',
-                                       'http://flowdraw2.northeurope.cloudapp.azure.com:8080/api/auth/google-drive-callback')
+                        os.environ.get('https://flowdraw2.northeurope.cloudapp.azure.com:8080/api/auth/google-drive-callback')
                     ]
                 }
             }
