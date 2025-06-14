@@ -98,7 +98,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",
     "http://40.69.31.144:5173",
-    "https://flowdraw2.northeurope.cloudapp.azure.com:5173"
+    "http://flowdraw2.northeurope.cloudapp.azure.com:5173"
 ]
 
 ALLOWED_HOSTS = [
