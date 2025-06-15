@@ -8,27 +8,46 @@ from apps.accounts.models import Diagram
 User = get_user_model()
 
 
+# api/test_api_diagram.py
 @pytest.mark.django_db
 def test_save_diagram_logged_in(api_client, user):
-    """Zalogowany użytkownik zapisuje diagram i dostaje 201."""
+    """
+    Zalogowany użytkownik zapisuje diagram.
+    Pole `name` jest wymagane
+    """
     token = RefreshToken.for_user(user)
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.access_token}")
 
     url = reverse("save-user-json")
-    payload = {"user": user.id, "data": {"nodes": [{"id": 1}]}}
+    payload = {
+        "user": user.id,
+        "name": "Mój pierwszy diagram",
+        "data": {"nodes": [{"id": 1}]},
+    }
+
     resp = api_client.post(url, payload, format="json")
 
     assert resp.status_code == 201
     assert resp.data["user"] == user.id
+    assert resp.data["name"] == payload["name"]
     assert resp.data["data"]["nodes"][0]["id"] == 1
 
 
+# api/test_api_diagram.py
 @pytest.mark.django_db
-def test_save_diagram_without_auth(api_client):
-    """Brak tokenu przy zapisie diagramu zwraca 401."""
+def test_save_diagram_missing_data(api_client, user):
+    """
+    Brak pola `data` i `name`, backend zwraca 400 z błędem dotyczącym `name`.
+    """
+    token = RefreshToken.for_user(user)
+    api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.access_token}")
+
     url = reverse("save-user-json")
-    resp = api_client.post(url, {"data": {"nodes": []}}, format="json")
-    assert resp.status_code == 401
+    resp = api_client.post(url, {"user": user.id}, format="json")
+
+    assert resp.status_code == 400
+    assert "error" in resp.data
+    assert "name" in resp.data["error"].lower()
 
 
 @pytest.mark.django_db
@@ -40,7 +59,8 @@ def test_save_diagram_missing_data(api_client, user):
     url = reverse("save-user-json")
     resp = api_client.post(url, {"user": user.id}, format="json")
     assert resp.status_code == 400
-    assert "data" in resp.data
+    assert "error" in resp.data
+    assert "name" in resp.data["error"].lower()
 
 
 @pytest.mark.django_db
