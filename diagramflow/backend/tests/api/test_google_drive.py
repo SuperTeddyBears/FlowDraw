@@ -55,7 +55,10 @@ def test_drive_upload_success(mock_cred, mock_build, api_client, drive_user):
 @patch(BUILD_PATH)
 @patch(CRED_PATH)
 def test_drive_upload_failure_keeps_201(mock_cred, mock_build, api_client, drive_user):
-    """Wyjątek podczas uploadu nie powoduje 500 – nadal 201, file_id puste."""
+    """
+    Gdy upload do Google Drive kończy się wyjątkiem,
+    backend nadal zwraca 201, a google_drive_file_id pozostaje puste.
+    """
     mock_service = MagicMock()
     mock_service.files.return_value.create.return_value.execute.side_effect = Exception("Drive fail")
     mock_build.return_value = mock_service
@@ -64,7 +67,13 @@ def test_drive_upload_failure_keeps_201(mock_cred, mock_build, api_client, drive
     api_client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.access_token}")
 
     url = reverse("save-user-json")
-    resp = api_client.post(url, {"data": {"nodes": []}}, format="json")
+    payload = {
+        "name": "Diagram z błędem Drive",
+        "data": {"nodes": []}
+    }
+
+    resp = api_client.post(url, payload, format="json")
     assert resp.status_code == 201
     diagram = Diagram.objects.get(id=resp.data["id"])
     assert diagram.google_drive_file_id is None
+
