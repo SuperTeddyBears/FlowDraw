@@ -76,9 +76,13 @@ def test_refresh_token_flow(api_client, user):
     assert resp.data["access"] != str(refresh.access_token)
 
 
+# api/test_auth.py
 @pytest.mark.django_db
 def test_refresh_invalid_token(api_client):
-    """Zły refresh-token zwraca 400."""
+    """
+    Niepoprawny refresh-token powinien zwrócić 401 Unauthorized.
+    """
     url = reverse("auth-refresh")
     resp = api_client.post(url, {"refresh": "bogus"})
-    assert resp.status_code == 400
+    assert resp.status_code == 401
+
