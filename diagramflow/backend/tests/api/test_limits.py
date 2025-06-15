@@ -32,20 +32,30 @@ THROTTLE_CONF = {
     },
 }
 
+# api/test_limits.py
 @override_settings(REST_FRAMEWORK=THROTTLE_CONF)
 @pytest.mark.django_db
 def test_save_diagram_rate_throttle(user):
-    """Szóste żądanie w minucie zwraca 429 Too Many Requests."""
+    """
+    Szóste żądanie zapisania diagramu w ciągu minuty zwraca 429 Too Many Requests.
+    Poprzednie pięć zakończone sukcesem (201).
+    """
     client = APIClient()
     token = RefreshToken.for_user(user)
     client.credentials(HTTP_AUTHORIZATION=f"Bearer {token.access_token}")
     url = reverse("save-user-json")
-    payload = {"data": {"nodes": []}}
 
-    # pierwsze 5 przechodzi (201)
-    for _ in range(5):
-        assert client.post(url, payload, format="json").status_code == 201
+    payload = {
+        "name": "Diagram testowy throttling",
+        "data": {"nodes": []}
+    }
 
-    # szóste → 429
-    res = client.post(url, payload, format="json")
+    # pierwsze 5 żądań → 201
+    for i in range(5):
+        response = client.post(url, {**payload, "name": f"{payload['name']} {i}"}, format="json")
+        assert response.status_code == 201
+
+    # szóste żądanie → 429
+    res = client.post(url, {**payload, "name": f"{payload['name']} 5"}, format="json")
     assert res.status_code == 429
+
