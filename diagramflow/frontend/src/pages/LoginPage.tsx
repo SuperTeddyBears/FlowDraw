@@ -104,13 +104,13 @@ export const LoginPage = () => {
                                     <input type="checkbox" id="remember"/>
                                     <label htmlFor="remember">Remember me</label>
                                 </div>
-                                <button
-                                    type="button"
-                                    className="forgot-password"
-                                    onClick={() => alert("Funkcja odzyskiwania hasła nie jest jeszcze dostępna.")}
-                                >
-                                    Forgot password?
-                                </button>
+                                {/*<button*/}
+                                {/*    type="button"*/}
+                                {/*    className="forgot-password"*/}
+                                {/*    onClick={() => alert("Funkcja odzyskiwania hasła nie jest jeszcze dostępna.")}*/}
+                                {/*>*/}
+                                {/*    Forgot password?*/}
+                                {/*</button>*/}
                             </div>
 
                             <button type="submit" className="sign-in">

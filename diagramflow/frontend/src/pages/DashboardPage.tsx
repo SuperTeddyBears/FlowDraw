@@ -5,7 +5,6 @@ import LoginBackground from '../assets/loginscreen_backgound.png';
 import NetDiagram from '../assets/network.png';
 import UMLDiagram from '../assets/uml.png';
 import FlowchartDiagram from '../assets/flowchart.png';
-import Icon from '../assets/search_icon.svg';
 import Logo from '../assets/logo.svg';
 import {Link} from 'react-router-dom';
 import {useAuth} from "../contexts/AuthContext.tsx";
@@ -91,10 +90,10 @@ const DashboardPage: FunctionComponent = () => {
                onClick={() => window.location.href = '/'}>
             <div className="buttonText">Home</div>
           </div>
-          <div className="searchBar">
-            <input className="searchInput" type="text" placeholder="Search FlowDraw"/>
-            <img className="icon" alt="Search icon" src={Icon}/>
-          </div>
+          {/*<div className="searchBar">*/}
+          {/*  <input className="searchInput" type="text" placeholder="Search FlowDraw"/>*/}
+          {/*  <img className="icon" alt="Search icon" src={Icon}/>*/}
+          {/*</div>*/}
           <div className="genericAvatar">
             <UserDropdown/>
           </div>
