@@ -1,0 +1,41 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 4px 16px;
+    border-bottom: 1px solid #ddd;
+    height: 40px;
+    border-radius: 20px;
+    background-color: #DDE1EBA6;
+}
+
+.toolbar-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.toolbar-btn {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 3px;
+    color: #000000;
+    background: #13B2EC;
+    transition: background 0.3s;
+}
+
+.toolbar-btn:hover {
+    background-color: #e0e0e4;
+}
+.toolbar-icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}

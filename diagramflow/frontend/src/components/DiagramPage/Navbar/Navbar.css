@@ -1,0 +1,263 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 8px 16px;
+    border-bottom: 1px solid #ddd;
+    height: 60px;
+    border-radius: 20px;
+    background-color: #DDE1EBA6;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 20px;
+    color: #333;
+}
+
+.logo span {
+    color: #00a8e8;
+}
+
+.drawing-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.save-button {
+    margin-left: auto;
+}
+
+.drawing-title h1 {
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 4px;
+}
+
+.drawing-buttons {
+    display: flex;
+    gap: 4px;
+}
+
+.btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #00a8e8;
+    color: white;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #e0e0e4;
+
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.btn-share {
+    background-color: #00a8e8;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.btn-share:hover {
+    background-color: #e0e0e4;
+}
+
+/* Modal overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+    z-index: 1000;
+}
+
+/* Base modal style */
+.modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    animation: slideDown 0.3s ease-out;
+    max-width: 300px;
+}
+
+/* Buttons container */
+.modal-buttons {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Secondary button style */
+.btn-secondary {
+    background-color: #ccc;
+    color: #333;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #bbb;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.drawing-title-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.drawing-title-text {
+    margin: 0;
+    font-size: 20px;
+    font-weight: normal;
+    color: #1E1E1E;
+}
+
+.edit-icon {
+    width: 14px;
+    height: 14px;
+    object-fit: contain;
+    margin-bottom: 6px;
+    transition: filter 0.3s;
+}
+
+.drawing-title-header:hover .drawing-title-text {
+    color: #00a8e8;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 10px;
+    min-width: 400px;
+    position: relative;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.modal-close {
+    position: absolute;
+    top: 3px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+
+.modal-buttons .modal-button-cancel {
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: white;
+    color: #333;
+    border: 1px solid #ABABAB;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, border 0.3s;
+}
+
+.modal-buttons .modal-button-cancel:hover {
+    background: #f5f5f5;
+}
+
+.modal-buttons .modal-button-save {
+    padding: 8px 20px;
+    border-radius: 10px;
+    background: #00A8E8;
+    color: white;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-buttons .modal-button-save:hover {
+    background: #008fc7;
+}

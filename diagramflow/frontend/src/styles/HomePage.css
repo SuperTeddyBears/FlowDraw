@@ -1,0 +1,381 @@
+.HomePage {
+    background-color: #FFFFFF;
+    text-align: center;
+    padding-top: 2rem;
+    min-height: 100vh;
+    width: 100%;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.HomePage h1 {
+    justify-content: center;
+    font-weight: lighter;
+    color: #000;
+    display: flex;
+    align-items: baseline;
+    font-size: 3.5rem;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.HomePage .flow {
+    padding-left: 0.625rem;
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #000;
+}
+
+.HomePage .draw {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #00AEEF;
+}
+
+.HomePage .dot {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #00AEEF;
+}
+
+.HomePage p {
+    font-size: 1.2rem;
+    color: #000;
+    padding-bottom: 1rem;
+}
+
+.HomePage button {
+    padding: 0.625rem 1.25rem;
+    font-size: 1rem;
+    background-color: #13B2EC;
+    color: white;
+    border: none;
+    border-radius: 0.438rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.HomePage button.Login {
+    background-color: #FFFFFF;
+    color: #13B2EC;
+    border: 1px solid #13B2EC;
+}
+
+.HomePage .RegisterLoginButtons {
+    display: flex;
+    justify-content: flex-end;
+    position: absolute;
+    right: 3.75rem;
+    top: 2.188rem;
+    gap: 1.875rem;
+    width: 24rem;
+    z-index: 10;
+}
+
+.HomePage .RegisterLoginButtons button {
+    width: 9.375rem;
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.HomePage .WelcomeText {
+    text-align: center;
+    flex: 1;
+    position: relative;
+    z-index: 2;
+}
+
+.HomePage .WelcomeMessage {
+    margin-top: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.HomePage .WelcomeTextContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    margin-bottom: 0rem;
+    overflow: visible; 
+}
+
+.HomePage .WavingHand {
+    font-size: 5rem;
+    cursor: default;
+    position: absolute;
+    left: 20%;
+    top: 10%;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.HomePage button.AppButton {
+    width: 11.25rem;
+    height: 3.125rem;
+    margin-top: 0rem;
+}
+
+.NewSection {
+    background-color: #FFFFFF;
+    padding-top: 9.375rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.ContentContainer {
+    width: 100%;
+    max-width: 75rem;
+    display: flex;
+    justify-content: space-between;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+}
+
+.NewSection .LeftContent {
+    flex: 1;
+    padding-right: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.NewSection .LeftContent h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1.25rem;
+    justify-content: flex-start;
+}
+
+.NewSection .RightContent {
+    flex: 1;
+    padding-left: 2.5rem;
+}
+
+.NewSection .RightContent p {
+    font-size: 1.5rem;
+    line-height: 1.6;
+    color: #000000;
+    text-align: left;
+}
+
+.NewSection .RightContent .flow,
+.NewSection .RightContent .draw,
+.NewSection .RightContent .dot {
+    font-size: 2rem;
+    display: inline;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
+
+.FeatureList {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-top: 0.938rem;
+    width: 100%;
+}
+
+.FeatureItem {
+    display: flex;
+    align-items: center;
+    gap: 0.938rem;
+    text-align: left;
+}
+
+.FeatureIcon {
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.FeatureText {
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #000;
+}
+
+.DiagramsSection {
+    padding: 7.5rem 1.25rem 6.25rem;
+    text-align: center;
+    width: 100%;
+}
+
+.DiagramsSection h1 {
+    font-size: 2.5rem;
+    color: #000;
+    margin-bottom: 3.75rem;
+}
+
+.DiagramsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+    width: 100%;
+    max-width: 62.5rem;
+    margin: 0 auto;
+}
+
+.DiagramItem {
+    text-align: center;
+}
+
+.DiagramItem h1 {
+    font-size: 2rem;
+    color: #000;
+    margin-bottom: 1.875rem;
+}
+
+.ImageWrapper {
+    overflow: hidden;
+    border-radius: 0.625rem;
+    display: inline-block;
+    animation: float 4s ease-in-out infinite;
+}
+
+.DiagramItem .CenteredDiagramImage {
+    width: 100%;
+    max-width: 37.5rem;
+    display: block;
+    transition: none;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.625rem);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 75rem) {
+    .ContentContainer {
+        flex-direction: column;
+    }
+
+    .NewSection .LeftContent,
+    .NewSection .RightContent {
+        padding: 0;
+        width: 100%;
+    }
+
+    .NewSection .RightContent {
+        margin-top: 3.75rem;
+    }
+}
+
+@media (max-width: 90rem) {
+    .HomePage .WavingHand {
+        left: 5%;
+    }
+}
+
+@media (max-width: 64rem) {
+    .HomePage .WavingHand {
+        left: 2%;
+        font-size: 4.5rem;
+    }
+}
+
+@media (max-width: 48rem) {
+    .HomePage .RegisterLoginButtons {
+        position: relative;
+        justify-content: center;
+        right: auto;
+        width: 100%;
+        padding: 0 1.25rem;
+        margin-bottom: 2rem;
+    }
+
+    .HomePage .WavingHand {
+        position: static;
+        display: inline-block;
+        font-size: 3.5rem;
+        margin-right: 0.5rem;
+        transform: none;
+    }
+
+    .HomePage .WelcomeTextContainer {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .HomePage .WelcomeMessage {
+        margin-top: 2rem;
+    }
+
+    .HomePage h1 {
+        font-size: 2.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .NewSection {
+        padding-top: 5rem;
+    }
+}
+
+@media (max-width: 30rem) {
+    .HomePage h1 {
+        font-size: 2rem;
+    }
+
+    .HomePage .RegisterLoginButtons button {
+        width: 7.5rem;
+    }
+
+    .DiagramsSection h1 {
+        font-size: 1.8rem;
+    }
+
+    .DiagramItem h1 {
+        font-size: 1.5rem;
+    }
+
+    .NewSection .RightContent p {
+        font-size: 1.2rem;
+    }
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #e2e2e2;
+    color: #000;
+    text-align: center;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.footer-logo {
+    height: 18px;
+    position: absolute;
+    left: 20px;
+}
+
+.footer-text {
+    font-size: 12px;
+}
+
